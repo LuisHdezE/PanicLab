@@ -7,6 +7,7 @@ import com.example.data.local.entity.DiagnosticSessionEntity
 import com.example.diagnostic.CandidateRanker
 import com.example.diagnostic.DiagnosticReportBuilder
 import com.example.diagnostic.DiagnosticRulesEngine
+import com.example.diagnostic.ExtractedSensors
 import com.example.diagnostic.SensorExtractor
 import com.example.domain.model.*
 import com.example.domain.repository.DiagnosticRepository
@@ -251,9 +252,179 @@ class DiagnosticRepositoryImpl(
             repairFlow = deserializeRepairFlow(sessionEntity.repairFlowJson),
             knowledgeBaseVersion = sessionEntity.knowledgeBaseVersion,
             rawLog = sessionEntity.rawLog,
-            rawLogSaved = sessionEntity.rawLogSaved
+            rawLogSaved = sessionEntity.rawLogSaved,
+            reanalyzedAt = sessionEntity.reanalyzedAt,
+            previousDiagnosis = sessionEntity.previousDiagnosis,
+            previousKnowledgeBaseVersion = sessionEntity.previousKnowledgeBaseVersion
         )
     }
+
+    override suspend fun reanalyzeSession(sessionId: String): Result<DiagnosticReport> = withContext(Dispatchers.IO) {
+        try {
+            val sessionEntity = sessionDao.getSessionById(sessionId)
+                ?: return@withContext Result.failure(IllegalArgumentException("Sesión no encontrada: $sessionId"))
+
+            val currentKbVersion = kbRepository.getCurrentRulePackVersion()
+            val allRules = kbRepository.getAllRulesDirect()
+            val device = DeviceResolver.resolve(sessionEntity.deviceProductCode, deviceDao)
+
+            val panicFamilies = RulePackJsonParser.parseJsonStringArray(sessionEntity.panicFamiliesJson).mapNotNull {
+                try { PanicFamily.valueOf(it) } catch (e: Exception) { null }
+            }
+
+            val rawLog = sessionEntity.rawLog
+            val (evaluatedPrimary, evaluatedAlts, appliedRules, updatedEvidences) = if (!rawLog.isNullOrBlank()) {
+                val normalizedLog = LogNormalizer.normalize(rawLog)
+                val metadata = MetadataExtractor.extract(normalizedLog)
+                val reclassifiedFamilies = PanicClassifier.classify(normalizedLog, metadata.panicString)
+                val sensors = SensorExtractor.extract(normalizedLog)
+                val newEvidences = EvidenceExtractor.extractEvidences(normalizedLog, metadata, reclassifiedFamilies, sensors)
+                val matchRes = DiagnosticRulesEngine.evaluate(
+                    deviceModel = device,
+                    productCode = sessionEntity.deviceProductCode,
+                    panicFamilies = if (reclassifiedFamilies.isNotEmpty()) reclassifiedFamilies else panicFamilies,
+                    extractedSensors = sensors,
+                    allRules = allRules
+                )
+                val (p, a) = CandidateRanker.toCandidates(matchRes.primaryRule, matchRes.alternativeRules)
+                Quad(p, a, matchRes.appliedRuleIds, newEvidences)
+            } else {
+                // Reconstruct extracted sensors from stored evidences
+                val existingEvidences = evidenceDao.getEvidencesForSession(sessionId)
+                val missingTokens = mutableListOf<String>()
+                val smcCodes = mutableListOf<String>()
+                val rawLines = mutableListOf<String>()
+
+                existingEvidences.forEach { ev ->
+                    if (ev.type == "SMC_CODE" || ev.type == "SENSOR") {
+                        smcCodes.add(ev.rawValue)
+                    } else if (ev.type == "MISSING_SENSOR") {
+                        missingTokens.add(ev.normalizedValue)
+                    }
+                    if (!ev.excerpt.isNullOrBlank()) {
+                        rawLines.add(ev.excerpt)
+                    }
+                }
+                val sensors = ExtractedSensors(
+                    missingSensorTokens = missingTokens,
+                    smcSensorCodes = smcCodes,
+                    rawSensorArrayLines = rawLines
+                )
+
+                val matchRes = DiagnosticRulesEngine.evaluate(
+                    deviceModel = device,
+                    productCode = sessionEntity.deviceProductCode,
+                    panicFamilies = panicFamilies,
+                    extractedSensors = sensors,
+                    allRules = allRules
+                )
+                val (p, a) = CandidateRanker.toCandidates(matchRes.primaryRule, matchRes.alternativeRules)
+                val mappedEvs = existingEvidences.map { ev ->
+                    DiagnosticEvidence(
+                        id = ev.id,
+                        type = ev.type,
+                        title = ev.title,
+                        rawValue = ev.rawValue,
+                        normalizedValue = ev.normalizedValue,
+                        excerpt = ev.excerpt,
+                        lineNumber = ev.lineNumber
+                    )
+                }
+                Quad(p, a, matchRes.appliedRuleIds, mappedEvs)
+            }
+
+            val newPrimaryLabel = evaluatedPrimary?.label ?: "Diagnóstico no catalogado"
+            val newConfidence = evaluatedPrimary?.confidence ?: ConfidenceLevel.UNKNOWN
+            val newStatus = evaluatedPrimary?.verificationStatus ?: VerificationStatus.UNKNOWN
+            val newRepairFlow = evaluatedPrimary?.repairFlow ?: RepairFlow()
+
+            // Update database
+            val updatedSessionEntity = sessionEntity.copy(
+                primaryRuleId = evaluatedPrimary?.ruleId,
+                primaryDiagnosis = newPrimaryLabel,
+                confidence = newConfidence.name,
+                verificationStatus = newStatus.name,
+                knowledgeBaseVersion = currentKbVersion,
+                appliedRuleIdsJson = JSONArray(appliedRules).toString(),
+                repairFlowJson = serializeRepairFlow(newRepairFlow),
+                reanalyzedAt = System.currentTimeMillis(),
+                previousDiagnosis = sessionEntity.primaryDiagnosis,
+                previousKnowledgeBaseVersion = sessionEntity.knowledgeBaseVersion
+            )
+            sessionDao.insertSession(updatedSessionEntity)
+
+            // Replace candidates
+            candidateDao.deleteCandidatesForSession(sessionId)
+            val candidateEntities = mutableListOf<DiagnosisCandidateEntity>()
+            evaluatedPrimary?.let { pc ->
+                candidateEntities.add(
+                    DiagnosisCandidateEntity(
+                        id = "${sessionId}_primary_${System.currentTimeMillis()}",
+                        sessionId = sessionId,
+                        ruleId = pc.ruleId,
+                        label = pc.label,
+                        subsystem = pc.subsystem,
+                        suspectedComponentsJson = serializeSuspectedComponents(pc.suspectedComponents),
+                        interpretation = pc.interpretation,
+                        confidence = pc.confidence.name,
+                        verificationStatus = pc.verificationStatus.name,
+                        isPrimary = true,
+                        repairFlowJson = serializeRepairFlow(pc.repairFlow)
+                    )
+                )
+            }
+            evaluatedAlts.forEachIndexed { idx, ac ->
+                candidateEntities.add(
+                    DiagnosisCandidateEntity(
+                        id = "${sessionId}_alt_${idx}_${System.currentTimeMillis()}",
+                        sessionId = sessionId,
+                        ruleId = ac.ruleId,
+                        label = ac.label,
+                        subsystem = ac.subsystem,
+                        suspectedComponentsJson = serializeSuspectedComponents(ac.suspectedComponents),
+                        interpretation = ac.interpretation,
+                        confidence = ac.confidence.name,
+                        verificationStatus = ac.verificationStatus.name,
+                        isPrimary = false,
+                        repairFlowJson = serializeRepairFlow(ac.repairFlow)
+                    )
+                )
+            }
+            candidateDao.insertAll(candidateEntities)
+
+            // Reconstruct updated report
+            val updatedReport = DiagnosticReport(
+                id = sessionId,
+                createdAt = sessionEntity.createdAt,
+                sourceFilename = sessionEntity.sourceFilename,
+                deviceModel = device,
+                productCode = sessionEntity.deviceProductCode,
+                osVersion = sessionEntity.osVersion,
+                build = sessionEntity.build,
+                panicFamilies = panicFamilies,
+                panicStringSummary = sessionEntity.panicStringSummary,
+                evidences = updatedEvidences,
+                primaryCandidate = evaluatedPrimary,
+                alternativeCandidates = evaluatedAlts,
+                confidence = newConfidence,
+                verificationStatus = newStatus,
+                repairFlow = newRepairFlow,
+                knowledgeBaseVersion = currentKbVersion,
+                rawLog = sessionEntity.rawLog,
+                rawLogSaved = sessionEntity.rawLogSaved,
+                reanalyzedAt = updatedSessionEntity.reanalyzedAt,
+                previousDiagnosis = sessionEntity.primaryDiagnosis,
+                previousKnowledgeBaseVersion = sessionEntity.knowledgeBaseVersion
+            )
+
+            Result.success(updatedReport)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+
+    private data class Quad<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
 
     override suspend fun deleteSession(sessionId: String) = withContext(Dispatchers.IO) {
         sessionDao.deleteSessionById(sessionId)
@@ -296,7 +467,10 @@ class DiagnosticRepositoryImpl(
             repairFlow = deserializeRepairFlow(entity.repairFlowJson),
             knowledgeBaseVersion = entity.knowledgeBaseVersion,
             rawLog = entity.rawLog,
-            rawLogSaved = entity.rawLogSaved
+            rawLogSaved = entity.rawLogSaved,
+            reanalyzedAt = entity.reanalyzedAt,
+            previousDiagnosis = entity.previousDiagnosis,
+            previousKnowledgeBaseVersion = entity.previousKnowledgeBaseVersion
         )
     }
 

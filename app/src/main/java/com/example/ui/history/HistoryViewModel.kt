@@ -56,6 +56,13 @@ class HistoryViewModel(
             diagnosticRepository.clearHistory()
         }
     }
+
+    fun reanalyzeSession(id: String, onResult: (Result<DiagnosticReport>) -> Unit) {
+        viewModelScope.launch {
+            val res = diagnosticRepository.reanalyzeSession(id)
+            onResult(res)
+        }
+    }
 }
 
 class HistoryViewModelFactory(

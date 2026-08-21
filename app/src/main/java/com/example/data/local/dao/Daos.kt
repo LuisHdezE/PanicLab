@@ -87,6 +87,9 @@ interface DiagnosticEvidenceDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(evidences: List<DiagnosticEvidenceEntity>)
+
+    @Query("DELETE FROM diagnostic_evidences WHERE sessionId = :sessionId")
+    suspend fun deleteEvidencesForSession(sessionId: String)
 }
 
 @Dao
@@ -96,6 +99,9 @@ interface DiagnosisCandidateDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(candidates: List<DiagnosisCandidateEntity>)
+
+    @Query("DELETE FROM diagnosis_candidates WHERE sessionId = :sessionId")
+    suspend fun deleteCandidatesForSession(sessionId: String)
 }
 
 @Dao
@@ -106,8 +112,20 @@ interface RulePackDao {
     @Query("SELECT * FROM rule_packs WHERE version = :version LIMIT 1")
     suspend fun getRulePack(version: String): RulePackEntity?
 
+    @Query("SELECT * FROM rule_packs WHERE isActive = 1 LIMIT 1")
+    suspend fun getActiveRulePack(): RulePackEntity?
+
+    @Query("SELECT * FROM rule_packs WHERE isActive = 1 LIMIT 1")
+    fun getActiveRulePackFlow(): Flow<RulePackEntity?>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRulePack(pack: RulePackEntity)
+
+    @Query("UPDATE rule_packs SET isActive = 0")
+    suspend fun deactivateAllPacks()
+
+    @Query("UPDATE rule_packs SET isActive = 1 WHERE version = :version")
+    suspend fun setActivePack(version: String)
 
     @Query("DELETE FROM rule_packs WHERE version = :version")
     suspend fun deleteRulePack(version: String)

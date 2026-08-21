@@ -67,7 +67,10 @@ data class DiagnosticSessionEntity(
     val appliedRuleIdsJson: String = "[]",
     val repairFlowJson: String = "{}",
     val rawLog: String? = null,
-    val rawLogSaved: Boolean = false
+    val rawLogSaved: Boolean = false,
+    val reanalyzedAt: Long? = null,
+    val previousDiagnosis: String? = null,
+    val previousKnowledgeBaseVersion: String? = null
 )
 
 @Entity(
@@ -127,6 +130,15 @@ data class RulePackEntity(
     val schemaVersion: Int,
     val rulesCount: Int,
     val modelsCount: Int,
-    val isDefault: Boolean,
+    val classifiersCount: Int = 0,
+    val sourcesCount: Int = 0,
+    val bitmaskCount: Int = 0,
+    val origin: String = "USER_IMPORTED", // "PANICLAB_OFFICIAL", "USER_IMPORTED", "BUNDLED"
+    val sourceFilename: String? = null,
+    val checksum: String = "",
+    val isActive: Boolean = false,
+    val isDefault: Boolean = false,
+    val previousVersion: String? = null,
+    val rawJson: String? = null,
     val importedAt: Long = System.currentTimeMillis()
 )

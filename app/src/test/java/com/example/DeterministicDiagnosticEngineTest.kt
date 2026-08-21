@@ -25,7 +25,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [36])
 class DeterministicDiagnosticEngineTest {
 
-    private lateinit var parsedPack: com.example.util.ParsedRulePack
+    private lateinit var parsedPack: com.example.util.RulePackParseResult
 
     private val sampleJsonRulePack = """
     {
@@ -236,7 +236,7 @@ class DeterministicDiagnosticEngineTest {
             productCode = metadata.product,
             panicFamilies = families,
             extractedSensors = sensors,
-            allRules = parsedPack.domainRules
+            allRules = parsedPack.parsedPack.diagnosticRules
         )
 
         val (primary, _) = CandidateRanker.toCandidates(matchResult.primaryRule, matchResult.alternativeRules)
@@ -266,7 +266,7 @@ class DeterministicDiagnosticEngineTest {
             productCode = metadata.product,
             panicFamilies = families,
             extractedSensors = sensors,
-            allRules = parsedPack.domainRules
+            allRules = parsedPack.parsedPack.diagnosticRules
         )
 
         val (primary, _) = CandidateRanker.toCandidates(matchResult.primaryRule, matchResult.alternativeRules)
@@ -294,7 +294,7 @@ class DeterministicDiagnosticEngineTest {
             productCode = metadata.product,
             panicFamilies = families,
             extractedSensors = sensors,
-            allRules = parsedPack.domainRules
+            allRules = parsedPack.parsedPack.diagnosticRules
         )
 
         val (primary, _) = CandidateRanker.toCandidates(matchResult.primaryRule, matchResult.alternativeRules)
@@ -321,7 +321,7 @@ class DeterministicDiagnosticEngineTest {
             productCode = metadata.product,
             panicFamilies = families,
             extractedSensors = sensors,
-            allRules = parsedPack.domainRules
+            allRules = parsedPack.parsedPack.diagnosticRules
         )
 
         val (primary, _) = CandidateRanker.toCandidates(matchResult.primaryRule, matchResult.alternativeRules)
@@ -348,7 +348,7 @@ class DeterministicDiagnosticEngineTest {
             productCode = metadata.product,
             panicFamilies = families,
             extractedSensors = sensors,
-            allRules = parsedPack.domainRules
+            allRules = parsedPack.parsedPack.diagnosticRules
         )
 
         val (primary, _) = CandidateRanker.toCandidates(matchResult.primaryRule, matchResult.alternativeRules)

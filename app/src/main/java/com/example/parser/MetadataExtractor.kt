@@ -109,14 +109,20 @@ object MetadataExtractor {
         val jsonPanicPattern = Pattern.compile("\"panicString\"\\s*:\\s*\"(.*?)(?<!\\\\)\"", Pattern.DOTALL)
         val jsonMatcher = jsonPanicPattern.matcher(text)
         if (jsonMatcher.find()) {
-            return jsonMatcher.group(1).replace("\\n", "\n").replace("\\\"", "\"")
+            val group = jsonMatcher.group(1)
+            if (group != null) {
+                return group.replace("\\n", "\n").replace("\\\"", "\"")
+            }
         }
 
         // Match panic(...) or "panicString" or "panic(" header block
         val panicBlockPattern = Pattern.compile("(panic\\(.*?\\):.*?)(?:\\n\\n|Debugger message|Backtrace:|\$)", Pattern.DOTALL or Pattern.CASE_INSENSITIVE)
         val blockMatcher = panicBlockPattern.matcher(text)
         if (blockMatcher.find()) {
-            return blockMatcher.group(1).trim()
+            val group = blockMatcher.group(1)
+            if (group != null) {
+                return group.trim()
+            }
         }
 
         // Match "SMC PANIC" or "Missing sensor(s)" or "userspace watchdog timeout" line

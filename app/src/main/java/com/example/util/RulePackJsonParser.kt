@@ -7,26 +7,54 @@ import com.example.domain.model.*
 import org.json.JSONArray
 import org.json.JSONObject
 
-data class ParsedRulePack(
+data class RulePackParseResult(
+    val parsedPack: ParsedRulePack,
     val rulePackEntity: RulePackEntity,
     val deviceModelEntities: List<DeviceModelEntity>,
-    val diagnosticRuleEntities: List<DiagnosticRuleEntity>,
-    val domainRules: List<DiagnosticRule>,
-    val domainDevices: List<DeviceModel>
+    val diagnosticRuleEntities: List<DiagnosticRuleEntity>
 )
 
 object RulePackJsonParser {
 
-    fun parse(jsonString: String, isDefault: Boolean = false): ParsedRulePack {
+    fun parse(
+        jsonString: String,
+        origin: RulePackOrigin = RulePackOrigin.USER_IMPORTED,
+        sourceFilename: String? = null
+    ): RulePackParseResult {
         val root = JSONObject(jsonString)
         val schemaVersion = root.optInt("schemaVersion", 1)
         val kbVersion = root.optString("knowledgeBaseVersion", "1.0.0")
         val title = root.optString("title", "PanicLab Rule Pack")
         val generatedAt = root.optString("generatedAt", "")
+        val locale = root.optString("locale", "es-UY")
+
+        val sourcesArray = root.optJSONArray("sources") ?: JSONArray()
+        val sources = mutableListOf<RulePackSource>()
+        for (i in 0 until sourcesArray.length()) {
+            val sObj = sourcesArray.getJSONObject(i)
+            val id = sObj.optString("id", "")
+            val sTitle = sObj.optString("title", "")
+            val publisher = sObj.optString("publisher", "")
+            val url = sObj.optString("url", "")
+            val checkedAt = sObj.optString("checkedAt", "")
+            val trustLevel = sObj.optString("trustLevel", "COMMUNITY")
+            val supportsArr = sObj.optJSONArray("supports") ?: JSONArray()
+            val supports = (0 until supportsArr.length()).map { supportsArr.getString(it) }
+
+            sources.add(
+                RulePackSource(
+                    id = id,
+                    title = sTitle,
+                    publisher = publisher,
+                    url = url,
+                    checkedAt = checkedAt,
+                    trustLevel = trustLevel,
+                    supports = supports
+                )
+            )
+        }
 
         val deviceModelsArray = root.optJSONArray("deviceModels") ?: JSONArray()
-        val diagnosticRulesArray = root.optJSONArray("diagnosticRules") ?: JSONArray()
-
         val deviceEntities = mutableListOf<DeviceModelEntity>()
         val domainDevices = mutableListOf<DeviceModel>()
 
@@ -67,6 +95,57 @@ object RulePackJsonParser {
             )
         }
 
+        val classifiersArray = root.optJSONArray("panicClassifiers") ?: JSONArray()
+        val classifiers = mutableListOf<PanicClassifier>()
+        for (i in 0 until classifiersArray.length()) {
+            val cObj = classifiersArray.getJSONObject(i)
+            val id = cObj.optString("id", "")
+            val family = cObj.optString("family", "")
+            val priority = cObj.optInt("priority", 100)
+            val matchObj = cObj.optJSONObject("match") ?: JSONObject()
+            val anyTermsArr = matchObj.optJSONArray("anyTerms") ?: JSONArray()
+            val allTermsArr = matchObj.optJSONArray("allTerms") ?: JSONArray()
+            val regexAnyArr = matchObj.optJSONArray("regexAny") ?: JSONArray()
+            val notRegexArr = matchObj.optJSONArray("notRegex") ?: JSONArray()
+            val notes = if (cObj.isNull("notes")) null else cObj.optString("notes")
+
+            classifiers.add(
+                PanicClassifier(
+                    id = id,
+                    family = family,
+                    priority = priority,
+                    anyTerms = (0 until anyTermsArr.length()).map { anyTermsArr.getString(it) },
+                    allTerms = (0 until allTermsArr.length()).map { allTermsArr.getString(it) },
+                    regexAny = (0 until regexAnyArr.length()).map { regexAnyArr.getString(it) },
+                    notRegex = (0 until notRegexArr.length()).map { notRegexArr.getString(it) },
+                    notes = notes
+                )
+            )
+        }
+
+        val bitmaskArray = root.optJSONArray("bitmaskPolicies") ?: JSONArray()
+        val bitmaskPolicies = mutableListOf<BitmaskPolicy>()
+        for (i in 0 until bitmaskArray.length()) {
+            val bObj = bitmaskArray.getJSONObject(i)
+            val diagProfile = bObj.optString("diagnosticProfile", "")
+            val enabled = bObj.optBoolean("enabled", false)
+            val knownBitsArr = bObj.optJSONArray("knownBits") ?: JSONArray()
+            val knownBits = (0 until knownBitsArr.length()).map { knownBitsArr.getString(it) }
+            val exactRulesAlwaysWin = bObj.optBoolean("exactRulesAlwaysWin", true)
+            val notes = if (bObj.isNull("notes")) null else bObj.optString("notes")
+
+            bitmaskPolicies.add(
+                BitmaskPolicy(
+                    diagnosticProfile = diagProfile,
+                    enabled = enabled,
+                    knownBits = knownBits,
+                    exactRulesAlwaysWin = exactRulesAlwaysWin,
+                    notes = notes
+                )
+            )
+        }
+
+        val diagnosticRulesArray = root.optJSONArray("diagnosticRules") ?: JSONArray()
         val ruleEntities = mutableListOf<DiagnosticRuleEntity>()
         val domainRules = mutableListOf<DiagnosticRule>()
 
@@ -219,6 +298,24 @@ object RulePackJsonParser {
             )
         }
 
+        val checksum = HashUtils.sha256(jsonString)
+
+        val parsedPack = ParsedRulePack(
+            schemaVersion = schemaVersion,
+            knowledgeBaseVersion = kbVersion,
+            title = title,
+            generatedAt = generatedAt,
+            locale = locale,
+            sources = sources,
+            deviceModels = domainDevices,
+            panicClassifiers = classifiers,
+            bitmaskPolicies = bitmaskPolicies,
+            diagnosticRules = domainRules,
+            checksum = checksum,
+            origin = origin,
+            rawJson = jsonString
+        )
+
         val rulePackEntity = RulePackEntity(
             version = kbVersion,
             title = title,
@@ -226,15 +323,22 @@ object RulePackJsonParser {
             schemaVersion = schemaVersion,
             rulesCount = ruleEntities.size,
             modelsCount = deviceEntities.size,
-            isDefault = isDefault
+            classifiersCount = classifiers.size,
+            sourcesCount = sources.size,
+            bitmaskCount = bitmaskPolicies.size,
+            origin = origin.name,
+            sourceFilename = sourceFilename,
+            checksum = checksum,
+            isActive = (origin == RulePackOrigin.BUNDLED),
+            isDefault = (origin == RulePackOrigin.BUNDLED),
+            rawJson = jsonString
         )
 
-        return ParsedRulePack(
+        return RulePackParseResult(
+            parsedPack = parsedPack,
             rulePackEntity = rulePackEntity,
             deviceModelEntities = deviceEntities,
-            diagnosticRuleEntities = ruleEntities,
-            domainRules = domainRules,
-            domainDevices = domainDevices
+            diagnosticRuleEntities = ruleEntities
         )
     }
 

@@ -25,14 +25,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.FileProvider
 import com.example.domain.model.DiagnosticReport
-import com.example.export.PdfReportGenerator
 import com.example.ui.components.ConfidenceBadge
 import com.example.ui.components.HexagonMicroscopeEmblem
-import com.example.ui.components.PanicCodeBadge
-import com.example.ui.components.VerificationBadge
 import com.example.ui.theme.*
+import com.example.util.UnknownCaseRedactor
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -41,6 +38,7 @@ import java.util.Locale
 @Composable
 fun CaseDetailScreen(
     report: DiagnosticReport?,
+    currentKbVersion: String = "1.0.0",
     onNavigateBack: () -> Unit,
     onNavigateToEvidence: () -> Unit,
     onNavigateToLogViewer: () -> Unit,
@@ -65,6 +63,23 @@ fun CaseDetailScreen(
 
     val dateStr = SimpleDateFormat("dd MMM yyyy • HH:mm", Locale.getDefault()).format(Date(report.createdAt))
     val deviceName = report.deviceModel?.marketingName ?: report.productCode
+    val isKbNewer = report.knowledgeBaseVersion != currentKbVersion
+
+    fun exportAnonymizedCase() {
+        try {
+            val jsonReport = UnknownCaseRedactor.generateUnknownCaseJson(report, technicianNotes)
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, jsonReport)
+                putExtra(Intent.EXTRA_TITLE, "Caso PanicLab (${report.productCode})")
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, "Exportar Caso Anonimizado")
+            context.startActivity(shareIntent)
+        } catch (e: Exception) {
+            Toast.makeText(context, "Error al exportar caso: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
 
     Scaffold(
         containerColor = TechDarkBg,
@@ -170,7 +185,50 @@ fun CaseDetailScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp)
         ) {
-            // Summary Header Card
+            // KB Version Discrepancy Banner (if current active rule pack differs)
+            if (isKbNewer) {
+                item {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(18.dp),
+                        color = Color(0xFF0284C7).copy(alpha = 0.15f),
+                        border = BorderStroke(1.dp, ElectricCyanLight.copy(alpha = 0.5f))
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.Update, contentDescription = null, tint = ElectricCyanLight, modifier = Modifier.size(24.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Nuevo Rule Pack Disponible (v$currentKbVersion)",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = "Este registro fue evaluado con v${report.knowledgeBaseVersion}. Puedes reanalizarlo con las reglas activas.",
+                                    fontSize = 11.sp,
+                                    color = Color(0xFFBAE6FD),
+                                    lineHeight = 15.sp
+                                )
+                            }
+                            Button(
+                                onClick = onReanalyze,
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = ElectricBlue),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                                modifier = Modifier.height(36.dp)
+                            ) {
+                                Text("Reanalizar", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Summary Header Card with Reanalysis tracking
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -210,11 +268,51 @@ fun CaseDetailScreen(
                             )
                         }
 
-                        Text(
-                            text = "Base de reglas instalada: v${report.knowledgeBaseVersion} (Determinista)",
-                            fontSize = 11.sp,
-                            color = Color(0xFF94A3B8)
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                text = "Base de reglas: v${report.knowledgeBaseVersion}",
+                                fontSize = 11.sp,
+                                color = Color(0xFF94A3B8)
+                            )
+                            if (report.reanalyzedAt != null) {
+                                Surface(
+                                    shape = RoundedCornerShape(4.dp),
+                                    color = Color(0xFF10B981).copy(alpha = 0.2f)
+                                ) {
+                                    Text(
+                                        text = "REANALIZADO",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF10B981),
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        if (!report.previousDiagnosis.isNullOrBlank() && report.previousDiagnosis != report.primaryCandidate?.label) {
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = TechDarkSurface,
+                                border = BorderStroke(1.dp, TechDarkBorder)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Icon(imageVector = Icons.Default.History, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(14.dp))
+                                    Text(
+                                        text = "Diagnóstico previo: ${report.previousDiagnosis}",
+                                        fontSize = 10.sp,
+                                        color = Color(0xFFFDE68A)
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -348,6 +446,55 @@ fun CaseDetailScreen(
                             Icon(imageVector = Icons.Default.Refresh, contentDescription = null, tint = ElectricBlue, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
                             Text("Reanalizar", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        }
+                    }
+                }
+            }
+
+            // Community Unknown Case Export Card (Phase 3)
+            item {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    color = TechDarkCard,
+                    border = BorderStroke(1.dp, TechDarkBorder)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(18.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.ShareLocation, contentDescription = null, tint = ElectricCyanLight, modifier = Modifier.size(20.dp))
+                            Text(
+                                text = "Exportar Caso Anónimo",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+
+                        Text(
+                            text = "Genera un archivo JSON anonimizado (eliminando números de serie, IMEIs, UUIDs y nombres de usuario) listo para compartir con la comunidad de PanicLab para incorporar nuevas reglas.",
+                            fontSize = 11.sp,
+                            color = Color(0xFF94A3B8),
+                            lineHeight = 16.sp
+                        )
+
+                        OutlinedButton(
+                            onClick = { exportAnonymizedCase() },
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, ElectricCyanLight.copy(alpha = 0.6f)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp)
+                                .testTag("export_anonymized_case_btn")
+                        ) {
+                            Icon(imageVector = Icons.Default.FileDownload, contentDescription = null, tint = ElectricCyanLight, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Exportar JSON Anonimizado", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ElectricCyanLight)
                         }
                     }
                 }

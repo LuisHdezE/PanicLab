@@ -24,10 +24,12 @@ object SensorExtractor {
                 val matcher = Pattern.compile("Missing sensor\\(s\\)\\s*:\\s*([A-Za-z0-9_,\\s]+)", Pattern.CASE_INSENSITIVE).matcher(line)
                 if (matcher.find()) {
                     val sensorsPart = matcher.group(1)
-                    val tokens = sensorsPart.split(",", " ", "\t")
-                        .map { it.trim() }
-                        .filter { it.isNotBlank() && it.length in 2..10 }
-                    missingSensors.addAll(tokens)
+                    if (sensorsPart != null) {
+                        val tokens = sensorsPart.split(",", " ", "\t")
+                            .map { it.trim() }
+                            .filter { it.isNotBlank() && it.length in 2..10 }
+                        missingSensors.addAll(tokens)
+                    }
                 }
             }
 
@@ -38,9 +40,11 @@ object SensorExtractor {
                 val tokenMatcher = Pattern.compile("(0x[0-9a-fA-F]+|\\b[0-9]{2,10}\\b)").matcher(line)
                 while (tokenMatcher.find()) {
                     val rawToken = tokenMatcher.group(1)
-                    val longVal = HexUtils.parseCodeToLong(rawToken)
-                    if (longVal != null && longVal > 0L) {
-                        smcCodes.add(rawToken)
+                    if (rawToken != null) {
+                        val longVal = HexUtils.parseCodeToLong(rawToken)
+                        if (longVal != null && longVal > 0L) {
+                            smcCodes.add(rawToken)
+                        }
                     }
                 }
             }
@@ -51,9 +55,11 @@ object SensorExtractor {
             val codeMatcher = Pattern.compile("\\b(0x[0-9a-fA-F]{2,8})\\b").matcher(logText)
             while (codeMatcher.find()) {
                 val token = codeMatcher.group(1)
-                val longVal = HexUtils.parseCodeToLong(token)
-                if (longVal != null && longVal > 0L) {
-                    smcCodes.add(token)
+                if (token != null) {
+                    val longVal = HexUtils.parseCodeToLong(token)
+                    if (longVal != null && longVal > 0L) {
+                        smcCodes.add(token)
+                    }
                 }
             }
         }

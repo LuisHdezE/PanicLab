@@ -1,0 +1,254 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://paniclab.local/schema/rulepack-v1.schema.json",
+  "title": "PanicLab Rule Pack v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "knowledgeBaseVersion",
+    "enginePolicy",
+    "sources",
+    "deviceModels",
+    "panicClassifiers",
+    "bitmaskPolicies",
+    "diagnosticRules"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "knowledgeBaseVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "generatedAt": {
+      "type": "string"
+    },
+    "locale": {
+      "type": "string"
+    },
+    "enginePolicy": {
+      "type": "object"
+    },
+    "confidenceDefinitions": {
+      "type": "object"
+    },
+    "verificationDefinitions": {
+      "type": "object"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "publisher",
+          "url",
+          "checkedAt",
+          "trustLevel"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string"
+          },
+          "publisher": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "checkedAt": {
+            "type": "string"
+          },
+          "trustLevel": {
+            "type": "string"
+          },
+          "supports": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "deviceModels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "productCode",
+          "marketingName",
+          "family",
+          "variant",
+          "diagnosticProfile",
+          "releaseYear"
+        ],
+        "properties": {
+          "productCode": {
+            "type": "string",
+            "pattern": "^iPhone\\d+,\\d+$"
+          },
+          "marketingName": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string"
+          },
+          "variant": {
+            "type": "string"
+          },
+          "diagnosticProfile": {
+            "type": "string"
+          },
+          "releaseYear": {
+            "type": "integer",
+            "minimum": 2007
+          },
+          "sourceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "panicClassifiers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "family",
+          "priority",
+          "match"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "integer"
+          },
+          "match": {
+            "type": "object"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "bitmaskPolicies": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "diagnosticRules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "active",
+          "priority",
+          "deviceScope",
+          "match",
+          "diagnosis",
+          "confidence",
+          "verificationStatus",
+          "primaryEligible",
+          "exactCodeOnly",
+          "allowBitmaskDecomposition",
+          "repairFlow",
+          "sourceIds"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "priority": {
+            "type": "integer"
+          },
+          "deviceScope": {
+            "type": "object"
+          },
+          "match": {
+            "type": "object"
+          },
+          "diagnosis": {
+            "type": "object"
+          },
+          "confidence": {
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW",
+              "UNKNOWN"
+            ]
+          },
+          "verificationStatus": {
+            "enum": [
+              "VERIFIED",
+              "WELL_DOCUMENTED",
+              "COMMUNITY_SUPPORTED",
+              "CONFLICTING_SOURCE",
+              "EXPERIMENTAL",
+              "UNKNOWN"
+            ]
+          },
+          "primaryEligible": {
+            "type": "boolean"
+          },
+          "exactCodeOnly": {
+            "type": "boolean"
+          },
+          "allowBitmaskDecomposition": {
+            "type": "boolean"
+          },
+          "repairFlow": {
+            "type": "object"
+          },
+          "sourceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

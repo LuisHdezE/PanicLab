@@ -346,6 +346,76 @@ fun ResultScreen(
                 }
             }
 
+            // KB Version & Anonymized Community Export Card
+            item {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    color = TechDarkCard,
+                    border = BorderStroke(1.dp, TechDarkBorder)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "BASE DE REGLAS: v${report.knowledgeBaseVersion}",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = ElectricCyanLight,
+                                letterSpacing = 1.sp
+                            )
+                            if (report.confidence == com.example.domain.model.ConfidenceLevel.LOW || report.primaryCandidate == null) {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = Color(0xFFEF4444).copy(alpha = 0.2f)
+                                ) {
+                                    Text(
+                                        text = "CASO NOVEDOSO",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFFFCA5A5),
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                try {
+                                    val json = com.example.util.UnknownCaseRedactor.generateUnknownCaseJson(report, "")
+                                    val sendIntent = Intent().apply {
+                                        action = Intent.ACTION_SEND
+                                        putExtra(Intent.EXTRA_TEXT, json)
+                                        putExtra(Intent.EXTRA_TITLE, "Caso PanicLab (${report.productCode})")
+                                        type = "text/plain"
+                                    }
+                                    context.startActivity(Intent.createChooser(sendIntent, "Exportar Caso Anonimizado"))
+                                } catch (e: Exception) {
+                                    Toast.makeText(context, "Error al exportar: ${e.message}", Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, ElectricCyanLight.copy(alpha = 0.5f)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(42.dp)
+                                .testTag("result_export_anonymized_btn")
+                        ) {
+                            Icon(imageVector = Icons.Default.ShareLocation, contentDescription = null, tint = ElectricCyanLight, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Exportar Caso Anonimizado (JSON)", fontSize = 12.sp, color = ElectricCyanLight, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+
             // Log Viewer Quick Action Card
             item {
                 Surface(

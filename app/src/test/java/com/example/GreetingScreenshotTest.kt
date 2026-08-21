@@ -27,12 +27,12 @@ class GreetingScreenshotTest {
         HomeScreen(
           recentReports = emptyList(),
           kbVersion = "1.0.0",
-          onNavigateToImport = {},
-          onNavigateToPaste = {},
+          onNavigateToImportFile = {},
+          onNavigateToPasteLog = {},
           onNavigateToHistory = {},
           onNavigateToKnowledgeBase = {},
           onNavigateToSettings = {},
-          onSelectReport = {}
+          onNavigateToReport = {}
         )
       }
     }

@@ -147,5 +147,117 @@ data class DiagnosticReport(
     val repairFlow: RepairFlow,
     val knowledgeBaseVersion: String,
     val rawLog: String? = null,
-    val rawLogSaved: Boolean = false
+    val rawLogSaved: Boolean = false,
+    val reanalyzedAt: Long? = null,
+    val previousDiagnosis: String? = null,
+    val previousKnowledgeBaseVersion: String? = null
+)
+
+enum class RulePackOrigin {
+    PANICLAB_OFFICIAL,
+    USER_IMPORTED,
+    BUNDLED
+}
+
+data class RulePackSource(
+    val id: String,
+    val title: String,
+    val publisher: String,
+    val url: String,
+    val checkedAt: String,
+    val trustLevel: String,
+    val supports: List<String> = emptyList()
+)
+
+data class PanicClassifier(
+    val id: String,
+    val family: String,
+    val priority: Int = 100,
+    val anyTerms: List<String> = emptyList(),
+    val allTerms: List<String> = emptyList(),
+    val regexAny: List<String> = emptyList(),
+    val notRegex: List<String> = emptyList(),
+    val notes: String? = null
+)
+
+data class BitmaskPolicy(
+    val diagnosticProfile: String,
+    val enabled: Boolean,
+    val knownBits: List<String> = emptyList(),
+    val exactRulesAlwaysWin: Boolean = true,
+    val notes: String? = null
+)
+
+data class ParsedRulePack(
+    val schemaVersion: Int,
+    val knowledgeBaseVersion: String,
+    val title: String,
+    val generatedAt: String,
+    val locale: String,
+    val sources: List<RulePackSource>,
+    val deviceModels: List<DeviceModel>,
+    val panicClassifiers: List<PanicClassifier>,
+    val bitmaskPolicies: List<BitmaskPolicy>,
+    val diagnosticRules: List<DiagnosticRule>,
+    val checksum: String = "",
+    val origin: RulePackOrigin = RulePackOrigin.USER_IMPORTED,
+    val rawJson: String = ""
+)
+
+data class ValidationIssue(
+    val type: IssueType,
+    val path: String,
+    val message: String
+) {
+    enum class IssueType {
+        ERROR,
+        WARNING
+    }
+}
+
+data class RulePackValidationResult(
+    val isValid: Boolean,
+    val schemaVersion: Int,
+    val knowledgeBaseVersion: String,
+    val rulesCount: Int,
+    val modelsCount: Int,
+    val classifiersCount: Int,
+    val sourcesCount: Int,
+    val bitmaskCount: Int,
+    val errors: List<ValidationIssue>,
+    val warnings: List<ValidationIssue>,
+    val checksum: String
+)
+
+data class RuleDiffItem(
+    val ruleId: String,
+    val title: String,
+    val changeType: ChangeType, // ADDED, MODIFIED, REMOVED, DEACTIVATED
+    val previousSummary: String? = null,
+    val newSummary: String? = null,
+    val confidenceChange: String? = null,
+    val statusChange: String? = null,
+    val details: List<String> = emptyList()
+) {
+    enum class ChangeType {
+        ADDED,
+        MODIFIED,
+        REMOVED,
+        DEACTIVATED,
+        UNCHANGED
+    }
+}
+
+data class RulePackDiffSummary(
+    val currentVersion: String,
+    val incomingVersion: String,
+    val addedRulesCount: Int,
+    val modifiedRulesCount: Int,
+    val deactivatedRulesCount: Int,
+    val removedRulesCount: Int,
+    val addedModelsCount: Int,
+    val modifiedModelsCount: Int,
+    val addedSourcesCount: Int,
+    val addedClassifiersCount: Int,
+    val ruleDiffs: List<RuleDiffItem>
 )

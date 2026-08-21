@@ -13,6 +13,13 @@ interface KnowledgeBaseRepository {
     suspend fun initializeDefaultRulePackIfNeeded(): Boolean
     suspend fun importRulePackJson(jsonContent: String): Result<String>
     suspend fun getCurrentRulePackVersion(): String
+    fun getActiveRulePackEntity(): Flow<com.example.data.local.entity.RulePackEntity?>
+    fun getAllRulePackEntities(): Flow<List<com.example.data.local.entity.RulePackEntity>>
+    suspend fun validateRulePack(jsonContent: String, origin: RulePackOrigin, filename: String?): Pair<RulePackValidationResult, ParsedRulePack?>
+    suspend fun computeDiffWithCurrent(incomingPack: ParsedRulePack): RulePackDiffSummary
+    suspend fun installRulePackAtomic(parsedPack: ParsedRulePack, filename: String?): Result<String>
+    suspend fun restoreBundledDefault(): Result<String>
+    suspend fun restoreRulePackVersion(version: String): Result<String>
 }
 
 interface DiagnosticRepository {
@@ -24,6 +31,7 @@ interface DiagnosticRepository {
 
     fun getSessionHistory(): Flow<List<DiagnosticReport>>
     suspend fun getSessionById(sessionId: String): DiagnosticReport?
+    suspend fun reanalyzeSession(sessionId: String): Result<DiagnosticReport>
     suspend fun deleteSession(sessionId: String)
     suspend fun clearHistory()
 }

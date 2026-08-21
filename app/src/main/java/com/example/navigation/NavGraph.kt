@@ -151,6 +151,8 @@ fun PanicLabNavGraph(
         ) { backStackEntry ->
             val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
             var report by remember { mutableStateOf<DiagnosticReport?>(null) }
+            val currentKbVersion by kbViewModel.currentVersion.collectAsState()
+            val coroutineScope = rememberCoroutineScope()
 
             LaunchedEffect(sessionId) {
                 report = diagnosticRepository.getSessionById(sessionId)
@@ -158,6 +160,7 @@ fun PanicLabNavGraph(
 
             CaseDetailScreen(
                 report = report,
+                currentKbVersion = currentKbVersion,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToEvidence = {
                     navController.navigate(Screen.TechnicalEvidence.createRoute(sessionId))
@@ -166,10 +169,10 @@ fun PanicLabNavGraph(
                     navController.navigate(Screen.LogViewer.createRoute(sessionId, -1))
                 },
                 onReanalyze = {
-                    val raw = report?.rawLog
-                    if (!raw.isNullOrBlank()) {
-                        analysisViewModel.analyzeRawLog(raw, report?.sourceFilename)
-                        navController.navigate(Screen.ImportFile.route)
+                    historyViewModel.reanalyzeSession(sessionId) { result ->
+                        if (result.isSuccess) {
+                            report = result.getOrNull()
+                        }
                     }
                 },
                 onExportPdf = {

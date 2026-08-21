@@ -101,18 +101,28 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIncomingIntent(intent: Intent?, analysisViewModel: AnalysisViewModel) {
-        if (intent == null || intent.action != Intent.ACTION_SEND) return
+        try {
+            if (intent == null || intent.action != Intent.ACTION_SEND) return
 
-        if ("text/plain" == intent.type) {
-            val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
-            if (!sharedText.isNullOrBlank()) {
-                analysisViewModel.updateLogInputText(sharedText)
+            if ("text/plain" == intent.type) {
+                val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
+                if (!sharedText.isNullOrBlank()) {
+                    analysisViewModel.updateLogInputText(sharedText)
+                }
             }
-        }
 
-        val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
-        if (uri != null) {
-            analysisViewModel.loadFromUri(applicationContext, uri, "Archivo Compartido")
+            @Suppress("DEPRECATION")
+            val uri: Uri? = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+            } else {
+                intent.getParcelableExtra(Intent.EXTRA_STREAM)
+            }
+
+            if (uri != null) {
+                analysisViewModel.loadFromUri(applicationContext, uri, "Archivo Compartido")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

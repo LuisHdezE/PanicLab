@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "rulePackVersion": "1.0.0",
+  "cases": [
+    {
+      "id": "t01_13mini_front_sensor_real_pattern",
+      "description": "iPhone 13 mini, SMC BSC, 0x1000",
+      "inputSnippet": "\"product\":\"iPhone14,4\"\\n\"panicString\":\"SMC PANIC - ASSERT: SMC BSC failure\\nS.sensor array 0 - 6 is 0x0, 0x1000, 0x0, 0x0, 0x0, 0x0, 0x0\"",
+      "expect": {
+        "device": "iPhone 13 mini",
+        "panicFamiliesContains": [
+          "SMC_BSC_FAILURE"
+        ],
+        "primaryRuleId": "smc13_0x1000_front_sensor",
+        "primaryDiagnosisContains": "sensor frontal",
+        "confidence": "HIGH"
+      }
+    },
+    {
+      "id": "t02_13_charge_0x800",
+      "inputSnippet": "\"product\":\"iPhone14,2\"\\nSMC PANIC - ASSERTION FAILED: SMC BSC failure\\nS.sensor array 0 - 6 is 0x0, 0x800, 0x0, 0x0, 0x0, 0x0, 0x0",
+      "expect": {
+        "primaryRuleId": "smc13_0x800_charge_port",
+        "confidence": "HIGH"
+      }
+    },
+    {
+      "id": "t03_13_multi_0x1800",
+      "inputSnippet": "\"product\":\"iPhone14,5\"\\nSMC BSC failure\\nS.sensor array is 0x0, 0x1800, 0x0",
+      "expect": {
+        "primaryRuleId": "smc13_0x1800_charge_front",
+        "diagnosisComponents": [
+          "Charge Port Assembly",
+          "Front Sensor Assembly"
+        ]
+      }
+    },
+    {
+      "id": "t04_14_base_battery_exact_no_decompose",
+      "inputSnippet": "\"product\":\"iPhone14,7\"\\nSMC BSC failure\\nS.sensor array is 0x0, 0x500000, 0x0",
+      "expect": {
+        "primaryDiagnosisContains": "Batería",
+        "mustNotDecompose": true
+      }
+    },
+    {
+      "id": "t05_14pro_multi_0xc0000",
+      "inputSnippet": "\"product\":\"iPhone15,2\"\\nSMC BSC failure\\nS.sensor array is 0x0, 0xC0000, 0x0",
+      "expect": {
+        "primaryRuleId": "smc14pro_0xc0000_charge_front"
+      }
+    },
+    {
+      "id": "t06_15_charge",
+      "inputSnippet": "\"product\":\"iPhone15,4\"\\nSMC BSC failure\\nS.sensor array is 0x0, 0x80000, 0x0",
+      "expect": {
+        "primaryDiagnosisContains": "Puerto de carga",
+        "confidence": "HIGH"
+      }
+    },
+    {
+      "id": "t07_15pro_charge",
+      "inputSnippet": "\"product\":\"iPhone16,2\"\\nSMC BSC failure\\nS.sensor array is 0x0, 0x300000, 0x0",
+      "expect": {
+        "primaryDiagnosisContains": "Puerto de carga",
+        "confidence": "HIGH"
+      }
+    },
+    {
+      "id": "t08_16pro_decimal_charge",
+      "inputSnippet": "\"product\":\"iPhone17,1\"\\nSMC BSC failure\\nS.sensor array 0 - 7 is 0, 3145728, 0, 0, 0, 0, 0",
+      "expect": {
+        "primaryRuleId": "smc16pro_3145728_charge",
+        "normalizedCode": "0x300000",
+        "confidence": "HIGH"
+      }
+    },
+    {
+      "id": "t09_16pro_low_confidence_0x200000",
+      "inputSnippet": "\"product\":\"iPhone17,2\"\\nSMC BSC failure\\nS.sensor array is 0, 2097152, 0, 0",
+      "expect": {
+        "mustNotUseLowConfidenceAsPrimary": true,
+        "hintRuleId": "smc16pro_2097152_charge_hint"
+      }
+    },
+    {
+      "id": "t10_classic_prs0",
+      "inputSnippet": "\"product\":\"iPhone13,2\"\\nuserspace watchdog timeout: no successful checkins from thermalmonitord\\nMissing sensor(s): PRS0",
+      "expect": {
+        "primaryRuleId": "classic_prs0_charge_port",
+        "confidence": "HIGH"
+      }
+    },
+    {
+      "id": "t11_11pro_tg0v_alternative",
+      "inputSnippet": "\"product\":\"iPhone12,3\"\\nthermalmonitord\\nMissing sensor(s): TG0V",
+      "expect": {
+        "appliedRuleIdsContain": [
+          "classic_tg0v_battery",
+          "iphone11pro_tg_charge_port_alternative"
+        ]
+      }
+    },
+    {
+      "id": "t12_aop_bosch",
+      "inputSnippet": "AOP PANIC - K2 - Bosch control channel write failure",
+      "expect": {
+        "primaryRuleId": "aop_bosch_charge_port",
+        "confidence": "HIGH"
+      }
+    },
+    {
+      "id": "t13_ans2",
+      "inputSnippet": "ANS2 Recoverable Panic",
+      "expect": {
+        "primaryRuleId": "ans2_storage",
+        "primaryDiagnosisContains": "NAND"
+      }
+    },
+    {
+      "id": "t14_unknown_smc",
+      "inputSnippet": "\"product\":\"iPhone18,5\"\\nSMC BSC failure\\nS.sensor array is 0, 987654, 0",
+      "expect": {
+        "primaryRuleId": "smc_unknown_code_fallback",
+        "confidence": "UNKNOWN",
+        "mustNotInventComponent": true
+      }
+    },
+    {
+      "id": "t15_watchdog_no_missing_sensor",
+      "inputSnippet": "userspace watchdog timeout: no successful checkins from SpringBoard",
+      "expect": {
+        "primaryRuleId": "watchdog_no_checkin_generic",
+        "panicFamily": "WATCHDOG_NO_CHECKIN"
+      }
+    }
+  ]
+}
