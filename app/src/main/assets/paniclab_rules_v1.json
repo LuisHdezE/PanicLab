@@ -1,0 +1,3222 @@
+{
+  "schemaVersion": 1,
+  "knowledgeBaseVersion": "1.0.0",
+  "title": "PanicLab Rule Pack v1",
+  "generatedAt": "2026-08-21T12:57:00-03:00",
+  "locale": "es-UY",
+  "enginePolicy": {
+    "deterministic": true,
+    "exactRuleBeforeCombination": true,
+    "explicitCombinationBeforeBitmask": true,
+    "deviceSpecificBeforeProfile": true,
+    "unknownMustNotGuess": true,
+    "lowConfidenceMayBePrimary": false,
+    "communityHintMayBePrimary": false,
+    "storeAppliedRuleIdsInHistory": true,
+    "storeKnowledgeBaseVersionInHistory": true
+  },
+  "confidenceDefinitions": {
+    "HIGH": "Relación bien documentada y/o repetida; aun así requiere confirmación física.",
+    "MEDIUM": "Evidencia útil pero con limitaciones, variación por modelo o fuentes incompletas.",
+    "LOW": "Pista comunitaria o evidencia insuficiente; no usar como diagnóstico principal automático.",
+    "UNKNOWN": "La base no permite asociar de forma responsable un componente."
+  },
+  "verificationDefinitions": {
+    "VERIFIED": "Regla de seguridad/comportamiento del motor o hecho directamente verificable.",
+    "WELL_DOCUMENTED": "Documentado en una fuente técnica principal y/o casos repetidos.",
+    "COMMUNITY_SUPPORTED": "Respaldado por técnicos/casos comunitarios, aún no consolidado en tabla principal.",
+    "CONFLICTING_SOURCE": "Fuentes o secciones de una misma fuente discrepan.",
+    "EXPERIMENTAL": "Clasificación preliminar; no debe disparar reemplazo de pieza.",
+    "UNKNOWN": "Sin respaldo suficiente."
+  },
+  "sources": [
+    {
+      "id": "ifixit_kernel_panics",
+      "title": "iPhone Kernel Panics",
+      "publisher": "iFixit",
+      "url": "https://www.ifixit.com/Wiki/iPhone_Kernel_Panics",
+      "checkedAt": "2026-08-21",
+      "trustLevel": "HIGH",
+      "supports": [
+        "thermalmonitord missing sensor mappings",
+        "watchdog no-check-in behavior",
+        "I2C classification guidance",
+        "AOP NMI POWER",
+        "AOP Bosch control channel",
+        "ANS2",
+        "AppleSocHot",
+        "SEP ROM Boot Panic",
+        "SMC overview",
+        "Undefined Kernel Instruction"
+      ]
+    },
+    {
+      "id": "ifixit_smc_assert",
+      "title": "iPhone SMC Panic Assert",
+      "publisher": "iFixit",
+      "url": "https://www.ifixit.com/Wiki/iPhone_SMC_Panic_Assertion_Failed",
+      "checkedAt": "2026-08-21",
+      "trustLevel": "HIGH",
+      "supports": [
+        "SMC sensor-array mappings iPhone 13-16 Pro/Max",
+        "multi-part hexadecimal behavior",
+        "advanced connector/diode-mode troubleshooting"
+      ]
+    },
+    {
+      "id": "ifixit_16_series_charge_community",
+      "title": "SMC PANIC - SMC BSC failure, which component is causing this?",
+      "publisher": "iFixit Answers",
+      "url": "https://www.ifixit.com/Answers/View/957760/SMC%2BPANIC%2B-%2BSMC%2BBSC%2Bfailure%2C%2Bwhich%2Bcomponent%2Bis%2Bcausing%2Bthis",
+      "checkedAt": "2026-08-21",
+      "trustLevel": "COMMUNITY",
+      "supports": [
+        "0x300000 / 3145728 charging-port evidence on iPhone 16 Pro Max",
+        "community claim that 0x100000 can also indicate charging-port damage",
+        "community claim that the same family applies to 16/17 series"
+      ]
+    },
+    {
+      "id": "ifixit_13_charge_case",
+      "title": "iPhone 13 Pro SMC 0x800 charge-port case",
+      "publisher": "iFixit Answers",
+      "url": "https://www.ifixit.com/Answers/View/856422/Why%2Bis%2Bmy%2Bphone%2Bgetting%2Bvery%2Bhot%2Band%2Bturns%2Boff%2Bevery%2B3%2Bminutes",
+      "checkedAt": "2026-08-21",
+      "trustLevel": "COMMUNITY_HIGH",
+      "supports": [
+        "iPhone 13 sensor-array 0x800 -> charge port"
+      ]
+    },
+    {
+      "id": "ifixit_15_charge_case",
+      "title": "iPhone 15 SMC 0x80000 charge-port case",
+      "publisher": "iFixit Answers",
+      "url": "https://www.ifixit.com/Answers/View/874876/iPhone%2B15%2C%2Brestarting%2Bevery%2B3%2Bmiutes%2C%2BI%2Battached%2Bthe%2Bcrash%2Blog",
+      "checkedAt": "2026-08-21",
+      "trustLevel": "COMMUNITY_HIGH",
+      "supports": [
+        "iPhone 15 sensor-array 0x80000 -> charge port"
+      ]
+    },
+    {
+      "id": "appledb_devices",
+      "title": "Device Selection (iPhone)",
+      "publisher": "AppleDB",
+      "url": "https://appledb.dev/device-selection/iPhone.html",
+      "checkedAt": "2026-08-21",
+      "trustLevel": "HIGH_FOR_IDENTIFIERS",
+      "supports": [
+        "iPhone product identifier to marketing-name mapping from iPhone X through iPhone 17e"
+      ]
+    }
+  ],
+  "deviceModels": [
+    {
+      "productCode": "iPhone10,3",
+      "marketingName": "iPhone X",
+      "family": "IPHONE_X",
+      "variant": "X",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2017,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone10,6",
+      "marketingName": "iPhone X",
+      "family": "IPHONE_X",
+      "variant": "X",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2017,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone11,2",
+      "marketingName": "iPhone XS",
+      "family": "IPHONE_XS",
+      "variant": "XS",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2018,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone11,4",
+      "marketingName": "iPhone XS Max",
+      "family": "IPHONE_XS_MAX",
+      "variant": "XS_MAX",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2018,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone11,6",
+      "marketingName": "iPhone XS Max",
+      "family": "IPHONE_XS_MAX",
+      "variant": "XS_MAX",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2018,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone11,8",
+      "marketingName": "iPhone XR",
+      "family": "IPHONE_XR",
+      "variant": "XR",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2018,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone12,1",
+      "marketingName": "iPhone 11",
+      "family": "IPHONE_11",
+      "variant": "11",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2019,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone12,3",
+      "marketingName": "iPhone 11 Pro",
+      "family": "IPHONE_11_PRO",
+      "variant": "11_PRO",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2019,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone12,5",
+      "marketingName": "iPhone 11 Pro Max",
+      "family": "IPHONE_11_PRO_MAX",
+      "variant": "11_PRO_MAX",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2019,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone12,8",
+      "marketingName": "iPhone SE (2nd generation)",
+      "family": "IPHONE_SE2",
+      "variant": "SE2",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2020,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone13,1",
+      "marketingName": "iPhone 12 mini",
+      "family": "IPHONE_12_MINI",
+      "variant": "12_MINI",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2020,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone13,2",
+      "marketingName": "iPhone 12",
+      "family": "IPHONE_12",
+      "variant": "12",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2020,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone13,3",
+      "marketingName": "iPhone 12 Pro",
+      "family": "IPHONE_12_PRO",
+      "variant": "12_PRO",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2020,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone13,4",
+      "marketingName": "iPhone 12 Pro Max",
+      "family": "IPHONE_12_PRO_MAX",
+      "variant": "12_PRO_MAX",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2020,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone14,2",
+      "marketingName": "iPhone 13 Pro",
+      "family": "IPHONE_13_PRO",
+      "variant": "13_PRO",
+      "diagnosticProfile": "SMC_13",
+      "releaseYear": 2021,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone14,3",
+      "marketingName": "iPhone 13 Pro Max",
+      "family": "IPHONE_13_PRO_MAX",
+      "variant": "13_PRO_MAX",
+      "diagnosticProfile": "SMC_13",
+      "releaseYear": 2021,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone14,4",
+      "marketingName": "iPhone 13 mini",
+      "family": "IPHONE_13_MINI",
+      "variant": "13_MINI",
+      "diagnosticProfile": "SMC_13_MINI",
+      "releaseYear": 2021,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone14,5",
+      "marketingName": "iPhone 13",
+      "family": "IPHONE_13",
+      "variant": "13",
+      "diagnosticProfile": "SMC_13",
+      "releaseYear": 2021,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone14,6",
+      "marketingName": "iPhone SE (3rd generation)",
+      "family": "IPHONE_SE3",
+      "variant": "SE3",
+      "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
+      "releaseYear": 2022,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone14,7",
+      "marketingName": "iPhone 14",
+      "family": "IPHONE_14",
+      "variant": "14",
+      "diagnosticProfile": "SMC_14_BASE",
+      "releaseYear": 2022,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone14,8",
+      "marketingName": "iPhone 14 Plus",
+      "family": "IPHONE_14_PLUS",
+      "variant": "14_PLUS",
+      "diagnosticProfile": "SMC_14_BASE",
+      "releaseYear": 2022,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone15,2",
+      "marketingName": "iPhone 14 Pro",
+      "family": "IPHONE_14_PRO",
+      "variant": "14_PRO",
+      "diagnosticProfile": "SMC_14_PRO",
+      "releaseYear": 2022,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone15,3",
+      "marketingName": "iPhone 14 Pro Max",
+      "family": "IPHONE_14_PRO_MAX",
+      "variant": "14_PRO_MAX",
+      "diagnosticProfile": "SMC_14_PRO",
+      "releaseYear": 2022,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone15,4",
+      "marketingName": "iPhone 15",
+      "family": "IPHONE_15",
+      "variant": "15",
+      "diagnosticProfile": "SMC_15_BASE",
+      "releaseYear": 2023,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone15,5",
+      "marketingName": "iPhone 15 Plus",
+      "family": "IPHONE_15_PLUS",
+      "variant": "15_PLUS",
+      "diagnosticProfile": "SMC_15_BASE",
+      "releaseYear": 2023,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone16,1",
+      "marketingName": "iPhone 15 Pro",
+      "family": "IPHONE_15_PRO",
+      "variant": "15_PRO",
+      "diagnosticProfile": "SMC_15_PRO",
+      "releaseYear": 2023,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone16,2",
+      "marketingName": "iPhone 15 Pro Max",
+      "family": "IPHONE_15_PRO_MAX",
+      "variant": "15_PRO_MAX",
+      "diagnosticProfile": "SMC_15_PRO",
+      "releaseYear": 2023,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone17,1",
+      "marketingName": "iPhone 16 Pro",
+      "family": "IPHONE_16_PRO",
+      "variant": "16_PRO",
+      "diagnosticProfile": "SMC_16_PRO",
+      "releaseYear": 2024,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone17,2",
+      "marketingName": "iPhone 16 Pro Max",
+      "family": "IPHONE_16_PRO_MAX",
+      "variant": "16_PRO_MAX",
+      "diagnosticProfile": "SMC_16_PRO",
+      "releaseYear": 2024,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone17,3",
+      "marketingName": "iPhone 16",
+      "family": "IPHONE_16",
+      "variant": "16",
+      "diagnosticProfile": "SMC_16_BASE",
+      "releaseYear": 2024,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone17,4",
+      "marketingName": "iPhone 16 Plus",
+      "family": "IPHONE_16_PLUS",
+      "variant": "16_PLUS",
+      "diagnosticProfile": "SMC_16_BASE",
+      "releaseYear": 2024,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone17,5",
+      "marketingName": "iPhone 16e",
+      "family": "IPHONE_16E",
+      "variant": "16E",
+      "diagnosticProfile": "SMC_16E",
+      "releaseYear": 2025,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone18,1",
+      "marketingName": "iPhone 17 Pro",
+      "family": "IPHONE_17_PRO",
+      "variant": "17_PRO",
+      "diagnosticProfile": "SMC_17",
+      "releaseYear": 2025,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone18,2",
+      "marketingName": "iPhone 17 Pro Max",
+      "family": "IPHONE_17_PRO_MAX",
+      "variant": "17_PRO_MAX",
+      "diagnosticProfile": "SMC_17",
+      "releaseYear": 2025,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone18,3",
+      "marketingName": "iPhone 17",
+      "family": "IPHONE_17",
+      "variant": "17",
+      "diagnosticProfile": "SMC_17",
+      "releaseYear": 2025,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone18,4",
+      "marketingName": "iPhone Air",
+      "family": "IPHONE_AIR",
+      "variant": "AIR",
+      "diagnosticProfile": "SMC_17",
+      "releaseYear": 2025,
+      "sourceIds": ["appledb_devices"]
+    },
+    {
+      "productCode": "iPhone18,5",
+      "marketingName": "iPhone 17e",
+      "family": "IPHONE_17E",
+      "variant": "17E",
+      "diagnosticProfile": "SMC_17E",
+      "releaseYear": 2026,
+      "sourceIds": ["appledb_devices"]
+    }
+  ],
+  "panicClassifiers": [
+    {
+      "id": "classifier_thermal_missing_sensor",
+      "family": "THERMAL_MISSING_SENSOR",
+      "priority": 100,
+      "match": {
+        "allTerms": ["thermalmonitord"],
+        "regexAny": ["Missing sensor\\(s\\)\\s*:"]
+      },
+      "notes": "Missing required thermal/sensor check-in."
+    },
+    {
+      "id": "classifier_smc_bsc",
+      "family": "SMC_BSC_FAILURE",
+      "priority": 100,
+      "match": {
+        "allTerms": ["SMC", "BSC failure"]
+      },
+      "notes": "SMC failed to receive expected communication from a sensor."
+    },
+    {
+      "id": "classifier_smc_assert",
+      "family": "SMC_ASSERTION",
+      "priority": 90,
+      "match": {
+        "anyTerms": [
+          "SMC PANIC - ASSERT",
+          "SMC PANIC - ASSERTION FAILED",
+          "ASSERTION FAILED"
+        ],
+        "allTerms": ["SMC"]
+      },
+      "notes": "SMC assertion family; may coexist with SMC_BSC_FAILURE."
+    },
+    {
+      "id": "classifier_aop_nmi_power",
+      "family": "AOP_NMI_POWER",
+      "priority": 95,
+      "match": {
+        "allTerms": ["AOP", "NMI POWER"]
+      },
+      "notes": "Always-On Processor non-maskable interrupt, power-related."
+    },
+    {
+      "id": "classifier_aop_bosch",
+      "family": "AOP_BOSCH_CONTROL",
+      "priority": 95,
+      "match": {
+        "allTerms": ["Bosch", "control channel", "write failure"]
+      },
+      "notes": "AOP Bosch control-channel failure."
+    },
+    {
+      "id": "classifier_ans2",
+      "family": "ANS2",
+      "priority": 95,
+      "match": {
+        "anyTerms": ["ANS2 Recoverable Panic", "ANS2"]
+      },
+      "notes": "Apple NAND Storage v2 subsystem."
+    },
+    {
+      "id": "classifier_applesochot",
+      "family": "APPLE_SOC_HOT",
+      "priority": 95,
+      "match": {
+        "anyTerms": ["AppleSocHot", "Hot Hot Hot"]
+      },
+      "notes": "SoC/power-management board-level thermal/power path."
+    },
+    {
+      "id": "classifier_sep_rom",
+      "family": "SEP_ROM_BOOT",
+      "priority": 95,
+      "match": {
+        "anyTerms": ["SEP ROM Boot Panic", "SEP ROM"]
+      },
+      "notes": "Secure Enclave ROM/CPU communication."
+    },
+    {
+      "id": "classifier_undefined_kernel",
+      "family": "UNDEFINED_KERNEL_INSTRUCTION",
+      "priority": 90,
+      "match": {
+        "allTerms": ["Undefined Kernel Instruction"]
+      },
+      "notes": "Software first; persistent cases may implicate RAM/NAND/board."
+    },
+    {
+      "id": "classifier_i2c",
+      "family": "I2C",
+      "priority": 80,
+      "match": {
+        "regexAny": ["\\bi2c\\d*\\b", "\\bi²c\\b"]
+      },
+      "notes": "Bus/channel requires model-specific schematic context."
+    },
+    {
+      "id": "classifier_dcp",
+      "family": "DCP_DISPLAY",
+      "priority": 70,
+      "match": {
+        "regexAny": ["\\bDCP\\b", "iomfb", "display coprocessor"]
+      },
+      "notes": "Classification only in v1; no automatic part diagnosis."
+    },
+    {
+      "id": "classifier_baseband",
+      "family": "BASEBAND",
+      "priority": 70,
+      "match": {
+        "regexAny": ["\\bbaseband\\b", "AppleBaseband", "\\bBB[A-Z_]*\\b"]
+      },
+      "notes": "Classification only in v1; no automatic part diagnosis."
+    },
+    {
+      "id": "classifier_watchdog_no_checkin",
+      "family": "WATCHDOG_NO_CHECKIN",
+      "priority": 50,
+      "match": {
+        "anyTerms": ["watchdog timeout", "userspace watchdog timeout"],
+        "notRegex": ["Missing sensor\\(s\\)\\s*:"]
+      },
+      "notes": "No missing-sensor token; often software/process check-in related."
+    }
+  ],
+  "bitmaskPolicies": [
+    {
+      "diagnosticProfile": "SMC_13",
+      "enabled": true,
+      "knownBits": ["0x800", "0x1000", "0x4000"],
+      "exactRulesAlwaysWin": true,
+      "notes": "0x1800 exists as an explicit multi-part rule. Treat conflicting aliases 0x10000/0x40000 separately."
+    },
+    {
+      "diagnosticProfile": "SMC_13_MINI",
+      "enabled": true,
+      "knownBits": ["0x400", "0x800", "0x1000", "0x4000"],
+      "exactRulesAlwaysWin": true
+    },
+    {
+      "diagnosticProfile": "SMC_14_PRO",
+      "enabled": true,
+      "knownBits": ["0x20000", "0x40000", "0x80000", "0x100000"],
+      "exactRulesAlwaysWin": true,
+      "notes": "0xC0000 is an explicit exact combination."
+    },
+    {
+      "diagnosticProfile": "SMC_14_BASE",
+      "enabled": false,
+      "knownBits": [],
+      "exactRulesAlwaysWin": true,
+      "notes": "Disabled in v1 to protect exact 0x500000 battery semantics and avoid undocumented combinations."
+    },
+    {
+      "diagnosticProfile": "SMC_15_BASE",
+      "enabled": false,
+      "knownBits": [],
+      "exactRulesAlwaysWin": true
+    },
+    {
+      "diagnosticProfile": "SMC_15_PRO",
+      "enabled": false,
+      "knownBits": [],
+      "exactRulesAlwaysWin": true
+    },
+    {
+      "diagnosticProfile": "SMC_16_PRO",
+      "enabled": false,
+      "knownBits": [],
+      "exactRulesAlwaysWin": true,
+      "notes": "Public documentation remains incomplete; exact/community rules only."
+    },
+    {
+      "diagnosticProfile": "SMC_16_BASE",
+      "enabled": false,
+      "knownBits": [],
+      "exactRulesAlwaysWin": true
+    },
+    {
+      "diagnosticProfile": "SMC_16E",
+      "enabled": false,
+      "knownBits": [],
+      "exactRulesAlwaysWin": true
+    },
+    {
+      "diagnosticProfile": "SMC_17",
+      "enabled": false,
+      "knownBits": [],
+      "exactRulesAlwaysWin": true
+    },
+    {
+      "diagnosticProfile": "SMC_17E",
+      "enabled": false,
+      "knownBits": [],
+      "exactRulesAlwaysWin": true
+    }
+  ],
+  "diagnosticRules": [
+    {
+      "id": "classic_prs0_charge_port",
+      "title": "PRS0 / barometer missing",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["THERMAL_CLASSIC_X_TO_12"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["THERMAL_MISSING_SENSOR"],
+        "sensorTokensAny": ["PRS0", "Prs0"],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Ruta de barómetro / conjunto del puerto de carga",
+        "subsystem": "THERMAL_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Logic-board connector / sensor communication lines",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "El sistema no recibe el barómetro PRS0, ubicado en el conjunto del puerto de carga en esta familia."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar flex del puerto de carga y FPC",
+          "Buscar líquido, corrosión, cortes o pines hundidos"
+        ],
+        "knownGoodTest": "Probar un conjunto de puerto de carga OEM/original o conocido como bueno.",
+        "boardLevelNextSteps": [
+          "Medir el FPC en modo diodo contra referencia",
+          "Seguir alimentación y líneas de comunicación del sensor"
+        ],
+        "cautions": [
+          "Que el teléfono cargue no demuestra que el sensor del flex esté comunicando."
+        ]
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "classic_mic1_charge_port",
+      "title": "Mic1 missing",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["THERMAL_CLASSIC_X_TO_12"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["THERMAL_MISSING_SENSOR"],
+        "sensorTokensAny": ["Mic1", "mic1"],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Ruta de micrófono inferior / conjunto del puerto de carga",
+        "subsystem": "THERMAL_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly / bottom microphone path",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Logic-board connector / communication lines",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Mic1 corresponde al micrófono inferior dentro de la ruta supervisada por el sistema."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar dock flex y su conector",
+          "Buscar daño por reemplazo de carcasa o humedad"
+        ],
+        "knownGoodTest": "Probar flex de carga de calidad conocida.",
+        "boardLevelNextSteps": [
+          "Modo diodo en FPC",
+          "Seguir línea de micrófono/sensor hasta placa"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "classic_mic2_power_flash",
+      "title": "Mic2 missing",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["THERMAL_CLASSIC_X_TO_12"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["THERMAL_MISSING_SENSOR"],
+        "sensorTokensAny": ["Mic2", "mic2"],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Ruta de micrófono trasero / power-flash flex",
+        "subsystem": "THERMAL_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Power Button Cable / Camera Flash Cable",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Respective logic-board connector",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Mic2 es el micrófono trasero; la pieza física exacta puede variar por modelo."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Confirmar en el modelo qué flex aloja Mic2",
+          "Inspeccionar power/flash flex y FPC"
+        ],
+        "knownGoodTest": "Probar el flex correcto para ese modelo, conocido como bueno.",
+        "boardLevelNextSteps": [
+          "Modo diodo en el conector correspondiente",
+          "Seguir líneas del micrófono trasero"
+        ],
+        "cautions": [
+          "No reemplazar un 'micrófono' aislado sin localizar primero el ensamblaje de ese modelo."
+        ]
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "classic_tg0v_battery",
+      "title": "TG0V missing",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["THERMAL_CLASSIC_X_TO_12"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["THERMAL_MISSING_SENSOR"],
+        "sensorTokensAny": ["TG0V", "tg0v"],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Comunicación/sensor de batería TG0V",
+        "subsystem": "BATTERY_DATA",
+        "suspectedComponents": [
+          {
+            "name": "Battery / BMS",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Battery connector / board charging circuitry",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "TG0V está asociado a sensores de batería, probablemente temperatura/voltaje."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar batería y FPC",
+          "Revisar daño/corrosión en conector"
+        ],
+        "knownGoodTest": "Probar batería conocida como buena y compatible.",
+        "boardLevelNextSteps": [
+          "Revisar líneas de datos/sensado de batería",
+          "Evaluar circuitería de carga a nivel de placa"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "classic_tg0b_battery",
+      "title": "TG0B missing",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["THERMAL_CLASSIC_X_TO_12"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["THERMAL_MISSING_SENSOR"],
+        "sensorTokensAny": ["TG0B", "tg0b"],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Comunicación/sensor de batería TG0B",
+        "subsystem": "BATTERY_DATA",
+        "suspectedComponents": [
+          {
+            "name": "Battery / BMS",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Battery connector / board charging circuitry",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "TG0B pertenece a la ruta de sensores/datos de batería."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar batería, BMS y FPC",
+          "Buscar pines deformados o corrosión"
+        ],
+        "knownGoodTest": "Probar batería conocida como buena.",
+        "boardLevelNextSteps": [
+          "Medir líneas de datos/sensado",
+          "Revisar circuitería de carga"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "iphone11pro_tg_charge_port_alternative",
+      "title": "11 Pro/Pro Max: TG0B/TG0V, charging-port alternative",
+      "active": true,
+      "priority": 120,
+      "deviceScope": {
+        "diagnosticProfiles": [],
+        "productCodes": ["iPhone12,3", "iPhone12,5"]
+      },
+      "match": {
+        "panicFamiliesAny": ["THERMAL_MISSING_SENSOR"],
+        "sensorTokensAny": ["TG0B", "TG0V", "tg0b", "tg0v"],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Ruta de batería con alternativa documentada en el charging flex",
+        "subsystem": "BATTERY_DATA",
+        "suspectedComponents": [
+          {
+            "name": "Battery / BMS",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Charge Port Assembly",
+            "role": "ALTERNATIVE"
+          },
+          {
+            "name": "Logic-board charging/data circuitry",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "En iPhone 11 Pro/Pro Max, TG0B/TG0V también puede involucrar el conjunto del puerto de carga."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Probar batería buena",
+          "Si persiste, inspeccionar/probar charge-port assembly"
+        ],
+        "knownGoodTest": "Usar batería y luego charging flex conocidos como buenos.",
+        "boardLevelNextSteps": [
+          "FPC de batería y carga",
+          "Líneas de datos y circuitería de carga"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "watchdog_no_checkin_generic",
+      "title": "Watchdog sin Missing Sensor",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": [],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["WATCHDOG_NO_CHECKIN"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Fallo de check-in de proceso; investigar software/proceso indicado",
+        "subsystem": "SOFTWARE_OR_SERVICE",
+        "suspectedComponents": [],
+        "interpretation": "Un watchdog sin sensor ausente no debe tratarse automáticamente como fallo de flex."
+      },
+      "confidence": "MEDIUM",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": false,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Extraer el proceso que dejó de hacer check-in",
+          "Comprobar actualizaciones y disponer de respaldo"
+        ],
+        "knownGoodTest": "Actualizar/reinstalar iOS cuando el contexto permita descartar datos del usuario.",
+        "boardLevelNextSteps": [
+          "Si persiste tras software limpio, investigar el subsistema nombrado en el log"
+        ],
+        "cautions": [
+          "No aplicar reglas de sensores si no existe Missing sensor(s)."
+        ]
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "i2c_generic",
+      "title": "Panic I2C",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": [],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["I2C"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Fallo de comunicación en bus I2C; requiere contexto de modelo/canal",
+        "subsystem": "I2C_BUS",
+        "suspectedComponents": [],
+        "interpretation": "El canal I2C y los dispositivos conectados cambian por modelo; el código por sí solo no identifica una pieza."
+      },
+      "confidence": "UNKNOWN",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": false,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Extraer canal i2c y nombres adicionales como ALS",
+          "Consultar esquema/boardview del modelo"
+        ],
+        "knownGoodTest": null,
+        "boardLevelNextSteps": [
+          "Identificar dispositivos del canal",
+          "Medir SDA/SCL, alimentación y componentes asociados"
+        ],
+        "cautions": [
+          "No asignar una pieza universal a i2c0/i2c1/i2c2/i2c3."
+        ]
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "aop_nmi_power_generic",
+      "title": "AOP NMI POWER",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": [],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["AOP_NMI_POWER"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "AOP NMI POWER: revisar power flex y conjunto frontal",
+        "subsystem": "AOP",
+        "suspectedComponents": [
+          {
+            "name": "Power Button Cable",
+            "role": "CANDIDATE"
+          },
+          {
+            "name": "Front Facing Camera/Sensor Assembly",
+            "role": "CANDIDATE"
+          }
+        ],
+        "interpretation": "Este panic se asocia con frecuencia al flex de power o al conjunto de cámara/sensor frontal."
+      },
+      "confidence": "MEDIUM",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": false,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar ambos flex y conectores",
+          "Revisar reparaciones previas/daño por líquido"
+        ],
+        "knownGoodTest": "Probar las piezas candidatas conocidas como buenas, una por una.",
+        "boardLevelNextSteps": [
+          "Si persiste, investigar líneas AOP y conectores en placa"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "aop_bosch_charge_port",
+      "title": "AOP Bosch control-channel failure",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": [],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["AOP_BOSCH_CONTROL"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Ruta de audio en charge-port flex",
+        "subsystem": "AOP_AUDIO",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Flex Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Audio/board signal path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "El charging flex transporta señales del altavoz y es la causa más común documentada para este panic."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": false,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Buscar líquido/corrosión",
+          "Inspeccionar charge-port flex y FPC"
+        ],
+        "knownGoodTest": "Probar un charging flex OEM/de alta calidad conocido como bueno.",
+        "boardLevelNextSteps": [
+          "Revisar líneas de audio y conector si persiste"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "ans2_storage",
+      "title": "ANS2 Recoverable Panic",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": [],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["ANS2"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Subsistema NAND/almacenamiento o sus líneas de comunicación",
+        "subsystem": "NAND_STORAGE",
+        "suspectedComponents": [
+          {
+            "name": "NAND / storage subsystem",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "NAND communication lines / logic board",
+            "role": "PRIMARY"
+          }
+        ],
+        "interpretation": "ANS2 es el controlador Apple NAND Storage v2; el panic apunta a almacenamiento o comunicación con NAND."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": false,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Preservar datos si son importantes",
+          "Evitar cambios aleatorios de periféricos"
+        ],
+        "knownGoodTest": null,
+        "boardLevelNextSteps": [
+          "Diagnóstico de placa/microsoldadura",
+          "Evaluar NAND y líneas; programación si se sustituye"
+        ],
+        "cautions": [
+          "La sustitución de NAND exige equipamiento y manejo de datos únicos."
+        ]
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "applesochot_board",
+      "title": "AppleSocHot",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": [],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["APPLE_SOC_HOT"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Problema de placa en ruta de potencia/temperatura SoC",
+        "subsystem": "BOARD_POWER_THERMAL",
+        "suspectedComponents": [
+          {
+            "name": "PMIC-to-CPU electrical path / logic board",
+            "role": "PRIMARY"
+          }
+        ],
+        "interpretation": "Puede reflejar temperatura real del CPU o fallo eléctrico de la línea entre gestión de potencia y CPU; se considera principalmente board-level."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": false,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Revisar zonas con trabajos previos",
+          "Buscar consumo/calor anormal y daño por líquido"
+        ],
+        "knownGoodTest": null,
+        "boardLevelNextSteps": [
+          "Diagnóstico de placa; revisar áreas Wi-Fi/audio y ruta PMIC-CPU según contexto"
+        ],
+        "cautions": [
+          "No asumir que el problema es simplemente una batería caliente."
+        ]
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "sep_rom_board",
+      "title": "SEP ROM Boot Panic",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": [],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SEP_ROM_BOOT"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "SEP ROM / comunicación SEP-CPU a nivel de placa",
+        "subsystem": "SECURE_ENCLAVE",
+        "suspectedComponents": [
+          {
+            "name": "SEP ROM / CPU communication path",
+            "role": "PRIMARY"
+          }
+        ],
+        "interpretation": "El panic indica daño del ROM asociado al Secure Enclave o de su comunicación con CPU."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": false,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Priorizar recuperación/preservación de datos",
+          "No sustituir periféricos al azar"
+        ],
+        "knownGoodTest": null,
+        "boardLevelNextSteps": [
+          "Diagnóstico especializado de placa/SEP"
+        ],
+        "cautions": [
+          "Los datos asociados al SEP son únicos; una intervención incorrecta puede comprometer la recuperación."
+        ]
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "undefined_kernel_instruction",
+      "title": "Undefined Kernel Instruction",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": [],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["UNDEFINED_KERNEL_INSTRUCTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Software primero; RAM/NAND/placa si persiste",
+        "subsystem": "KERNEL_SOFTWARE_OR_MEMORY",
+        "suspectedComponents": [],
+        "interpretation": "Suele ser software; si persiste tras reinstalación limpia, considerar RAM/NAND y sus sistemas de placa."
+      },
+      "confidence": "MEDIUM",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": false,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Comprobar actualización de iOS/apps",
+          "Realizar respaldo antes de restaurar"
+        ],
+        "knownGoodTest": "Restauración/reinstalación limpia de iOS para separar software de hardware.",
+        "boardLevelNextSteps": [
+          "Si persiste, investigar RAM/NAND/placa"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_kernel_panics"],
+      "notes": null
+    },
+    {
+      "id": "dcp_classification_only",
+      "title": "DCP/display panic: clasificación solamente",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": [],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["DCP_DISPLAY"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Panic relacionado con DCP/display; sin regla de pieza automática en Rule Pack v1",
+        "subsystem": "DISPLAY_DCP",
+        "suspectedComponents": [],
+        "interpretation": "PanicLab reconoce la familia, pero esta versión no dispone de una correspondencia de pieza suficientemente verificada."
+      },
+      "confidence": "UNKNOWN",
+      "verificationStatus": "EXPERIMENTAL",
+      "primaryEligible": true,
+      "exactCodeOnly": false,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Conservar panicString completo",
+          "Revisar contexto de pantalla/reparaciones y documentación específica del modelo"
+        ],
+        "knownGoodTest": null,
+        "boardLevelNextSteps": [
+          "Diagnóstico específico de DCP/display a nivel de modelo"
+        ],
+        "cautions": [
+          "No recomendar display o placa únicamente por la palabra DCP."
+        ]
+      },
+      "sourceIds": [],
+      "notes": null
+    },
+    {
+      "id": "baseband_classification_only",
+      "title": "Baseband panic: clasificación solamente",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": [],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["BASEBAND"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Panic relacionado con baseband; sin regla de pieza automática en Rule Pack v1",
+        "subsystem": "BASEBAND",
+        "suspectedComponents": [],
+        "interpretation": "La clasificación no basta para determinar si la causa está en módem, alimentación, RF, interposer u otra ruta."
+      },
+      "confidence": "UNKNOWN",
+      "verificationStatus": "EXPERIMENTAL",
+      "primaryEligible": true,
+      "exactCodeOnly": false,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Extraer panicString completo y nombres del subsistema",
+          "Comprobar síntomas de IMEI/modem firmware/red"
+        ],
+        "knownGoodTest": null,
+        "boardLevelNextSteps": [
+          "Diagnóstico especializado de baseband según modelo"
+        ],
+        "cautions": [
+          "No afirmar 'baseband IC dañado' sin evidencia adicional."
+        ]
+      },
+      "sourceIds": [],
+      "notes": null
+    },
+    {
+      "id": "smc13_0x800_charge_port",
+      "title": "iPhone 13: 0x800",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_13", "SMC_13_MINI"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x800"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Conjunto del puerto de carga / sensor asociado",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "FPC / BSC communication lines",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "En iPhone 13, 0x800 está documentado en el conjunto del puerto de carga."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar charge-port flex y FPC",
+          "Buscar corrosión o daño de reparación"
+        ],
+        "knownGoodTest": "Probar un charge-port assembly conocido como bueno.",
+        "boardLevelNextSteps": [
+          "Modo diodo del FPC",
+          "Seguir líneas BSC/sensor"
+        ],
+        "cautions": []
+      },
+      "sourceIds": [
+        "ifixit_kernel_panics",
+        "ifixit_smc_assert",
+        "ifixit_13_charge_case"
+      ],
+      "notes": null
+    },
+    {
+      "id": "smc13_0x1000_front_sensor",
+      "title": "iPhone 13: 0x1000",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_13", "SMC_13_MINI"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x1000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Conjunto de sensor frontal / proximidad",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Front Sensor / Proximity Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Front-sensor FPC / BSC lines",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "La página general de Kernel Panics y la regla explícita 0x1800 apoyan 0x1000 como sensor frontal en la serie 13."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "CONFLICTING_SOURCE",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar flex frontal/proximidad y conector",
+          "Buscar daño al cambiar pantalla o humedad"
+        ],
+        "knownGoodTest": "Probar un flex frontal conocido como bueno; desconectarlo no es una prueba válida.",
+        "boardLevelNextSteps": [
+          "Modo diodo en FPC",
+          "Seguir alimentación y líneas BSC"
+        ],
+        "cautions": [
+          "La tabla SMC dedicada de iFixit muestra 0x10000; el propio ejemplo 0x1800 de esa página implica 0x1000. Mantener visible la discrepancia."
+        ]
+      },
+      "sourceIds": [
+        "ifixit_kernel_panics",
+        "ifixit_smc_assert"
+      ],
+      "notes": null
+    },
+    {
+      "id": "smc13_0x10000_front_sensor_alias",
+      "title": "iPhone 13: 0x10000 (fuente conflictiva)",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_13", "SMC_13_MINI"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x10000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Posible conjunto de sensor frontal / proximidad",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Front Sensor / Proximity Assembly",
+            "role": "CANDIDATE"
+          }
+        ],
+        "interpretation": "La tabla SMC dedicada publica 0x10000 para sensor frontal, en conflicto con la página general y el ejemplo 0x1800."
+      },
+      "confidence": "MEDIUM",
+      "verificationStatus": "CONFLICTING_SOURCE",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Verificar el código exacto del log",
+          "Inspeccionar/probar front sensor flex"
+        ],
+        "knownGoodTest": "Probar flex frontal conocido como bueno.",
+        "boardLevelNextSteps": [
+          "FPC y líneas BSC si persiste"
+        ],
+        "cautions": [
+          "Mostrar al técnico que existe conflicto documental."
+        ]
+      },
+      "sourceIds": [
+        "ifixit_smc_assert",
+        "ifixit_kernel_panics"
+      ],
+      "notes": null
+    },
+    {
+      "id": "smc13_0x4000_battery",
+      "title": "iPhone 13: 0x4000",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_13", "SMC_13_MINI"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x4000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Batería / comunicación de batería",
+        "subsystem": "BATTERY_DATA",
+        "suspectedComponents": [
+          {
+            "name": "Battery / battery data path",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Battery FPC / board lines",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "La página general de Kernel Panics publica 0x4000 como batería para la serie 13."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "CONFLICTING_SOURCE",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar batería y FPC",
+          "Revisar datos/sensado de batería"
+        ],
+        "knownGoodTest": "Probar batería conocida como buena.",
+        "boardLevelNextSteps": [
+          "Medir líneas de datos/sensado de batería"
+        ],
+        "cautions": [
+          "La tabla SMC dedicada publica 0x40000; conservar la discrepancia."
+        ]
+      },
+      "sourceIds": [
+        "ifixit_kernel_panics",
+        "ifixit_smc_assert"
+      ],
+      "notes": null
+    },
+    {
+      "id": "smc13_0x40000_battery_alias",
+      "title": "iPhone 13: 0x40000 (fuente conflictiva)",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_13", "SMC_13_MINI"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x40000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Posible batería / comunicación de batería",
+        "subsystem": "BATTERY_DATA",
+        "suspectedComponents": [
+          {
+            "name": "Battery / battery data path",
+            "role": "CANDIDATE"
+          }
+        ],
+        "interpretation": "La tabla SMC dedicada publica 0x40000 para batería, en conflicto con la página general."
+      },
+      "confidence": "MEDIUM",
+      "verificationStatus": "CONFLICTING_SOURCE",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Confirmar código exacto",
+          "Inspeccionar batería/FPC"
+        ],
+        "knownGoodTest": "Probar batería conocida como buena.",
+        "boardLevelNextSteps": [
+          "Revisar líneas de datos/sensado"
+        ],
+        "cautions": [
+          "Mostrar conflicto documental."
+        ]
+      },
+      "sourceIds": [
+        "ifixit_smc_assert",
+        "ifixit_kernel_panics"
+      ],
+      "notes": null
+    },
+    {
+      "id": "smc13mini_0x400_gyro",
+      "title": "iPhone 13 mini: 0x400",
+      "active": true,
+      "priority": 130,
+      "deviceScope": {
+        "diagnosticProfiles": [],
+        "productCodes": ["iPhone14,4"]
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x400"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Giroscopio / bottom board",
+        "subsystem": "BOARD_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Gyroscope on bottom board",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Bottom-board / sandwich path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "0x400 está documentado como fallo del giroscopio situado en la bottom board del iPhone 13 mini."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspección de placa y signos de golpe/líquido",
+          "Revisar integridad del conjunto bottom board"
+        ],
+        "knownGoodTest": null,
+        "boardLevelNextSteps": [
+          "Diagnóstico de placa/sandwich y líneas del giroscopio"
+        ],
+        "cautions": []
+      },
+      "sourceIds": [
+        "ifixit_smc_assert",
+        "ifixit_kernel_panics"
+      ],
+      "notes": null
+    },
+    {
+      "id": "smc13_0x1800_charge_front",
+      "title": "iPhone 13: 0x1800 multi-part",
+      "active": true,
+      "priority": 150,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_13", "SMC_13_MINI"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x1800"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Puerto de carga + sensor frontal",
+        "subsystem": "SMC_SENSOR_MULTI",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Front Sensor Assembly",
+            "role": "PRIMARY"
+          }
+        ],
+        "interpretation": "iFixit documenta 0x1800 como indicación simultánea de charge port y front sensor en iPhone 13."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar ambos flex/conectores",
+          "Buscar una causa común como líquido o daño de placa"
+        ],
+        "knownGoodTest": "Probar ambos conjuntos conocidos como buenos, uno por vez.",
+        "boardLevelNextSteps": [
+          "Si ambos buenos no resuelven, revisar FPC y líneas comunes/BSC"
+        ],
+        "cautions": [
+          "Usar esta regla exacta antes de cualquier descomposición bitwise."
+        ]
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc14base_0x100000_charge_port_assembly",
+      "title": "iPhone 14/14 Plus: 0x100000",
+      "active": true,
+      "priority": 120,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_14_BASE"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x100000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board communication path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla exacta documentada para iPhone 14/14 Plus: 0x100000 → Puerto de carga."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Charge Port Assembly y su conector",
+          "Buscar líquido, cortes o pines dañados"
+        ],
+        "knownGoodTest": "Probar Charge Port Assembly conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Si persiste, revisar FPC y líneas de comunicación/sensado"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc14base_0x200000_front_sensor_assembly",
+      "title": "iPhone 14/14 Plus: 0x200000",
+      "active": true,
+      "priority": 120,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_14_BASE"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x200000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Sensor frontal",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Front Sensor Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board communication path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla exacta documentada para iPhone 14/14 Plus: 0x200000 → Sensor frontal."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Front Sensor Assembly y su conector",
+          "Buscar líquido, cortes o pines dañados"
+        ],
+        "knownGoodTest": "Probar Front Sensor Assembly conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Si persiste, revisar FPC y líneas de comunicación/sensado"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc14base_0x400000_wireless_charge_coil",
+      "title": "iPhone 14/14 Plus: 0x400000",
+      "active": true,
+      "priority": 120,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_14_BASE"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x400000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Bobina de carga inalámbrica",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Wireless Charge Coil",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board communication path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla exacta documentada para iPhone 14/14 Plus: 0x400000 → Bobina de carga inalámbrica."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Wireless Charge Coil y su conector",
+          "Buscar líquido, cortes o pines dañados"
+        ],
+        "knownGoodTest": "Probar Wireless Charge Coil conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Si persiste, revisar FPC y líneas de comunicación/sensado"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc14base_0x500000_battery___battery_data_path",
+      "title": "iPhone 14/14 Plus: 0x500000",
+      "active": true,
+      "priority": 160,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_14_BASE"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x500000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Batería",
+        "subsystem": "BATTERY_DATA",
+        "suspectedComponents": [
+          {
+            "name": "Battery / battery data path",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board communication path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla exacta documentada para iPhone 14/14 Plus: 0x500000 → Batería."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Battery / battery data path y su conector",
+          "Buscar líquido, cortes o pines dañados"
+        ],
+        "knownGoodTest": "Probar Battery / battery data path conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Si persiste, revisar FPC y líneas de comunicación/sensado"
+        ],
+        "cautions": [
+          "No descomponer este valor si existe una regla exacta para el modelo."
+        ]
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc14pro_0x41",
+      "title": "iPhone 14 Pro/Max: 0x41",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_14_PRO"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x41"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Batería / datos de batería",
+        "subsystem": "BATTERY_DATA",
+        "suspectedComponents": [
+          {
+            "name": "Battery / battery data path",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board communication path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla exacta documentada para iPhone 14 Pro/Pro Max: 0x41 → Batería / datos de batería."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Battery / battery data path y FPC"
+        ],
+        "knownGoodTest": "Probar Battery / battery data path conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Modo diodo / líneas asociadas si persiste"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc14pro_0x20000",
+      "title": "iPhone 14 Pro/Max: 0x20000",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_14_PRO"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x20000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Giroscopio / bottom board",
+        "subsystem": "BOARD_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Gyroscope on bottom board",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board communication path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla exacta documentada para iPhone 14 Pro/Pro Max: 0x20000 → Giroscopio / bottom board."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Gyroscope on bottom board y FPC"
+        ],
+        "knownGoodTest": "Probar Gyroscope on bottom board conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Modo diodo / líneas asociadas si persiste"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc14pro_0x40000",
+      "title": "iPhone 14 Pro/Max: 0x40000",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_14_PRO"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x40000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board communication path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla exacta documentada para iPhone 14 Pro/Pro Max: 0x40000 → Puerto de carga."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Charge Port Assembly y FPC"
+        ],
+        "knownGoodTest": "Probar Charge Port Assembly conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Modo diodo / líneas asociadas si persiste"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc14pro_0x80000",
+      "title": "iPhone 14 Pro/Max: 0x80000",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_14_PRO"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x80000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Sensor frontal",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Front Sensor Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board communication path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla exacta documentada para iPhone 14 Pro/Pro Max: 0x80000 → Sensor frontal."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Front Sensor Assembly y FPC"
+        ],
+        "knownGoodTest": "Probar Front Sensor Assembly conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Modo diodo / líneas asociadas si persiste"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc14pro_0x100000",
+      "title": "iPhone 14 Pro/Max: 0x100000",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_14_PRO"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x100000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Flex de botón de encendido",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Power Button Flex Cable",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board communication path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla exacta documentada para iPhone 14 Pro/Pro Max: 0x100000 → Flex de botón de encendido."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Power Button Flex Cable y FPC"
+        ],
+        "knownGoodTest": "Probar Power Button Flex Cable conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Modo diodo / líneas asociadas si persiste"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc14pro_0xc0000_charge_front",
+      "title": "iPhone 14 Pro/Max: 0xC0000 multi-part",
+      "active": true,
+      "priority": 150,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_14_PRO"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0xC0000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Puerto de carga + sensor frontal",
+        "subsystem": "SMC_SENSOR_MULTI",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Front Sensor Assembly",
+            "role": "PRIMARY"
+          }
+        ],
+        "interpretation": "0xC0000 = 0x40000 + 0x80000 y está documentado como fallo simultáneo de charge port y front sensor."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar/probar ambos conjuntos",
+          "Buscar daño común por líquido o placa"
+        ],
+        "knownGoodTest": "Probar ambos flex conocidos como buenos.",
+        "boardLevelNextSteps": [
+          "Revisar conectores y líneas BSC si persiste"
+        ],
+        "cautions": [
+          "Regla exacta de combinación; debe evaluarse antes de descomposición genérica."
+        ]
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc15base_0xa1",
+      "title": "iPhone 15/15 Plus: 0xA1",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_15_BASE"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0xA1"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Batería / datos de batería",
+        "subsystem": "BATTERY_DATA",
+        "suspectedComponents": [
+          {
+            "name": "Battery / battery data path",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla documentada para iPhone 15/15 Plus: 0xA1 → Batería / datos de batería."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Battery / battery data path y conector"
+        ],
+        "knownGoodTest": "Probar Battery / battery data path conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Revisar FPC y líneas asociadas"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc15base_0x80000",
+      "title": "iPhone 15/15 Plus: 0x80000",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_15_BASE"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x80000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla documentada para iPhone 15/15 Plus: 0x80000 → Puerto de carga."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Charge Port Assembly y conector"
+        ],
+        "knownGoodTest": "Probar Charge Port Assembly conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Revisar FPC y líneas asociadas"
+        ],
+        "cautions": []
+      },
+      "sourceIds": [
+        "ifixit_smc_assert",
+        "ifixit_15_charge_case"
+      ],
+      "notes": null
+    },
+    {
+      "id": "smc15base_0x100000",
+      "title": "iPhone 15/15 Plus: 0x100000",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_15_BASE"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x100000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Sensor frontal",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Front Sensor Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla documentada para iPhone 15/15 Plus: 0x100000 → Sensor frontal."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Front Sensor Assembly y conector"
+        ],
+        "knownGoodTest": "Probar Front Sensor Assembly conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Revisar FPC y líneas asociadas"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc15base_0x200000",
+      "title": "iPhone 15/15 Plus: 0x200000",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_15_BASE"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x200000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Bobina de carga inalámbrica",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Wireless Charge Coil",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla documentada para iPhone 15/15 Plus: 0x200000 → Bobina de carga inalámbrica."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Wireless Charge Coil y conector"
+        ],
+        "knownGoodTest": "Probar Wireless Charge Coil conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Revisar FPC y líneas asociadas"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc15pro_0xa1",
+      "title": "iPhone 15 Pro/Max: 0xA1",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_15_PRO"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0xA1"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Batería / datos de batería",
+        "subsystem": "BATTERY_DATA",
+        "suspectedComponents": [
+          {
+            "name": "Battery / battery data path",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla documentada para iPhone 15 Pro/Pro Max: 0xA1 → Batería / datos de batería."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Battery / battery data path y conector"
+        ],
+        "knownGoodTest": "Probar Battery / battery data path conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Revisar FPC y líneas asociadas"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc15pro_0x300000",
+      "title": "iPhone 15 Pro/Max: 0x300000",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_15_PRO"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x300000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla documentada para iPhone 15 Pro/Pro Max: 0x300000 → Puerto de carga."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Charge Port Assembly y conector"
+        ],
+        "knownGoodTest": "Probar Charge Port Assembly conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Revisar FPC y líneas asociadas"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc15pro_0x400000",
+      "title": "iPhone 15 Pro/Max: 0x400000",
+      "active": true,
+      "priority": 100,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_15_PRO"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x400000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Bobina de carga inalámbrica",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Wireless Charge Coil",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Associated connector/board path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "Regla documentada para iPhone 15 Pro/Pro Max: 0x400000 → Bobina de carga inalámbrica."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar Wireless Charge Coil y conector"
+        ],
+        "knownGoodTest": "Probar Wireless Charge Coil conocido como bueno cuando sea viable.",
+        "boardLevelNextSteps": [
+          "Revisar FPC y líneas asociadas"
+        ],
+        "cautions": []
+      },
+      "sourceIds": ["ifixit_smc_assert"],
+      "notes": null
+    },
+    {
+      "id": "smc16pro_3145728_charge",
+      "title": "iPhone 16 Pro/Max: 3145728 / 0x300000",
+      "active": true,
+      "priority": 140,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_16_PRO"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["3145728", "0x300000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "PRIMARY"
+          },
+          {
+            "name": "Charge-port FPC / board communication path",
+            "role": "SECONDARY"
+          }
+        ],
+        "interpretation": "La tabla SMC actual documenta 3145728 como charge-port assembly en 16 Pro/Pro Max; 3145728 equivale a 0x300000."
+      },
+      "confidence": "HIGH",
+      "verificationStatus": "WELL_DOCUMENTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar USB-C/charge-port flex y FPC",
+          "Buscar líquido/corrosión"
+        ],
+        "knownGoodTest": "Probar charge-port assembly conocido como bueno.",
+        "boardLevelNextSteps": [
+          "Modo diodo del conector y líneas de comunicación si persiste"
+        ],
+        "cautions": []
+      },
+      "sourceIds": [
+        "ifixit_smc_assert",
+        "ifixit_16_series_charge_community"
+      ],
+      "notes": null
+    },
+    {
+      "id": "smc16pro_1048576_charge_community",
+      "title": "iPhone 16 Pro/Max: 1048576 / 0x100000",
+      "active": true,
+      "priority": 90,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_16_PRO"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["1048576", "0x100000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Posible ruta del puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "CANDIDATE"
+          }
+        ],
+        "interpretation": "Caso comunitario de técnico de reparación asocia 0x100000/1048576 al charging-port flex en 16/17."
+      },
+      "confidence": "MEDIUM",
+      "verificationStatus": "COMMUNITY_SUPPORTED",
+      "primaryEligible": true,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Confirmar valor exacto",
+          "Inspeccionar/probar charge-port flex antes de placa"
+        ],
+        "knownGoodTest": "Probar charge-port assembly conocido como bueno.",
+        "boardLevelNextSteps": [
+          "FPC y líneas asociadas"
+        ],
+        "cautions": [
+          "No está todavía en la tabla oficial comunitaria principal de iFixit para 16 Pro/Max."
+        ]
+      },
+      "sourceIds": ["ifixit_16_series_charge_community"],
+      "notes": null
+    },
+    {
+      "id": "smc16pro_2097152_charge_hint",
+      "title": "iPhone 16 Pro/Max: 2097152 / 0x200000, pista comunitaria",
+      "active": true,
+      "priority": 40,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_16_PRO"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["2097152", "0x200000"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Código SMC con pista comunitaria hacia puerto de carga; requiere verificación manual",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "LOW_CONFIDENCE_CANDIDATE"
+          }
+        ],
+        "interpretation": "Existen casos comunitarios que lo relacionan con charge port, pero la evidencia es menos sólida que para 0x300000."
+      },
+      "confidence": "LOW",
+      "verificationStatus": "COMMUNITY_SUPPORTED",
+      "primaryEligible": false,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "No sustituir pieza solo por este código",
+          "Buscar panicString completo y contexto del modelo"
+        ],
+        "knownGoodTest": "Si los síntomas/contexto acompañan, probar charge-port assembly conocido como bueno.",
+        "boardLevelNextSteps": [
+          "Comparar FPC/diode mode y consultar documentación actualizada"
+        ],
+        "cautions": [
+          "Esta regla no puede producir por sí sola un diagnóstico principal."
+        ]
+      },
+      "sourceIds": ["ifixit_16_series_charge_community"],
+      "notes": null
+    },
+    {
+      "id": "smc_16_base_0x300000_charge_community",
+      "title": "SMC_16_BASE: 0x300000 / 3145728, evidencia comunitaria",
+      "active": true,
+      "priority": 50,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_16_BASE"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x300000", "3145728"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Posible ruta del puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "CANDIDATE"
+          }
+        ],
+        "interpretation": "Técnicos de reparación reportan que la familia 0x300000 de charge-port continúa en series 16/17; no existe aún una tabla pública completa para todas estas variantes."
+      },
+      "confidence": "MEDIUM",
+      "verificationStatus": "COMMUNITY_SUPPORTED",
+      "primaryEligible": false,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar USB-C/charge-port flex y FPC",
+          "Corroborar con síntomas y reparación previa"
+        ],
+        "knownGoodTest": "Probar charge-port assembly conocido como bueno si el contexto lo justifica.",
+        "boardLevelNextSteps": [
+          "Modo diodo y documentación específica del modelo"
+        ],
+        "cautions": [
+          "No puede ser diagnóstico principal automático en este Rule Pack v1."
+        ]
+      },
+      "sourceIds": ["ifixit_16_series_charge_community"],
+      "notes": null
+    },
+    {
+      "id": "smc_16_base_0x100000_charge_community",
+      "title": "SMC_16_BASE: 0x100000 / 1048576, evidencia comunitaria",
+      "active": true,
+      "priority": 35,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_16_BASE"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x100000", "1048576"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Posible ruta del puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "LOW_CONFIDENCE_CANDIDATE"
+          }
+        ],
+        "interpretation": "Existe una asociación comunitaria con charge-port flex para 16/17, aún no suficientemente documentada por variante."
+      },
+      "confidence": "LOW",
+      "verificationStatus": "COMMUNITY_SUPPORTED",
+      "primaryEligible": false,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "No cambiar piezas solo por este valor",
+          "Buscar contexto del panic y daños físicos"
+        ],
+        "knownGoodTest": "Prueba con flex conocido bueno únicamente como descarte razonado.",
+        "boardLevelNextSteps": [
+          "FPC/diode mode y consulta de documentación más reciente"
+        ],
+        "cautions": [
+          "No puede generar diagnóstico principal automático."
+        ]
+      },
+      "sourceIds": ["ifixit_16_series_charge_community"],
+      "notes": null
+    },
+    {
+      "id": "smc_16e_0x300000_charge_community",
+      "title": "SMC_16E: 0x300000 / 3145728, evidencia comunitaria",
+      "active": true,
+      "priority": 50,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_16E"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x300000", "3145728"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Posible ruta del puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "CANDIDATE"
+          }
+        ],
+        "interpretation": "Técnicos de reparación reportan que la familia 0x300000 de charge-port continúa en series 16/17; no existe aún una tabla pública completa para todas estas variantes."
+      },
+      "confidence": "MEDIUM",
+      "verificationStatus": "COMMUNITY_SUPPORTED",
+      "primaryEligible": false,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar USB-C/charge-port flex y FPC",
+          "Corroborar con síntomas y reparación previa"
+        ],
+        "knownGoodTest": "Probar charge-port assembly conocido como bueno si el contexto lo justifica.",
+        "boardLevelNextSteps": [
+          "Modo diodo y documentación específica del modelo"
+        ],
+        "cautions": [
+          "No puede ser diagnóstico principal automático en este Rule Pack v1."
+        ]
+      },
+      "sourceIds": ["ifixit_16_series_charge_community"],
+      "notes": null
+    },
+    {
+      "id": "smc_16e_0x100000_charge_community",
+      "title": "SMC_16E: 0x100000 / 1048576, evidencia comunitaria",
+      "active": true,
+      "priority": 35,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_16E"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x100000", "1048576"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Posible ruta del puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "LOW_CONFIDENCE_CANDIDATE"
+          }
+        ],
+        "interpretation": "Existe una asociación comunitaria con charge-port flex para 16/17, aún no suficientemente documentada por variante."
+      },
+      "confidence": "LOW",
+      "verificationStatus": "COMMUNITY_SUPPORTED",
+      "primaryEligible": false,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "No cambiar piezas solo por este valor",
+          "Buscar contexto del panic y daños físicos"
+        ],
+        "knownGoodTest": "Prueba con flex conocido bueno únicamente como descarte razonado.",
+        "boardLevelNextSteps": [
+          "FPC/diode mode y consulta de documentación más reciente"
+        ],
+        "cautions": [
+          "No puede generar diagnóstico principal automático."
+        ]
+      },
+      "sourceIds": ["ifixit_16_series_charge_community"],
+      "notes": null
+    },
+    {
+      "id": "smc_17_0x300000_charge_community",
+      "title": "SMC_17: 0x300000 / 3145728, evidencia comunitaria",
+      "active": true,
+      "priority": 50,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_17"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x300000", "3145728"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Posible ruta del puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "CANDIDATE"
+          }
+        ],
+        "interpretation": "Técnicos de reparación reportan que la familia 0x300000 de charge-port continúa en series 16/17; no existe aún una tabla pública completa para todas estas variantes."
+      },
+      "confidence": "MEDIUM",
+      "verificationStatus": "COMMUNITY_SUPPORTED",
+      "primaryEligible": false,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar USB-C/charge-port flex y FPC",
+          "Corroborar con síntomas y reparación previa"
+        ],
+        "knownGoodTest": "Probar charge-port assembly conocido como bueno si el contexto lo justifica.",
+        "boardLevelNextSteps": [
+          "Modo diodo y documentación específica del modelo"
+        ],
+        "cautions": [
+          "No puede ser diagnóstico principal automático en este Rule Pack v1."
+        ]
+      },
+      "sourceIds": ["ifixit_16_series_charge_community"],
+      "notes": null
+    },
+    {
+      "id": "smc_17_0x100000_charge_community",
+      "title": "SMC_17: 0x100000 / 1048576, evidencia comunitaria",
+      "active": true,
+      "priority": 35,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_17"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x100000", "1048576"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Posible ruta del puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "LOW_CONFIDENCE_CANDIDATE"
+          }
+        ],
+        "interpretation": "Existe una asociación comunitaria con charge-port flex para 16/17, aún no suficientemente documentada por variante."
+      },
+      "confidence": "LOW",
+      "verificationStatus": "COMMUNITY_SUPPORTED",
+      "primaryEligible": false,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "No cambiar piezas solo por este valor",
+          "Buscar contexto del panic y daños físicos"
+        ],
+        "knownGoodTest": "Prueba con flex conocido bueno únicamente como descarte razonado.",
+        "boardLevelNextSteps": [
+          "FPC/diode mode y consulta de documentación más reciente"
+        ],
+        "cautions": [
+          "No puede generar diagnóstico principal automático."
+        ]
+      },
+      "sourceIds": ["ifixit_16_series_charge_community"],
+      "notes": null
+    },
+    {
+      "id": "smc_17e_0x300000_charge_community",
+      "title": "SMC_17E: 0x300000 / 3145728, evidencia comunitaria",
+      "active": true,
+      "priority": 50,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_17E"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x300000", "3145728"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Posible ruta del puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "CANDIDATE"
+          }
+        ],
+        "interpretation": "Técnicos de reparación reportan que la familia 0x300000 de charge-port continúa en series 16/17; no existe aún una tabla pública completa para todas estas variantes."
+      },
+      "confidence": "MEDIUM",
+      "verificationStatus": "COMMUNITY_SUPPORTED",
+      "primaryEligible": false,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Inspeccionar USB-C/charge-port flex y FPC",
+          "Corroborar con síntomas y reparación previa"
+        ],
+        "knownGoodTest": "Probar charge-port assembly conocido como bueno si el contexto lo justifica.",
+        "boardLevelNextSteps": [
+          "Modo diodo y documentación específica del modelo"
+        ],
+        "cautions": [
+          "No puede ser diagnóstico principal automático en este Rule Pack v1."
+        ]
+      },
+      "sourceIds": ["ifixit_16_series_charge_community"],
+      "notes": null
+    },
+    {
+      "id": "smc_17e_0x100000_charge_community",
+      "title": "SMC_17E: 0x100000 / 1048576, evidencia comunitaria",
+      "active": true,
+      "priority": 35,
+      "deviceScope": {
+        "diagnosticProfiles": ["SMC_17E"],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": ["0x100000", "1048576"],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "Posible ruta del puerto de carga",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [
+          {
+            "name": "Charge Port Assembly",
+            "role": "LOW_CONFIDENCE_CANDIDATE"
+          }
+        ],
+        "interpretation": "Existe una asociación comunitaria con charge-port flex para 16/17, aún no suficientemente documentada por variante."
+      },
+      "confidence": "LOW",
+      "verificationStatus": "COMMUNITY_SUPPORTED",
+      "primaryEligible": false,
+      "exactCodeOnly": true,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "No cambiar piezas solo por este valor",
+          "Buscar contexto del panic y daños físicos"
+        ],
+        "knownGoodTest": "Prueba con flex conocido bueno únicamente como descarte razonado.",
+        "boardLevelNextSteps": [
+          "FPC/diode mode y consulta de documentación más reciente"
+        ],
+        "cautions": [
+          "No puede generar diagnóstico principal automático."
+        ]
+      },
+      "sourceIds": ["ifixit_16_series_charge_community"],
+      "notes": null
+    },
+    {
+      "id": "smc_unknown_code_fallback",
+      "title": "SMC/BSC con código sin regla verificada",
+      "active": true,
+      "priority": -100,
+      "deviceScope": {
+        "diagnosticProfiles": [],
+        "productCodes": []
+      },
+      "match": {
+        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "sensorTokensAny": [],
+        "sensorCodesExactAny": [],
+        "requiredTermsAll": [],
+        "rawTermsAny": []
+      },
+      "diagnosis": {
+        "label": "SMC/BSC detectado, pero código no resuelto por la base instalada",
+        "subsystem": "SMC_SENSOR",
+        "suspectedComponents": [],
+        "interpretation": "La aplicación debe mostrar el código extraído, modelo y evidencia, sin inventar un componente."
+      },
+      "confidence": "UNKNOWN",
+      "verificationStatus": "VERIFIED",
+      "primaryEligible": true,
+      "exactCodeOnly": false,
+      "allowBitmaskDecomposition": false,
+      "repairFlow": {
+        "firstChecks": [
+          "Confirmar productCode y código exacto",
+          "Consultar Base de conocimiento y versiones más recientes del Rule Pack"
+        ],
+        "knownGoodTest": null,
+        "boardLevelNextSteps": [
+          "Usar esquema/boardview, contexto de reparación y mediciones si no existe regla"
+        ],
+        "cautions": [
+          "Nunca inferir por similitud con códigos de otra generación."
+        ]
+      },
+      "sourceIds": [
+        "ifixit_kernel_panics",
+        "ifixit_smc_assert"
+      ],
+      "notes": null
+    }
+  ]
+}

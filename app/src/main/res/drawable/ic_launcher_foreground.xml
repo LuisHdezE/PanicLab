@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Chip base -->
+    <path
+        android:pathData="M34,34 h40 v40 h-40 z"
+        android:strokeColor="#38BDF8"
+        android:strokeWidth="3.5"
+        android:strokeLineJoin="round" />
+        
+    <!-- Inner glowing core / pulse -->
+    <path
+        android:pathData="M44,44 h20 v20 h-20 z"
+        android:fillColor="#0284C7" />
+        
+    <!-- Center pulse / lightning / diagnostic wave -->
+    <path
+        android:pathData="M51,46 L47,54 L53,54 L51,62 L61,52 L55,52 Z"
+        android:fillColor="#38BDF8" />
+        
+    <!-- Chip pins top -->
+    <path
+        android:pathData="M42,26 L42,34 M54,24 L54,34 M66,26 L66,34"
+        android:strokeColor="#F59E0B"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+        
+    <!-- Chip pins bottom -->
+    <path
+        android:pathData="M42,74 L42,82 M54,74 L54,84 M66,74 L66,82"
+        android:strokeColor="#F59E0B"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+        
+    <!-- Chip pins left -->
+    <path
+        android:pathData="M26,42 L34,42 M24,54 L34,54 M26,66 L34,66"
+        android:strokeColor="#F59E0B"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+        
+    <!-- Chip pins right -->
+    <path
+        android:pathData="M74,42 L82,42 M74,54 L84,54 M74,66 L82,66"
+        android:strokeColor="#F59E0B"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+</vector>

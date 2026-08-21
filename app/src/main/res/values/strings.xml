@@ -1,0 +1,68 @@
+<resources>
+    <string name="app_name">PanicLab</string>
+    <string name="app_tagline">Diagnóstico determinista de Panic Full para técnicos</string>
+    
+    <!-- Navigation & Titles -->
+    <string name="title_home">PanicLab</string>
+    <string name="title_import_file">Importar Archivo</string>
+    <string name="title_paste_log">Pegar Panic Full</string>
+    <string name="title_analysis_results">Diagnóstico de Hardware</string>
+    <string name="title_evidence">Evidencia Técnica</string>
+    <string name="title_log_viewer">Visor de Registro</string>
+    <string name="title_history">Historial de Casos</string>
+    <string name="title_case_detail">Detalle del Caso</string>
+    <string name="title_knowledge_base">Base de Conocimiento</string>
+    <string name="title_rule_detail">Detalle de Regla</string>
+    <string name="title_manage_rules">Gestionar Rule Packs</string>
+    <string name="title_settings">Ajustes</string>
+    <string name="title_export_pdf">Exportar Informe PDF</string>
+    
+    <!-- Actions -->
+    <string name="action_analyze_file">Analizar archivo (.ips / .txt / .log)</string>
+    <string name="action_paste_panic">Pegar texto de Panic Full</string>
+    <string name="action_history">Historial de casos</string>
+    <string name="action_knowledge_base">Base de conocimiento</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="action_analyze">Analizar Registro</string>
+    <string name="action_export_pdf">Generar PDF</string>
+    <string name="action_share_pdf">Compartir PDF</string>
+    <string name="action_view_in_log">Ver en el log</string>
+    <string name="action_copy">Copiar</string>
+    <string name="action_reanalyze">Reanalizar con reglas actuales</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_import_pack">Importar Rule Pack JSON</string>
+    <string name="action_reset_pack">Restaurar Rule Pack predeterminado</string>
+    <string name="action_clear">Limpiar</string>
+    
+    <!-- Status & Labels -->
+    <string name="label_device">Dispositivo</string>
+    <string name="label_product_code">Código de producto</string>
+    <string name="label_os_version">Versión iOS</string>
+    <string name="label_build">Build</string>
+    <string name="label_panic_family">Familia de Panic</string>
+    <string name="label_confidence">Nivel de confianza</string>
+    <string name="label_primary_diagnosis">Diagnóstico principal</string>
+    <string name="label_alternative_candidates">Candidatos alternativos</string>
+    <string name="label_detected_codes">Códigos / sensores detectados</string>
+    <string name="label_why">Interpretación técnica</string>
+    <string name="label_what_to_check">Pasos iniciales en taller</string>
+    <string name="label_next_steps">Si la falla continúa (Board-Level)</string>
+    <string name="label_cautions">Precauciones</string>
+    <string name="label_technical_evidence">Evidencia técnica</string>
+    <string name="label_kb_version">Versión Base de Conocimiento</string>
+    <string name="label_rule_pack_active">Rule Pack activo</string>
+    <string name="label_inconclusive">Diagnóstico no concluyente</string>
+    <string name="label_unknown_code">Código identificado sin asociación confirmada en la base actual</string>
+    <string name="label_search_kb">Buscar código, sensor, modelo o componente...</string>
+    <string name="label_search_history">Buscar en historial...</string>
+    
+    <!-- Preferences -->
+    <string name="pref_dark_mode">Modo oscuro</string>
+    <string name="pref_dark_mode_desc">Ajustar apariencia de la interfaz</string>
+    <string name="pref_save_raw_logs">Guardar registros completos</string>
+    <string name="pref_save_raw_logs_desc">Almacena el texto íntegro en historial (desactivado por privacidad)</string>
+    <string name="pref_redact_identifiers">Ocultar identificadores en PDF</string>
+    <string name="pref_redact_identifiers_desc">Anonimiza UUID, incident_id y crashReporterKey en reportes</string>
+    <string name="pref_offline_guarantee">Garantía 100% Offline</string>
+    <string name="pref_offline_guarantee_desc">Motor local determinista sin llamadas a red ni IA generativa</string>
+</resources>

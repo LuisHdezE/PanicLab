@@ -1,0 +1,6 @@
+{
+  "name": "PanicLab",
+  "description": "Herramienta de diagnóstico de hardware para técnicos de iPhone mediante análisis determinista de registros Panic Full de iOS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
