@@ -41,8 +41,10 @@ fun HomeScreen(
     kbVersion: String,
     onNavigateToImportFile: () -> Unit,
     onNavigateToPasteLog: () -> Unit,
+    onNavigateToCameraScanner: () -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateToKnowledgeBase: () -> Unit,
+    onNavigateToTrends: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToReport: (String) -> Unit
 ) {
@@ -72,6 +74,83 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(18.dp),
             contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp)
         ) {
+            // Hero Camera OCR Scanner Banner
+            item {
+                Surface(
+                    onClick = onNavigateToCameraScanner,
+                    shape = RoundedCornerShape(22.dp),
+                    color = TechDarkCard,
+                    border = BorderStroke(1.5.dp, ElectricCyanLight.copy(alpha = 0.6f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("home_camera_scanner_hero_card")
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(18.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(ElectricBlue.copy(alpha = 0.2f))
+                                .border(1.5.dp, ElectricCyanLight, RoundedCornerShape(14.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CameraAlt,
+                                contentDescription = null,
+                                tint = ElectricCyanLight,
+                                modifier = Modifier.size(26.dp)
+                            )
+                        }
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = "Escanear con Cámara",
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = ElectricCyanLight.copy(alpha = 0.2f)
+                                ) {
+                                    Text(
+                                        text = "OCR LIVE",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = ElectricCyanLight,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "Extrae y diagnostica logs automáticamente desde pantallas o papel impreso.",
+                                fontSize = 12.sp,
+                                color = Color(0xFF94A3B8),
+                                lineHeight = 16.sp
+                            )
+                        }
+
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = ElectricCyanLight,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
+
             // 2x2 Primary Action Grid Cards
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -116,13 +195,13 @@ fun HomeScreen(
                             modifier = Modifier.weight(1f)
                         )
                         ActionGridCard(
-                            title = "Base de reglas",
-                            subtitle = "Sensores y modelos",
-                            badgeText = "Explorar",
-                            icon = Icons.Default.MenuBook,
-                            accentColor = Color(0xFFF59E0B),
-                            onClick = onNavigateToKnowledgeBase,
-                            tag = "home_kb_card",
+                            title = "Tendencias D3",
+                            subtitle = "Frecuencia & Hardware",
+                            badgeText = "D3.js",
+                            icon = Icons.Default.Analytics,
+                            accentColor = ElectricCyanLight,
+                            onClick = onNavigateToTrends,
+                            tag = "home_trends_card",
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -146,6 +225,16 @@ fun HomeScreen(
                             .horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        QuickAccessChip(
+                            label = "📊 Dashboard D3",
+                            icon = Icons.Default.Analytics,
+                            onClick = onNavigateToTrends
+                        )
+                        QuickAccessChip(
+                            label = "Base de reglas",
+                            icon = Icons.Default.MenuBook,
+                            onClick = onNavigateToKnowledgeBase
+                        )
                         QuickAccessChip(
                             label = "Buscar código (0x1000, 0x80000...)",
                             icon = Icons.Default.Code,

@@ -29,6 +29,7 @@ class GreetingScreenshotTest {
           kbVersion = "1.0.0",
           onNavigateToImportFile = {},
           onNavigateToPasteLog = {},
+          onNavigateToCameraScanner = {},
           onNavigateToHistory = {},
           onNavigateToKnowledgeBase = {},
           onNavigateToSettings = {},

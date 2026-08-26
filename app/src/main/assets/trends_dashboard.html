@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>PanicLab D3 Hardware Trend Analytics</title>
+  <!-- D3.js CDN with offline standalone fallback -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: #0B0F19;
+      color: #F8FAFC;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      overflow-x: hidden;
+      padding: 12px 14px 40px 14px;
+      font-size: 13px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0F19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1E293B;
+      border-radius: 4px;
+    }
+
+    /* Container */
+    #dashboard-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* Top Controls */
+    .controls-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #131B2E;
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 16px;
+      padding: 12px 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .view-mode-tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .tab-button {
+      background: #0F172A;
+      color: #94A3B8;
+      border: 1px solid #1E293B;
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tab-button.active {
+      background: rgba(0, 245, 255, 0.15);
+      color: #00F5FF;
+      border-color: #00F5FF;
+      box-shadow: 0 0 10px rgba(0, 245, 255, 0.25);
+    }
+
+    /* Filter Strip */
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .filter-select {
+      background: #0B0F19;
+      color: #E2E8F0;
+      border: 1px solid #334155;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    /* Chart Canvas Card */
+    .chart-card {
+      background: #131B2E;
+      border: 1px solid rgba(0, 245, 255, 0.2);
+      border-radius: 20px;
+      padding: 16px 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      position: relative;
+      min-height: 340px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 0 4px;
+    }
+
+    .chart-title-group h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chart-title-group p {
+      font-size: 11px;
+      color: #94A3B8;
+      margin-top: 2px;
+    }
+
+    .d3-badge {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #60A5FA;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    /* SVG container */
+    #chart-svg-container {
+      width: 100%;
+      height: 330px;
+      position: relative;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* Tooltip */
+    #d3-tooltip {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      background: rgba(11, 15, 25, 0.95);
+      border: 1px solid #00F5FF;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 11px;
+      color: #FFFFFF;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 245, 255, 0.3);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      z-index: 100;
+      max-width: 260px;
+      line-height: 1.4;
+    }
+
+    #d3-tooltip .tt-title {
+      font-weight: 700;
+      color: #00F5FF;
+      font-size: 13px;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #d3-tooltip .tt-sub {
+      color: #94A3B8;
+      font-size: 10px;
+      margin-bottom: 6px;
+    }
+
+    #d3-tooltip .tt-metric {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 3px;
+    }
+
+    #d3-tooltip .tt-hint {
+      background: rgba(59, 130, 246, 0.15);
+      border-left: 2px solid #3B82F6;
+      padding: 4px 6px;
+      font-size: 10px;
+      color: #93C5FD;
+      margin-top: 6px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* Axis styling */
+    .axis text {
+      fill: #94A3B8;
+      font-size: 10px;
+      font-family: monospace;
+    }
+    .axis line, .axis path {
+      stroke: #1E293B;
+    }
+    .grid line {
+      stroke: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Interactive bar hover */
+    .bar-rect {
+      cursor: pointer;
+      transition: filter 0.2s ease, transform 0.2s ease;
+    }
+    .bar-rect:hover {
+      filter: brightness(1.3) drop-shadow(0 0 8px rgba(0, 245, 255, 0.6));
+    }
+
+    /* Donut Slices */
+    .donut-slice {
+      cursor: pointer;
+      transition: transform 0.3s ease, filter 0.2s ease;
+    }
+    .donut-slice:hover {
+      filter: brightness(1.25) drop-shadow(0 0 10px rgba(0, 245, 255, 0.5));
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 280px;
+      text-align: center;
+      color: #64748B;
+      gap: 10px;
+    }
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      stroke: #334155;
+    }
+
+    /* Hardware Insight Card */
+    .insights-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .insight-card {
+      background: #131B2E;
+      border: 1px solid #1E293B;
+      border-left: 4px solid #00F5FF;
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .insight-card.CRITICAL {
+      border-left-color: #EF4444;
+      background: rgba(239, 68, 68, 0.05);
+    }
+    .insight-card.WARNING {
+      border-left-color: #F59E0B;
+      background: rgba(245, 158, 11, 0.05);
+    }
+    .insight-card.INFO {
+      border-left-color: #3B82F6;
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    .insight-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .insight-title {
+      font-weight: 700;
+      color: #FFFFFF;
+      font-size: 12px;
+    }
+
+    .insight-badge {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .badge-critical { background: rgba(239, 68, 68, 0.2); color: #F87171; }
+    .badge-warning { background: rgba(245, 158, 11, 0.2); color: #FBBF24; }
+    .badge-info { background: rgba(59, 130, 246, 0.2); color: #60A5FA; }
+
+    .insight-desc {
+      font-size: 11px;
+      color: #94A3B8;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .insight-rec {
+      font-size: 11px;
+      color: #00F5FF;
+      background: rgba(0, 245, 255, 0.08);
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div id="dashboard-container">
+    
+    <!-- Controls & View Mode Tabs -->
+    <div class="controls-panel">
+      <div class="view-mode-tabs">
+        <button class="tab-button active" onclick="switchViewMode('codes')" id="tab-codes">
+          📊 Códigos Frecuentes
+        </button>
+        <button class="tab-button" onclick="switchViewMode('subsystems')" id="tab-subsystems">
+          🍩 Subsistemas
+        </button>
+        <button class="tab-button" onclick="switchViewMode('models')" id="tab-models">
+          📱 Por Modelo
+        </button>
+        <button class="tab-button" onclick="switchViewMode('timeline')" id="tab-timeline">
+          📈 Línea Temporal
+        </button>
+      </div>
+
+      <div class="filter-row">
+        <span class="filter-label">Filtrar Modelo:</span>
+        <select id="model-filter" class="filter-select" onchange="onModelFilterChanged(this.value)">
+          <option value="ALL">Todos los Modelos</option>
+        </select>
+
+        <span class="filter-label" style="margin-left:auto;">Período:</span>
+        <select id="time-filter" class="filter-select" onchange="onTimeFilterChanged(this.value)">
+          <option value="ALL">Todo el Historial</option>
+          <option value="30">Últimos 30 días</option>
+          <option value="7">Últimos 7 días</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Chart Card with D3 Canvas -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title-group">
+          <h3 id="chart-main-title">Frecuencia de Códigos de Pánico</h3>
+          <p id="chart-sub-title">Distribución y ranking de fallas identificadas en Room</p>
+        </div>
+        <span class="d3-badge">D3.js ENGINE</span>
+      </div>
+
+      <div id="chart-svg-container">
+        <!-- SVG will be rendered here dynamically -->
+      </div>
+    </div>
+
+    <!-- Hardware Failure Insights Section -->
+    <div class="insights-container" id="insights-list">
+      <!-- Injected by JS -->
+    </div>
+
+  </div>
+
+  <!-- Interactive Tooltip Overlay -->
+  <div id="d3-tooltip"></div>
+
+  <script>
+    // Global Dashboard State
+    let dashboardData = null;
+    let currentViewMode = 'codes';
+    let selectedModelFilter = 'ALL';
+    let selectedTimeFilter = 'ALL';
+
+    // Color Palette
+    const CYBER_COLORS = [
+      '#00F5FF', // Electric Cyan
+      '#3B82F6', // Electric Blue
+      '#10B981', // Emerald
+      '#F59E0B', // Amber
+      '#EF4444', // Red
+      '#A855F7', // Purple
+      '#EC4899', // Pink
+      '#06B6D4'  // Teal
+    ];
+
+    // Fallback D3 helper if CDN is not reachable
+    function ensureD3Loaded() {
+      if (typeof d3 === 'undefined') {
+        console.warn('D3 CDN not available, initializing lightweight SVG generator...');
+        // Minimal polyfill for D3 rendering
+        window.d3FallbackMode = true;
+      }
+    }
+
+    // Called from Android Kotlin via evaluateJavascript
+    function updateDashboardData(jsonString) {
+      try {
+        dashboardData = (typeof jsonString === 'string') ? JSON.parse(jsonString) : jsonString;
+        populateModelFilterOptions();
+        renderCurrentView();
+        renderInsights();
+      } catch (e) {
+        console.error('Error parsing dashboard data:', e);
+      }
+    }
+
+    function switchViewMode(mode) {
+      currentViewMode = mode;
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById('tab-' + mode);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const titleEl = document.getElementById('chart-main-title');
+      const subTitleEl = document.getElementById('chart-sub-title');
+
+      if (mode === 'codes') {
+        titleEl.textContent = 'Frecuencia de Códigos de Pánico';
+        subTitleEl.textContent = 'Ranking de códigos SMC, direcciones I2C y fallas de sensores';
+      } else if (mode === 'subsystems') {
+        titleEl.textContent = 'Distribución por Subsistemas de Hardware';
+        subTitleEl.textContent = 'Proporción de flex de carga, sensores térmicos, bus I2C y periféricos';
+      } else if (mode === 'models') {
+        titleEl.textContent = 'Matriz de Vulnerabilidad por Modelo';
+        subTitleEl.textContent = 'Falla más frecuente identificada para cada modelo de iPhone';
+      } else if (mode === 'timeline') {
+        titleEl.textContent = 'Tendencia Temporal de Diagnósticos';
+        subTitleEl.textContent = 'Casos diagnosticados cronológicamente en el taller';
+      }
+
+      renderCurrentView();
+    }
+
+    function onModelFilterChanged(model) {
+      selectedModelFilter = model;
+      renderCurrentView();
+      if (window.AndroidBridge && window.AndroidBridge.onModelFilterChanged) {
+        window.AndroidBridge.onModelFilterChanged(model);
+      }
+    }
+
+    function onTimeFilterChanged(days) {
+      selectedTimeFilter = days;
+      renderCurrentView();
+      if (window.AndroidBridge && window.AndroidBridge.onTimeFilterChanged) {
+        window.AndroidBridge.onTimeFilterChanged(days);
+      }
+    }
+
+    function populateModelFilterOptions() {
+      if (!dashboardData || !dashboardData.modelCorrelations) return;
+      const select = document.getElementById('model-filter');
+      const currentVal = select.value;
+      select.innerHTML = '<option value="ALL">Todos los Modelos</option>';
+
+      dashboardData.modelCorrelations.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.productCode;
+        opt.textContent = m.marketingName + ' (' + m.totalPanics + ')';
+        select.appendChild(opt);
+      });
+
+      select.value = currentVal;
+    }
+
+    function renderCurrentView() {
+      const container = document.getElementById('chart-svg-container');
+      container.innerHTML = '';
+
+      if (!dashboardData || dashboardData.totalCases === 0) {
+        renderEmptyState(container);
+        return;
+      }
+
+      if (typeof d3 === 'undefined') {
+        renderNativeSvgFallback(container);
+        return;
+      }
+
+      if (currentViewMode === 'codes') {
+        renderD3BarChart(container);
+      } else if (currentViewMode === 'subsystems') {
+        renderD3DonutChart(container);
+      } else if (currentViewMode === 'models') {
+        renderD3ModelCorrelationChart(container);
+      } else if (currentViewMode === 'timeline') {
+        renderD3TimelineChart(container);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       MODE 1: D3 Animated Horizontal Bar Chart
+       ------------------------------------------------------------- */
+    function renderD3BarChart(container) {
+      let data = dashboardData.panicCodeStats || [];
+      if (selectedModelFilter !== 'ALL') {
+        data = data.filter(d => d.affectedModels && d.affectedModels.includes(selectedModelFilter));
+      }
+
+      if (data.length === 0) {
+        renderEmptyState(container, 'No hay códigos de pánico para este filtro');
+        return;
+      }
+
+      // Top 8 codes
+      data = data.slice(0, 8);
+
+      const margin = { top: 10, right: 50, bottom: 25, left: 105 };
+      const width = container.clientWidth - margin.left - margin.right;
+      const height = container.clientHeight - margin.top - margin.bottom;
+
+      const svg = d3.select(container)
+        .append('svg')
+        .attr('viewBox', `0 0 ${container.clientWidth} ${container.clientHeight}`)
+        .append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+
+      // Define Gradient
+      const defs = svg.append('defs');
+      const grad = defs.append('linearGradient')
+        .attr('id', 'bar-gradient')
+        .attr('x1', '0%')
+        .attr('y1', '0%')
+        .attr('x2', '100%')
+        .attr('y2', '0%');
+      grad.append('stop').attr('offset', '0%').attr('stop-color', '#3B82F6');
+      grad.append('stop').attr('offset', '100%').attr('stop-color', '#00F5FF');
+
+      // Scales
+      const y = d3.scaleBand()
+        .domain(data.map(d => d.code))
+        .range([0, height])
+        .padding(0.28);
+
+      const maxVal = d3.max(data, d => d.count) || 1;
+      const x = d3.scaleLinear()
+        .domain([0, maxVal * 1.15])
+        .range([0, width]);
+
+      // Y Axis
+      svg.append('g')
+        .attr('class', 'axis')
+        .call(d3.axisLeft(y).tickSize(0))
+        .selectAll('text')
+        .style('fill', '#00F5FF')
+        .style('font-weight', 'bold')
+        .style('font-size', '11px');
+
+      // Grid lines
+      svg.append('g')
+        .attr('class', 'grid')
+        .call(d3.axisBottom(x).ticks(4).tickSize(height).tickFormat(''))
+        .selectAll('line')
+        .style('stroke', 'rgba(255, 255, 255, 0.05)');
+
+      // Background track bars
+      svg.selectAll('.track-bar')
+        .data(data)
+        .enter()
+        .append('rect')
+        .attr('class', 'track-bar')
+        .attr('y', d => y(d.code))
+        .attr('height', y.bandwidth())
+        .attr('x', 0)
+        .attr('width', width)
+        .attr('rx', 6)
+        .attr('fill', '#0F172A');
+
+      // Value Bars with Animation
+      const bars = svg.selectAll('.bar-rect')
+        .data(data)
+        .enter()
+        .append('rect')
+        .attr('class', 'bar-rect')
+        .attr('y', d => y(d.code))
+        .attr('height', y.bandwidth())
+        .attr('x', 0)
+        .attr('width', 0)
+        .attr('rx', 6)
+        .attr('fill', 'url(#bar-gradient)')
+        .on('click', (event, d) => {
+          showTooltip(event, d);
+          if (window.AndroidBridge && window.AndroidBridge.onCodeSelected) {
+            window.AndroidBridge.onCodeSelected(d.code, d.ruleId || '');
+          }
+        })
+        .on('mouseover', (event, d) => showTooltip(event, d))
+        .on('mouseout', hideTooltip);
+
+      bars.transition()
+        .duration(700)
+        .delay((d, i) => i * 60)
+        .attr('width', d => x(d.count));
+
+      // Labels on end of bar
+      svg.selectAll('.bar-label')
+        .data(data)
+        .enter()
+        .append('text')
+        .attr('class', 'bar-label')
+        .attr('y', d => y(d.code) + y.bandwidth() / 2 + 4)
+        .attr('x', d => x(d.count) + 8)
+        .text(d => `${d.count} (${Math.round(d.percentage)}%)`)
+        .style('fill', '#FFFFFF')
+        .style('font-size', '10px')
+        .style('font-weight', 'bold')
+        .style('opacity', 0)
+        .transition()
+        .duration(800)
+        .delay((d, i) => i * 60 + 300)
+        .style('opacity', 1);
+    }
+
+    /* -------------------------------------------------------------
+       MODE 2: D3 Interactive Donut Chart
+       ------------------------------------------------------------- */
+    function renderD3DonutChart(container) {
+      const data = dashboardData.subsystemStats || [];
+      if (data.length === 0) {
+        renderEmptyState(container, 'No hay datos de subsistemas');
+        return;
+      }
+
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      const radius = Math.min(width, height) / 2 - 20;
+
+      const svg = d3.select(container)
+        .append('svg')
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .append('g')
+        .attr('transform', `translate(${width / 2},${height / 2})`);
+
+      const color = d3.scaleOrdinal()
+        .domain(data.map(d => d.subsystemId))
+        .range(CYBER_COLORS);
+
+      const pie = d3.pie()
+        .value(d => d.count)
+        .sort(null);
+
+      const arc = d3.arc()
+        .innerRadius(radius * 0.55)
+        .outerRadius(radius * 0.9)
+        .cornerRadius(6);
+
+      const arcHover = d3.arc()
+        .innerRadius(radius * 0.52)
+        .outerRadius(radius * 0.96)
+        .cornerRadius(6);
+
+      // Slices
+      const path = svg.selectAll('path')
+        .data(pie(data))
+        .enter()
+        .append('path')
+        .attr('class', 'donut-slice')
+        .attr('fill', d => d.data.colorHex || color(d.data.subsystemId))
+        .attr('stroke', '#0B0F19')
+        .attr('stroke-width', '3px')
+        .on('click', (event, d) => {
+          showSubsystemTooltip(event, d.data);
+          if (window.AndroidBridge && window.AndroidBridge.onSubsystemSelected) {
+            window.AndroidBridge.onSubsystemSelected(d.data.subsystemId);
+          }
+        })
+        .on('mouseover', function(event, d) {
+          d3.select(this).transition().duration(200).attr('d', arcHover);
+          centerTextMain.text(`${d.data.count} casos`);
+          centerTextSub.text(`${Math.round(d.data.percentage)}% total`);
+          showSubsystemTooltip(event, d.data);
+        })
+        .on('mouseout', function() {
+          d3.select(this).transition().duration(200).attr('d', arc);
+          centerTextMain.text(`${dashboardData.totalCases}`);
+          centerTextSub.text('Total Casos');
+          hideTooltip();
+        });
+
+      // Arc transition
+      path.transition()
+        .duration(800)
+        .attrTween('d', function(d) {
+          const interpolate = d3.interpolate({ startAngle: 0, endAngle: 0 }, d);
+          return function(t) { return arc(interpolate(t)); };
+        });
+
+      // Center KPI text
+      const centerTextMain = svg.append('text')
+        .attr('text-anchor', 'middle')
+        .attr('dy', '-2px')
+        .style('font-size', '20px')
+        .style('font-weight', 'bold')
+        .style('fill', '#FFFFFF')
+        .text(`${dashboardData.totalCases}`);
+
+      const centerTextSub = svg.append('text')
+        .attr('text-anchor', 'middle')
+        .attr('dy', '18px')
+        .style('font-size', '11px')
+        .style('font-weight', '600')
+        .style('fill', '#00F5FF')
+        .text('Total Casos');
+    }
+
+    /* -------------------------------------------------------------
+       MODE 3: D3 Model vs Panic Vulnerability Chart
+       ------------------------------------------------------------- */
+    function renderD3ModelCorrelationChart(container) {
+      const data = dashboardData.modelCorrelations || [];
+      if (data.length === 0) {
+        renderEmptyState(container, 'No hay correlaciones de modelo registradas');
+        return;
+      }
+
+      const margin = { top: 15, right: 20, bottom: 50, left: 45 };
+      const width = container.clientWidth - margin.left - margin.right;
+      const height = container.clientHeight - margin.top - margin.bottom;
+
+      const svg = d3.select(container)
+        .append('svg')
+        .attr('viewBox', `0 0 ${container.clientWidth} ${container.clientHeight}`)
+        .append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+
+      const x = d3.scaleBand()
+        .domain(data.map(d => d.marketingName))
+        .range([0, width])
+        .padding(0.35);
+
+      const maxVal = d3.max(data, d => d.totalPanics) || 1;
+      const y = d3.scaleLinear()
+        .domain([0, maxVal * 1.2])
+        .range([height, 0]);
+
+      // X Axis
+      svg.append('g')
+        .attr('class', 'axis')
+        .attr('transform', `translate(0,${height})`)
+        .call(d3.axisBottom(x))
+        .selectAll('text')
+        .style('text-anchor', 'end')
+        .attr('dx', '-8px')
+        .attr('dy', '4px')
+        .attr('transform', 'rotate(-30)')
+        .style('fill', '#94A3B8')
+        .style('font-size', '10px');
+
+      // Y Axis
+      svg.append('g')
+        .attr('class', 'axis')
+        .call(d3.axisLeft(y).ticks(4));
+
+      // Bars
+      const bars = svg.selectAll('.model-bar')
+        .data(data)
+        .enter()
+        .append('rect')
+        .attr('class', 'bar-rect')
+        .attr('x', d => x(d.marketingName))
+        .attr('width', x.bandwidth())
+        .attr('y', height)
+        .attr('height', 0)
+        .attr('rx', 6)
+        .attr('fill', '#A855F7')
+        .on('click', (event, d) => {
+          showModelTooltip(event, d);
+          if (window.AndroidBridge && window.AndroidBridge.onModelSelected) {
+            window.AndroidBridge.onModelSelected(d.marketingName);
+          }
+        })
+        .on('mouseover', (event, d) => showModelTooltip(event, d))
+        .on('mouseout', hideTooltip);
+
+      bars.transition()
+        .duration(700)
+        .delay((d, i) => i * 80)
+        .attr('y', d => y(d.totalPanics))
+        .attr('height', d => height - y(d.totalPanics));
+
+      // Top failing code badge over each bar
+      svg.selectAll('.top-code-label')
+        .data(data)
+        .enter()
+        .append('text')
+        .attr('class', 'top-code-label')
+        .attr('x', d => x(d.marketingName) + x.bandwidth() / 2)
+        .attr('y', d => y(d.totalPanics) - 8)
+        .attr('text-anchor', 'middle')
+        .text(d => d.topPanicCode)
+        .style('fill', '#00F5FF')
+        .style('font-family', 'monospace')
+        .style('font-size', '9px')
+        .style('font-weight', 'bold')
+        .style('opacity', 0)
+        .transition()
+        .duration(800)
+        .delay((d, i) => i * 80 + 300)
+        .style('opacity', 1);
+    }
+
+    /* -------------------------------------------------------------
+       MODE 4: D3 Timeline Area Trend Chart
+       ------------------------------------------------------------- */
+    function renderD3TimelineChart(container) {
+      const data = dashboardData.timelinePoints || [];
+      if (data.length < 2) {
+        renderEmptyState(container, 'Se requieren al menos 2 sesiones para graficar la tendencia');
+        return;
+      }
+
+      const margin = { top: 15, right: 20, bottom: 35, left: 40 };
+      const width = container.clientWidth - margin.left - margin.right;
+      const height = container.clientHeight - margin.top - margin.bottom;
+
+      const svg = d3.select(container)
+        .append('svg')
+        .attr('viewBox', `0 0 ${container.clientWidth} ${container.clientHeight}`)
+        .append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+
+      const x = d3.scalePoint()
+        .domain(data.map(d => d.dateFormatted))
+        .range([0, width])
+        .padding(0.2);
+
+      const maxVal = d3.max(data, d => d.count) || 1;
+      const y = d3.scaleLinear()
+        .domain([0, maxVal * 1.25])
+        .range([height, 0]);
+
+      // Gradients
+      const defs = svg.append('defs');
+      const areaGrad = defs.append('linearGradient')
+        .attr('id', 'area-grad')
+        .attr('x1', '0%').attr('y1', '0%')
+        .attr('x2', '0%').attr('y2', '100%');
+      areaGrad.append('stop').attr('offset', '0%').attr('stop-color', '#00F5FF').attr('stop-opacity', 0.4);
+      areaGrad.append('stop').attr('offset', '100%').attr('stop-color', '#00F5FF').attr('stop-opacity', 0.0);
+
+      // Area generator
+      const area = d3.area()
+        .x(d => x(d.dateFormatted))
+        .y0(height)
+        .y1(d => y(d.count))
+        .curve(d3.curveMonotoneX);
+
+      // Line generator
+      const line = d3.line()
+        .x(d => x(d.dateFormatted))
+        .y(d => y(d.count))
+        .curve(d3.curveMonotoneX);
+
+      // Draw Area
+      svg.append('path')
+        .datum(data)
+        .attr('fill', 'url(#area-grad)')
+        .attr('d', area);
+
+      // Draw Line
+      svg.append('path')
+        .datum(data)
+        .attr('fill', 'none')
+        .attr('stroke', '#00F5FF')
+        .attr('stroke-width', 2.5)
+        .attr('d', line);
+
+      // Dots
+      svg.selectAll('.dot')
+        .data(data)
+        .enter()
+        .append('circle')
+        .attr('class', 'dot')
+        .attr('cx', d => x(d.dateFormatted))
+        .attr('cy', d => y(d.count))
+        .attr('r', 4.5)
+        .attr('fill', '#0B0F19')
+        .attr('stroke', '#00F5FF')
+        .attr('stroke-width', 2.5)
+        .on('mouseover', (event, d) => {
+          showTimelineTooltip(event, d);
+        })
+        .on('mouseout', hideTooltip);
+
+      // Axes
+      svg.append('g')
+        .attr('class', 'axis')
+        .attr('transform', `translate(0,${height})`)
+        .call(d3.axisBottom(x))
+        .selectAll('text')
+        .style('font-size', '10px');
+
+      svg.append('g')
+        .attr('class', 'axis')
+        .call(d3.axisLeft(y).ticks(4));
+    }
+
+    /* -------------------------------------------------------------
+       Tooltips
+       ------------------------------------------------------------- */
+    const tooltip = document.getElementById('d3-tooltip');
+
+    function showTooltip(event, d) {
+      tooltip.innerHTML = `
+        <div class="tt-title"><span>⚡</span> ${d.code}</div>
+        <div class="tt-sub">${d.label}</div>
+        <div class="tt-metric"><span>Frecuencia:</span> <b>${d.count} casos (${Math.round(d.percentage)}%)</b></div>
+        <div class="tt-metric"><span>Subsistema:</span> <b>${d.subsystem}</b></div>
+        ${d.diodeModeHint ? `<div class="tt-hint">📐 Multímetro: ${d.diodeModeHint}</div>` : ''}
+      `;
+      positionTooltip(event);
+    }
+
+    function showSubsystemTooltip(event, d) {
+      tooltip.innerHTML = `
+        <div class="tt-title"><span>🔧</span> ${d.label}</div>
+        <div class="tt-metric"><span>Casos:</span> <b>${d.count} (${Math.round(d.percentage)}%)</b></div>
+        <div class="tt-metric"><span>Componente Crítico:</span> <b>${d.topFailingPart}</b></div>
+        <div class="tt-hint">Síntomas habituales: ${d.commonSymptoms.join(', ')}</div>
+      `;
+      positionTooltip(event);
+    }
+
+    function showModelTooltip(event, d) {
+      tooltip.innerHTML = `
+        <div class="tt-title"><span>📱</span> ${d.marketingName}</div>
+        <div class="tt-metric"><span>Total Diagnósticos:</span> <b>${d.totalPanics}</b></div>
+        <div class="tt-metric"><span>Falla Frecuente:</span> <b style="color:#00F5FF">${d.topPanicCode}</b></div>
+        <div class="tt-sub" style="margin-top:4px;">${d.topPanicLabel}</div>
+      `;
+      positionTooltip(event);
+    }
+
+    function showTimelineTooltip(event, d) {
+      tooltip.innerHTML = `
+        <div class="tt-title"><span>📅</span> ${d.dateFormatted}</div>
+        <div class="tt-metric"><span>Casos Diagnosticados:</span> <b>${d.count}</b></div>
+        <div class="tt-metric"><span>Código Principal:</span> <b>${d.topCode}</b></div>
+      `;
+      positionTooltip(event);
+    }
+
+    function positionTooltip(event) {
+      tooltip.style.opacity = 1;
+      const x = event.pageX || (event.touches && event.touches[0] ? event.touches[0].pageX : 100);
+      const y = event.pageY || (event.touches && event.touches[0] ? event.touches[0].pageY : 100);
+      
+      const left = Math.min(x + 10, window.innerWidth - 270);
+      const top = Math.max(y - 80, 10);
+      
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = top + 'px';
+    }
+
+    function hideTooltip() {
+      tooltip.style.opacity = 0;
+    }
+
+    /* -------------------------------------------------------------
+       Hardware Failure Insights Rendering
+       ------------------------------------------------------------- */
+    function renderInsights() {
+      const container = document.getElementById('insights-list');
+      container.innerHTML = '';
+
+      const insights = dashboardData.hardwareInsights || [];
+      if (insights.length === 0) return;
+
+      const header = document.createElement('h4');
+      header.style.color = '#FFFFFF';
+      header.style.fontSize = '13px';
+      header.style.fontWeight = 'bold';
+      header.style.marginBottom = '6px';
+      header.textContent = '💡 Recomendaciones de Taller y Hallazgos';
+      container.appendChild(header);
+
+      insights.forEach(ins => {
+        const card = document.createElement('div');
+        card.className = `insight-card ${ins.priority}`;
+
+        const badgeClass = ins.priority === 'CRITICAL' ? 'badge-critical' : (ins.priority === 'WARNING' ? 'badge-warning' : 'badge-info');
+
+        card.innerHTML = `
+          <div class="insight-header">
+            <span class="insight-title">${ins.title}</span>
+            <span class="insight-badge ${badgeClass}">${ins.priority}</span>
+          </div>
+          <div class="insight-desc">${ins.description}</div>
+          <div class="insight-rec">🛠️ Acción: ${ins.recommendation}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    /* -------------------------------------------------------------
+       Empty State & Fallbacks
+       ------------------------------------------------------------- */
+    function renderEmptyState(container, msg) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 3v18h18"/>
+            <path d="M18 17V9"/>
+            <path d="M13 17V5"/>
+            <path d="M8 17v-3"/>
+          </svg>
+          <div style="font-size:13px; font-weight:bold; color:#FFFFFF;">Sin datos suficientes</div>
+          <div style="font-size:11px; max-width:240px;">${msg || 'Guarda y diagnostica registros .ips en el historial para visualizar tendencias de fallas.'}</div>
+        </div>
+      `;
+    }
+
+    function renderNativeSvgFallback(container) {
+      // Fallback if D3 is loading or offline
+      container.innerHTML = `
+        <div class="empty-state">
+          <div style="color:#00F5FF; font-weight:bold;">Cargando motor D3...</div>
+        </div>
+      `;
+    }
+
+    // Auto-init listener
+    window.addEventListener('DOMContentLoaded', () => {
+      ensureD3Loaded();
+      if (window.AndroidBridge && window.AndroidBridge.requestInitialData) {
+        window.AndroidBridge.requestInitialData();
+      }
+    });
+  </script>
+</body>
+</html>

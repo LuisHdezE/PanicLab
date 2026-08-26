@@ -23,7 +23,8 @@ import org.json.JSONObject
 
 class DiagnosticRepositoryImpl(
     private val database: AppDatabase,
-    private val kbRepository: KnowledgeBaseRepository
+    private val kbRepository: KnowledgeBaseRepository,
+    private val groundingService: com.example.data.remote.GeminiRepairGroundingService = com.example.data.remote.GeminiRepairGroundingService()
 ) : DiagnosticRepository {
 
     private val sessionDao = database.diagnosticSessionDao()
@@ -52,7 +53,7 @@ class DiagnosticRepositoryImpl(
         val panicFamilies = PanicClassifier.classify(normalizedLog, metadata.panicString)
 
         // 5. Extract Sensors & Codes
-        val extractedSensors = SensorExtractor.extract(normalizedLog)
+        val extractedSensors = SensorExtractor.extract(normalizedLog, metadata.panicString)
 
         // 6. Extract Evidences
         val evidences = EvidenceExtractor.extractEvidences(
@@ -131,7 +132,9 @@ class DiagnosticRepositoryImpl(
             appliedRuleIdsJson = JSONArray(appliedRuleIds).toString(),
             repairFlowJson = repairFlowJson,
             rawLog = if (saveRawLog) normalizedLog else null,
-            rawLogSaved = saveRawLog
+            rawLogSaved = saveRawLog,
+            technicianNotes = report.technicianNotes,
+            customerName = report.customerName
         )
 
         sessionDao.insertSession(sessionEntity)
@@ -255,8 +258,22 @@ class DiagnosticRepositoryImpl(
             rawLogSaved = sessionEntity.rawLogSaved,
             reanalyzedAt = sessionEntity.reanalyzedAt,
             previousDiagnosis = sessionEntity.previousDiagnosis,
-            previousKnowledgeBaseVersion = sessionEntity.previousKnowledgeBaseVersion
+            previousKnowledgeBaseVersion = sessionEntity.previousKnowledgeBaseVersion,
+            technicianNotes = sessionEntity.technicianNotes,
+            customerName = sessionEntity.customerName
         )
+    }
+
+    override suspend fun saveTechnicianNotes(sessionId: String, notes: String) = withContext(Dispatchers.IO) {
+        sessionDao.updateTechnicianNotes(sessionId, notes.ifBlank { null })
+    }
+
+    override suspend fun saveCustomerInfo(sessionId: String, customerName: String, notes: String) = withContext(Dispatchers.IO) {
+        sessionDao.updateCustomerInfo(sessionId, customerName.ifBlank { null }, notes.ifBlank { null })
+    }
+
+    override suspend fun fetchRealTimeRepairSuggestions(report: DiagnosticReport): Result<GroundedRepairSuggestion> = withContext(Dispatchers.IO) {
+        groundingService.fetchRepairSuggestions(report)
     }
 
     override suspend fun reanalyzeSession(sessionId: String): Result<DiagnosticReport> = withContext(Dispatchers.IO) {
@@ -277,7 +294,7 @@ class DiagnosticRepositoryImpl(
                 val normalizedLog = LogNormalizer.normalize(rawLog)
                 val metadata = MetadataExtractor.extract(normalizedLog)
                 val reclassifiedFamilies = PanicClassifier.classify(normalizedLog, metadata.panicString)
-                val sensors = SensorExtractor.extract(normalizedLog)
+                val sensors = SensorExtractor.extract(normalizedLog, metadata.panicString)
                 val newEvidences = EvidenceExtractor.extractEvidences(normalizedLog, metadata, reclassifiedFamilies, sensors)
                 val matchRes = DiagnosticRulesEngine.evaluate(
                     deviceModel = device,
@@ -305,9 +322,11 @@ class DiagnosticRepositoryImpl(
                         rawLines.add(ev.excerpt)
                     }
                 }
+                val sensorCodes = smcCodes.mapNotNull { SensorCode.parse(it) }
                 val sensors = ExtractedSensors(
                     missingSensorTokens = missingTokens,
                     smcSensorCodes = smcCodes,
+                    sensorCodes = sensorCodes,
                     rawSensorArrayLines = rawLines
                 )
 
@@ -414,7 +433,9 @@ class DiagnosticRepositoryImpl(
                 rawLogSaved = sessionEntity.rawLogSaved,
                 reanalyzedAt = updatedSessionEntity.reanalyzedAt,
                 previousDiagnosis = sessionEntity.primaryDiagnosis,
-                previousKnowledgeBaseVersion = sessionEntity.knowledgeBaseVersion
+                previousKnowledgeBaseVersion = sessionEntity.knowledgeBaseVersion,
+                technicianNotes = sessionEntity.technicianNotes,
+                customerName = sessionEntity.customerName
             )
 
             Result.success(updatedReport)
@@ -470,7 +491,9 @@ class DiagnosticRepositoryImpl(
             rawLogSaved = entity.rawLogSaved,
             reanalyzedAt = entity.reanalyzedAt,
             previousDiagnosis = entity.previousDiagnosis,
-            previousKnowledgeBaseVersion = entity.previousKnowledgeBaseVersion
+            previousKnowledgeBaseVersion = entity.previousKnowledgeBaseVersion,
+            technicianNotes = entity.technicianNotes,
+            customerName = entity.customerName
         )
     }
 

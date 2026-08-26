@@ -32,6 +32,9 @@ interface DiagnosticRepository {
     fun getSessionHistory(): Flow<List<DiagnosticReport>>
     suspend fun getSessionById(sessionId: String): DiagnosticReport?
     suspend fun reanalyzeSession(sessionId: String): Result<DiagnosticReport>
+    suspend fun saveTechnicianNotes(sessionId: String, notes: String)
+    suspend fun saveCustomerInfo(sessionId: String, customerName: String, notes: String)
+    suspend fun fetchRealTimeRepairSuggestions(report: DiagnosticReport): Result<GroundedRepairSuggestion>
     suspend fun deleteSession(sessionId: String)
     suspend fun clearHistory()
 }

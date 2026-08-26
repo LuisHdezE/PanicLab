@@ -26,8 +26,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.domain.model.DiagnosticReport
+import com.example.domain.model.RepairSuggestionUiState
 import com.example.ui.components.ConfidenceBadge
 import com.example.ui.components.HexagonMicroscopeEmblem
+import com.example.ui.components.RepairSuggestionsSection
 import com.example.ui.theme.*
 import com.example.util.UnknownCaseRedactor
 import java.text.SimpleDateFormat
@@ -42,12 +44,16 @@ fun CaseDetailScreen(
     onNavigateBack: () -> Unit,
     onNavigateToEvidence: () -> Unit,
     onNavigateToLogViewer: () -> Unit,
+    onNavigateToResult: (String) -> Unit = {},
+    onSaveNotes: (String, String) -> Unit = { _, _ -> },
     onReanalyze: () -> Unit,
-    onExportPdf: () -> Unit
+    onExportPdf: () -> Unit,
+    repairSuggestionState: RepairSuggestionUiState = RepairSuggestionUiState.Idle,
+    onFetchRepairSuggestions: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
-    var technicianNotes by remember { mutableStateOf("") }
-    var notesSaved by remember { mutableStateOf(false) }
+    var technicianNotes by remember(report?.technicianNotes) { mutableStateOf(report?.technicianNotes ?: "") }
+    var notesSaved by remember(report?.technicianNotes) { mutableStateOf(!report?.technicianNotes.isNullOrBlank()) }
 
     if (report == null) {
         Box(
@@ -115,6 +121,16 @@ fun CaseDetailScreen(
                     }
                 },
                 actions = {
+                    IconButton(
+                        onClick = { onNavigateToResult(report.id) },
+                        modifier = Modifier.testTag("case_detail_view_full_result_top_btn")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Analytics,
+                            contentDescription = "Ver Informe Completo",
+                            tint = ElectricCyanLight
+                        )
+                    }
                     IconButton(
                         onClick = onExportPdf,
                         modifier = Modifier.testTag("case_detail_export_top_button")
@@ -401,6 +417,21 @@ fun CaseDetailScreen(
                 }
             }
 
+            // Real-Time Google Search Grounding Repair Suggestions
+            item {
+                RepairSuggestionsSection(
+                    report = report,
+                    state = repairSuggestionState,
+                    onFetchSuggestions = {
+                        onFetchRepairSuggestions?.invoke()
+                    },
+                    onAppendToNotes = { notesToAppend ->
+                        technicianNotes = if (technicianNotes.isBlank()) notesToAppend else "$technicianNotes\n$notesToAppend"
+                        onSaveNotes(report.id, technicianNotes)
+                    }
+                )
+            }
+
             // Action: Reanalyze & Evidence Buttons
             item {
                 Row(
@@ -564,8 +595,9 @@ fun CaseDetailScreen(
 
                         Button(
                             onClick = {
+                                onSaveNotes(report.id, technicianNotes)
                                 notesSaved = true
-                                Toast.makeText(context, "Notas guardadas localmente", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Notas guardadas en Room", Toast.LENGTH_SHORT).show()
                             },
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = ElectricBlueContainer),

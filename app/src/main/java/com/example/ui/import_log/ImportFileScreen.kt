@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -40,6 +41,7 @@ import java.io.BufferedReader
 fun ImportFileScreen(
     viewModel: AnalysisViewModel,
     onNavigateBack: () -> Unit,
+    onNavigateToCameraScanner: () -> Unit,
     onAnalysisSuccess: (String) -> Unit
 ) {
     val context = LocalContext.current
@@ -219,6 +221,61 @@ fun ImportFileScreen(
                             FormatPill(".log")
                             FormatPill(".json")
                         }
+                    }
+                }
+            }
+
+            // OCR Camera Scanner Alternative Card
+            item {
+                Surface(
+                    onClick = onNavigateToCameraScanner,
+                    shape = RoundedCornerShape(18.dp),
+                    color = TechDarkCard,
+                    border = BorderStroke(1.dp, ElectricCyanLight.copy(alpha = 0.5f)),
+                    modifier = Modifier.fillMaxWidth().testTag("import_file_camera_scanner_btn")
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(ElectricBlue.copy(alpha = 0.2f)),
+                            contentAlignment = Alignment.Center
+                         ) {
+                            Icon(
+                                imageVector = Icons.Default.CameraAlt,
+                                contentDescription = null,
+                                tint = ElectricCyanLight,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "¿Tienes el log en otra pantalla o en papel?",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Text(
+                                text = "Escanear con Cámara (OCR automático)",
+                                fontSize = 11.sp,
+                                color = ElectricCyanLight
+                            )
+                        }
+
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = ElectricCyanLight,
+                            modifier = Modifier.size(16.dp)
+                        )
                     }
                 }
             }

@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.example.domain.model.DiagnosticReport
 import com.example.export.PdfReportGenerator
+import com.example.export.TextSummaryOptions
+import com.example.export.TextSummaryReportGenerator
 import com.example.ui.components.ConfidenceBadge
 import com.example.ui.components.HexagonMicroscopeEmblem
 import com.example.ui.theme.*
@@ -302,6 +304,105 @@ fun ExportReportScreen(
                                 onCheckedChange = { includeFullLog = it },
                                 modifier = Modifier.testTag("switch_include_full_log")
                             )
+                        }
+                    }
+                }
+            }
+
+            // Customer Text Summary Action Card
+            item {
+                val customerText = remember(report, redactIdentifiers) {
+                    TextSummaryReportGenerator.generateCustomerSummary(
+                        report = report,
+                        options = TextSummaryOptions(
+                            redactSensitiveData = redactIdentifiers,
+                            includeRepairSteps = true,
+                            includeTechnicalEvidences = true
+                        )
+                    )
+                }
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(22.dp),
+                    color = TechDarkCard,
+                    border = BorderStroke(1.dp, TechDarkBorderGlow)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(18.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "INFORME EN TEXTO PARA CLIENTE",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp,
+                                color = ElectricCyanLight
+                            )
+                            Icon(
+                                imageVector = Icons.Default.Chat,
+                                contentDescription = null,
+                                tint = ElectricCyanLight,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+
+                        Text(
+                            text = "Envía un resumen técnico profesional adaptado para mensajería instantánea (WhatsApp, Telegram o SMS).",
+                            fontSize = 12.sp,
+                            color = Color(0xFF94A3B8),
+                            lineHeight = 16.sp
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = {
+                                    TextSummaryReportGenerator.copyToClipboard(
+                                        context = context,
+                                        reportText = customerText,
+                                        message = "Resumen de texto copiado al portapapeles"
+                                    )
+                                },
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, TechDarkBorder),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(44.dp)
+                                    .testTag("export_copy_text_summary_button")
+                            ) {
+                                Icon(imageVector = Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(15.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Copiar Texto", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            }
+
+                            Button(
+                                onClick = {
+                                    TextSummaryReportGenerator.shareReport(
+                                        context = context,
+                                        reportText = customerText,
+                                        title = "Informe de Diagnóstico - $deviceName"
+                                    )
+                                },
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = ElectricCyanLight.copy(alpha = 0.2f)),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(44.dp)
+                                    .testTag("export_share_text_summary_button")
+                            ) {
+                                Icon(imageVector = Icons.Default.Share, contentDescription = null, tint = ElectricCyanLight, modifier = Modifier.size(15.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Compartir", fontSize = 12.sp, color = ElectricCyanLight, fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }

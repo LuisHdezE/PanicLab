@@ -5,6 +5,7 @@ sealed class Screen(val route: String) {
     object Home : Screen("home")
     object ImportFile : Screen("import_file")
     object PasteLog : Screen("paste_log")
+    object CameraScanner : Screen("camera_scanner")
     object Result : Screen("result/{sessionId}") {
         fun createRoute(sessionId: String) = "result/$sessionId"
     }
@@ -23,6 +24,7 @@ sealed class Screen(val route: String) {
         fun createRoute(ruleId: String) = "rule_detail/$ruleId"
     }
     object RulePacks : Screen("rule_packs")
+    object TrendsDashboard : Screen("trends_dashboard")
     object ExportReport : Screen("export_report/{sessionId}") {
         fun createRoute(sessionId: String) = "export_report/$sessionId"
     }

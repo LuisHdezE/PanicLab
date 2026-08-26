@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.domain.model.ConfidenceLevel
 import com.example.domain.model.DiagnosticReport
+import com.example.domain.model.RepairSuggestionUiState
 import com.example.domain.repository.DiagnosticRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -19,6 +20,9 @@ class HistoryViewModel(
     private val _selectedConfidenceFilter = MutableStateFlow<ConfidenceLevel?>(null)
     val selectedConfidenceFilter: StateFlow<ConfidenceLevel?> = _selectedConfidenceFilter.asStateFlow()
 
+    private val _repairSuggestionState = MutableStateFlow<RepairSuggestionUiState>(RepairSuggestionUiState.Idle)
+    val repairSuggestionState: StateFlow<RepairSuggestionUiState> = _repairSuggestionState.asStateFlow()
+
     val sessions: StateFlow<List<DiagnosticReport>> = combine(
         diagnosticRepository.getSessionHistory(),
         _searchQuery,
@@ -29,7 +33,9 @@ class HistoryViewModel(
                 session.deviceModel?.marketingName?.contains(query, ignoreCase = true) == true ||
                 session.productCode.contains(query, ignoreCase = true) ||
                 session.primaryCandidate?.label?.contains(query, ignoreCase = true) == true ||
-                session.sourceFilename?.contains(query, ignoreCase = true) == true
+                session.sourceFilename?.contains(query, ignoreCase = true) == true ||
+                session.technicianNotes?.contains(query, ignoreCase = true) == true ||
+                session.customerName?.contains(query, ignoreCase = true) == true
 
             val matchesConfidence = filterConfidence == null || session.confidence == filterConfidence
 
@@ -43,6 +49,18 @@ class HistoryViewModel(
 
     fun setConfidenceFilter(confidence: ConfidenceLevel?) {
         _selectedConfidenceFilter.value = confidence
+    }
+
+    fun saveTechnicianNotes(id: String, notes: String) {
+        viewModelScope.launch {
+            diagnosticRepository.saveTechnicianNotes(id, notes)
+        }
+    }
+
+    fun saveCustomerInfo(id: String, customerName: String, notes: String) {
+        viewModelScope.launch {
+            diagnosticRepository.saveCustomerInfo(id, customerName, notes)
+        }
     }
 
     fun deleteSession(id: String) {
@@ -61,6 +79,24 @@ class HistoryViewModel(
         viewModelScope.launch {
             val res = diagnosticRepository.reanalyzeSession(id)
             onResult(res)
+        }
+    }
+
+    fun fetchRepairSuggestions(report: DiagnosticReport) {
+        viewModelScope.launch {
+            _repairSuggestionState.value = RepairSuggestionUiState.Loading
+            try {
+                val res = diagnosticRepository.fetchRealTimeRepairSuggestions(report)
+                if (res.isSuccess) {
+                    _repairSuggestionState.value = RepairSuggestionUiState.Success(res.getOrThrow())
+                } else {
+                    _repairSuggestionState.value = RepairSuggestionUiState.Error(
+                        res.exceptionOrNull()?.localizedMessage ?: "Error al consultar sugerencias."
+                    )
+                }
+            } catch (e: Exception) {
+                _repairSuggestionState.value = RepairSuggestionUiState.Error(e.localizedMessage ?: "Error")
+            }
         }
     }
 }

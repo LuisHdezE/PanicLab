@@ -65,10 +65,18 @@ interface DiagnosticSessionDao {
         WHERE deviceName LIKE '%' || :query || '%' OR 
               deviceProductCode LIKE '%' || :query || '%' OR 
               primaryDiagnosis LIKE '%' || :query || '%' OR 
-              sourceFilename LIKE '%' || :query || '%'
+              sourceFilename LIKE '%' || :query || '%' OR
+              technicianNotes LIKE '%' || :query || '%' OR
+              customerName LIKE '%' || :query || '%'
         ORDER BY createdAt DESC
     """)
     fun searchSessions(query: String): Flow<List<DiagnosticSessionEntity>>
+
+    @Query("UPDATE diagnostic_sessions SET technicianNotes = :notes WHERE id = :sessionId")
+    suspend fun updateTechnicianNotes(sessionId: String, notes: String?)
+
+    @Query("UPDATE diagnostic_sessions SET customerName = :customerName, technicianNotes = :notes WHERE id = :sessionId")
+    suspend fun updateCustomerInfo(sessionId: String, customerName: String?, notes: String?)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSession(session: DiagnosticSessionEntity)
@@ -78,6 +86,9 @@ interface DiagnosticSessionDao {
 
     @Query("DELETE FROM diagnostic_sessions")
     suspend fun deleteAllSessions()
+
+    @Query("SELECT COUNT(*) FROM diagnostic_sessions")
+    fun getSessionsCount(): Flow<Int>
 }
 
 @Dao

@@ -70,7 +70,9 @@ data class DiagnosticSessionEntity(
     val rawLogSaved: Boolean = false,
     val reanalyzedAt: Long? = null,
     val previousDiagnosis: String? = null,
-    val previousKnowledgeBaseVersion: String? = null
+    val previousKnowledgeBaseVersion: String? = null,
+    val technicianNotes: String? = null,
+    val customerName: String? = null
 )
 
 @Entity(

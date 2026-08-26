@@ -17,7 +17,7 @@ object HexUtils {
                 val hexPart = trimmed.substring(2)
                 hexPart.toLong(16)
             } else if (trimmed.matches(Regex("^[0-9]+$"))) {
-                // Could be decimal number like 3145728 or 0
+                // Could be decimal number like 3145728 or 4194304 or 0
                 trimmed.toLong(10)
             } else if (trimmed.matches(Regex("^[0-9a-fA-F]+$"))) {
                 trimmed.toLong(16)
@@ -27,6 +27,22 @@ object HexUtils {
         } catch (e: Exception) {
             null
         }
+    }
+
+    /**
+     * Alias for parseCodeToLong for concise numeric evaluation
+     */
+    fun parse(code: String): Long? = parseCodeToLong(code)
+
+    /**
+     * Parses a string code into a complete PanicCode/SensorCode representation
+     */
+    fun parseSensorCode(code: String): com.example.domain.model.SensorCode? {
+        return com.example.domain.model.SensorCode.parse(code)
+    }
+
+    fun parsePanicCode(code: String): com.example.domain.model.PanicCode? {
+        return com.example.domain.model.PanicCode.parse(code)
     }
 
     /**

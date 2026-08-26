@@ -39,23 +39,31 @@ object DiagnosticRulesEngine {
             }
         }
 
-        // --- STAGE 2: SMC Sensor Codes (0x800, 0x1000, 0x1800, 0x500000, 3145728, etc.) ---
+        // --- STAGE 2: SMC Sensor Codes (0x800, 0x1000, 0x1800, 0x500000, 3145728, 4194304, etc.) ---
         if (extractedSensors.smcSensorCodes.isNotEmpty() ||
+            extractedSensors.sensorCodes.isNotEmpty() ||
             panicFamilies.contains(PanicFamily.SMC_BSC_FAILURE) ||
             panicFamilies.contains(PanicFamily.SMC_ASSERTION)
         ) {
-            for (code in extractedSensors.smcSensorCodes) {
-                val canonicalHex = HexUtils.toCanonicalHex(code)
-                val decimalStr = HexUtils.toDecimalString(code)
+            val codesToEvaluate: List<SensorCode> = if (extractedSensors.sensorCodes.isNotEmpty()) {
+                extractedSensors.sensorCodes
+            } else {
+                extractedSensors.smcSensorCodes.mapNotNull { SensorCode.parse(it) }
+            }
 
-                // 2.1 Exact code matches for this specific device/profile
+            for (sensorCode in codesToEvaluate) {
+                // 2.1 Exact code matches for this specific device/profile using numeric comparison
                 val exactMatches = activeRules.filter { rule ->
                     val familyMatch = rule.panicFamilies.isEmpty() || rule.panicFamilies.any { it in panicFamilies }
-                    val codeMatch = rule.sensorCodesExact.any {
-                        HexUtils.areCodesEquivalent(it, code) ||
-                        it.equals(code, ignoreCase = true) ||
-                        it.equals(canonicalHex, ignoreCase = true) ||
-                        it.equals(decimalStr, ignoreCase = true)
+                    val codeMatch = rule.sensorCodesExact.any { ruleCodeStr ->
+                        val ruleCodeLong = HexUtils.parseCodeToLong(ruleCodeStr)
+                        if (ruleCodeLong != null) {
+                            ruleCodeLong == sensorCode.numericValue
+                        } else {
+                            ruleCodeStr.equals(sensorCode.rawValue, ignoreCase = true) ||
+                            ruleCodeStr.equals(sensorCode.hexadecimal, ignoreCase = true) ||
+                            ruleCodeStr.equals(sensorCode.decimal, ignoreCase = true)
+                        }
                     }
                     val scopeMatch = isScopeMatch(rule, resolvedProduct, resolvedProfile)
                     familyMatch && codeMatch && scopeMatch
@@ -66,7 +74,7 @@ object DiagnosticRulesEngine {
                 } else {
                     // 2.2 Bitmask decomposition ONLY if device profile permits it and rule allows it
                     val bitmaskMatches = tryBitmaskDecomposition(
-                        code = code,
+                        codeLong = sensorCode.numericValue,
                         profile = resolvedProfile,
                         product = resolvedProduct,
                         panicFamilies = panicFamilies,
@@ -147,7 +155,7 @@ object DiagnosticRulesEngine {
     }
 
     private fun tryBitmaskDecomposition(
-        code: String,
+        codeLong: Long,
         profile: String?,
         product: String?,
         panicFamilies: List<PanicFamily>,
@@ -159,7 +167,6 @@ object DiagnosticRulesEngine {
             return emptyList()
         }
 
-        val codeLong = HexUtils.parseCodeToLong(code) ?: return emptyList()
         if (codeLong == 0L) return emptyList()
 
         val decomposedMatches = mutableListOf<DiagnosticRule>()

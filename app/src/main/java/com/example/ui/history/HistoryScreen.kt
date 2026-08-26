@@ -43,6 +43,7 @@ fun HistoryScreen(
     onSelectReport: (String) -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToKnowledgeBase: () -> Unit,
+    onNavigateToTrends: () -> Unit,
     onNavigateToImport: () -> Unit
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -117,6 +118,12 @@ fun HistoryScreen(
                     }
                 },
                 actions = {
+                    IconButton(
+                        onClick = onNavigateToTrends,
+                        modifier = Modifier.testTag("history_trends_dashboard_button")
+                    ) {
+                        Icon(imageVector = Icons.Default.Analytics, contentDescription = "Ver Dashboard de Tendencias D3", tint = ElectricCyanLight)
+                    }
                     if (sessions.isNotEmpty()) {
                         IconButton(
                             onClick = { showClearDialog = true },
@@ -240,6 +247,66 @@ fun HistoryScreen(
                             modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp)
                         )
                     }
+                }
+            }
+
+            // D3 Trends Dashboard quick launch banner
+            Surface(
+                onClick = onNavigateToTrends,
+                shape = RoundedCornerShape(16.dp),
+                color = ElectricBlueContainer.copy(alpha = 0.4f),
+                border = BorderStroke(1.dp, ElectricCyanLight.copy(alpha = 0.4f)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("history_open_d3_trends_banner")
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(ElectricCyanLight.copy(alpha = 0.2f))
+                                .border(1.dp, ElectricCyanLight, RoundedCornerShape(10.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Analytics,
+                                contentDescription = null,
+                                tint = ElectricCyanLight,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                        Column {
+                            Text(
+                                text = "Tendencias de Falla D3",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Text(
+                                text = "Frecuencia de códigos y correlación de modelos",
+                                fontSize = 11.sp,
+                                color = Color(0xFF94A3B8)
+                            )
+                        }
+                    }
+
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = null,
+                        tint = ElectricCyanLight,
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
             }
 

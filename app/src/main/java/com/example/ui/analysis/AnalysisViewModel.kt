@@ -45,6 +45,9 @@ class AnalysisViewModel(
     private val _selectedFilename = MutableStateFlow<String?>(null)
     val selectedFilename: StateFlow<String?> = _selectedFilename.asStateFlow()
 
+    private val _repairSuggestionState = MutableStateFlow<com.example.domain.model.RepairSuggestionUiState>(com.example.domain.model.RepairSuggestionUiState.Idle)
+    val repairSuggestionState: StateFlow<com.example.domain.model.RepairSuggestionUiState> = _repairSuggestionState.asStateFlow()
+
     val sampleLogs: List<SampleLog> = listOf(
         SampleLog(
             title = "iPhone 13 mini — 0x1000",
@@ -205,8 +208,33 @@ class AnalysisViewModel(
         }
     }
 
+    fun fetchRepairSuggestions(report: DiagnosticReport) {
+        viewModelScope.launch {
+            _repairSuggestionState.value = com.example.domain.model.RepairSuggestionUiState.Loading
+            try {
+                val result = diagnosticRepository.fetchRealTimeRepairSuggestions(report)
+                if (result.isSuccess) {
+                    _repairSuggestionState.value = com.example.domain.model.RepairSuggestionUiState.Success(result.getOrThrow())
+                } else {
+                    _repairSuggestionState.value = com.example.domain.model.RepairSuggestionUiState.Error(
+                        result.exceptionOrNull()?.localizedMessage ?: "Error al consultar sugerencias de reparación."
+                    )
+                }
+            } catch (e: Exception) {
+                _repairSuggestionState.value = com.example.domain.model.RepairSuggestionUiState.Error(e.localizedMessage ?: "Error inesperado")
+            }
+        }
+    }
+
+    fun saveTechnicianNotes(sessionId: String, notes: String) {
+        viewModelScope.launch {
+            diagnosticRepository.saveTechnicianNotes(sessionId, notes)
+        }
+    }
+
     fun resetState() {
         _uiState.value = AnalysisUiState.Idle
+        _repairSuggestionState.value = com.example.domain.model.RepairSuggestionUiState.Idle
     }
 }
 

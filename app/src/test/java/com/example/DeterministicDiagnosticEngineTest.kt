@@ -97,6 +97,33 @@ class DeterministicDiagnosticEngineTest {
           "allowBitmaskDecomposition": false
         },
         {
+          "id": "smc14base_0x400000_wireless_charge_coil",
+          "title": "iPhone 14/14 Plus: 0x400000 (Wireless Charging Coil)",
+          "active": true,
+          "priority": 120,
+          "deviceScope": {
+            "diagnosticProfiles": ["SMC_14_BASE"],
+            "productCodes": []
+          },
+          "match": {
+            "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+            "sensorCodesExactAny": ["0x400000"]
+          },
+          "diagnosis": {
+            "label": "Wireless Charging Coil",
+            "subsystem": "SMC_SENSOR",
+            "suspectedComponents": [
+              { "name": "Wireless Charging Coil", "role": "PRIMARY" }
+            ],
+            "interpretation": "Código 0x400000 correspondiente a la bobina de carga inalámbrica."
+          },
+          "confidence": "HIGH",
+          "verificationStatus": "VERIFIED",
+          "primaryEligible": true,
+          "exactCodeOnly": true,
+          "allowBitmaskDecomposition": false
+        },
+        {
           "id": "iphone14_base_0x500000_battery",
           "title": "iPhone 14 / 14 Plus — Fallo SMC 0x500000 (Batería / Gas Gauge)",
           "active": true,
@@ -357,5 +384,147 @@ class DeterministicDiagnosticEngineTest {
         assertEquals("Diagnóstico no concluyente (Código no catalogado)", primary?.label)
         assertEquals(ConfidenceLevel.UNKNOWN, primary?.confidence)
         assertTrue(primary?.suspectedComponents?.isEmpty() == true)
+    }
+
+    @Test
+    fun testSensorCodeModelParsing() {
+        val fromDecimal = com.example.domain.model.SensorCode.parse("4194304")
+        assertNotNull(fromDecimal)
+        assertEquals("4194304", fromDecimal?.rawValue)
+        assertEquals(4194304L, fromDecimal?.numericValue)
+        assertEquals("0x400000", fromDecimal?.hexadecimal)
+        assertEquals("4194304", fromDecimal?.decimal)
+
+        val fromHex = com.example.domain.model.SensorCode.parse("0x400000")
+        assertNotNull(fromHex)
+        assertEquals("0x400000", fromHex?.rawValue)
+        assertEquals(4194304L, fromHex?.numericValue)
+        assertEquals("0x400000", fromHex?.hexadecimal)
+        assertEquals("4194304", fromHex?.decimal)
+    }
+
+    @Test
+    fun testHexUtilsEquivalencesRequiredBySpec() {
+        assertEquals(HexUtils.parse("0x1000"), HexUtils.parse("4096"))
+        assertEquals(HexUtils.parse("0x80000"), HexUtils.parse("524288"))
+        assertEquals(HexUtils.parse("0x100000"), HexUtils.parse("1048576"))
+        assertEquals(HexUtils.parse("0x200000"), HexUtils.parse("2097152"))
+        assertEquals(HexUtils.parse("0x300000"), HexUtils.parse("3145728"))
+        assertEquals(HexUtils.parse("0x400000"), HexUtils.parse("4194304"))
+        assertEquals(HexUtils.parse("0x500000"), HexUtils.parse("5242880"))
+
+        assertTrue(HexUtils.areCodesEquivalent("4096", "0x1000"))
+        assertTrue(HexUtils.areCodesEquivalent("524288", "0x80000"))
+        assertTrue(HexUtils.areCodesEquivalent("1048576", "0x100000"))
+        assertTrue(HexUtils.areCodesEquivalent("2097152", "0x200000"))
+        assertTrue(HexUtils.areCodesEquivalent("3145728", "0x300000"))
+        assertTrue(HexUtils.areCodesEquivalent("4194304", "0x400000"))
+        assertTrue(HexUtils.areCodesEquivalent("5242880", "0x500000"))
+    }
+
+    @Test
+    fun testDynamicSensorArrayExtractionLengthsAndFormats() {
+        // 0 - 5 format with decimal
+        val sensors5 = SensorExtractor.extract("S.sensor array 0 - 5 is 0, 4194304, 0, 0, 0")
+        assertEquals(listOf("4194304"), sensors5.smcSensorCodes)
+        assertEquals(4194304L, sensors5.sensorCodes.first().numericValue)
+        assertEquals("0x400000", sensors5.sensorCodes.first().hexadecimal)
+
+        // 0 - 6 format with hex
+        val sensors6 = SensorExtractor.extract("S.sensor array 0 - 6 is 0x0, 0x1000, 0x0, 0x0, 0x0, 0x0, 0x0")
+        assertEquals(listOf("0x1000"), sensors6.smcSensorCodes)
+        assertEquals(4096L, sensors6.sensorCodes.first().numericValue)
+
+        // 0 - 7 format with decimal
+        val sensors7 = SensorExtractor.extract("S.sensor array 0 - 7 is 0, 3145728, 0, 0, 0, 0, 0")
+        assertEquals(listOf("3145728"), sensors7.smcSensorCodes)
+        assertEquals(3145728L, sensors7.sensorCodes.first().numericValue)
+        assertEquals("0x300000", sensors7.sensorCodes.first().hexadecimal)
+
+        // 0 - 12 format with double digit N
+        val sensors12 = SensorExtractor.extract("S.sensor array 0 - 12 is 0x0, 0x2000, 0x0")
+        assertEquals(listOf("0x2000"), sensors12.smcSensorCodes)
+        assertEquals(0x2000L, sensors12.sensorCodes.first().numericValue)
+
+        // Mixed hex and decimal elements
+        val sensorsMixed = SensorExtractor.extract("S.sensor array 0 - 4 is 0x0, 4194304, 0x1000, 0")
+        assertEquals(listOf("4194304", "0x1000"), sensorsMixed.smcSensorCodes)
+        assertEquals(2, sensorsMixed.sensorCodes.size)
+    }
+
+    @Test
+    fun testIPhone14WirelessCoilDecimalRegression() {
+        val rawLog = """
+            "product":"iPhone14,7"
+            "panicString":"SMC PANIC - ASSERT: SMC BSC failure\nS.sensor array 0 - 5 is 0, 4194304, 0, 0, 0"
+        """.trimIndent()
+
+        val normalized = LogNormalizer.normalize(rawLog)
+        val metadata = MetadataExtractor.extract(normalized)
+        val device = DeviceResolver.resolveSynchronous(metadata.product)
+        val families = PanicClassifier.classify(normalized, metadata.panicString)
+        val sensors = SensorExtractor.extract(normalized, metadata.panicString)
+        val evidences = EvidenceExtractor.extractEvidences(normalized, metadata, families, sensors)
+
+        // Assert device
+        assertEquals("iPhone14,7", metadata.product)
+        assertEquals("iPhone 14", device?.marketingName)
+        assertEquals("SMC_14_BASE", device?.diagnosticProfile)
+
+        // Assert panic family
+        assertTrue(families.contains(PanicFamily.SMC_BSC_FAILURE))
+
+        // Assert sensor codes
+        assertEquals(1, sensors.sensorCodes.size)
+        val extractedCode = sensors.sensorCodes.first()
+        assertEquals("4194304", extractedCode.rawValue)
+        assertEquals("4194304", extractedCode.decimal)
+        assertEquals("0x400000", extractedCode.hexadecimal)
+        assertEquals(4194304L, extractedCode.numericValue)
+
+        // Assert evaluation against sample rule pack (which has only "0x400000" in sensorCodesExactAny)
+        val matchResult = DiagnosticRulesEngine.evaluate(
+            deviceModel = device,
+            productCode = metadata.product,
+            panicFamilies = families,
+            extractedSensors = sensors,
+            allRules = parsedPack.parsedPack.diagnosticRules
+        )
+
+        val (primary, _) = CandidateRanker.toCandidates(matchResult.primaryRule, matchResult.alternativeRules)
+
+        assertNotNull(primary)
+        assertEquals("Wireless Charging Coil", primary?.label)
+        assertEquals(ConfidenceLevel.HIGH, primary?.confidence)
+        assertEquals(VerificationStatus.VERIFIED, primary?.verificationStatus)
+        assertEquals("Wireless Charging Coil", primary?.suspectedComponents?.first()?.name)
+
+        // Assert evidence normalization
+        val smcEvidence = evidences.find { it.type == "SMC_CODE" }
+        assertNotNull(smcEvidence)
+        assertEquals("4194304", smcEvidence?.rawValue)
+        assertEquals("0x400000", smcEvidence?.normalizedValue)
+    }
+
+    @Test
+    fun testPanicCodeHelperClass() {
+        val codeFromDec = com.example.domain.model.PanicCode.parse("4194304")
+        assertNotNull(codeFromDec)
+        assertEquals(4194304L, codeFromDec?.numericValue)
+        assertEquals("0x400000", codeFromDec?.hexadecimal)
+        assertEquals("4194304", codeFromDec?.decimal)
+
+        val codeFromHex = com.example.domain.model.PanicCode.parse("0x400000")
+        assertNotNull(codeFromHex)
+        assertEquals(4194304L, codeFromHex?.numericValue)
+        assertEquals("0x400000", codeFromHex?.hexadecimal)
+        assertEquals("4194304", codeFromHex?.decimal)
+
+        assertEquals(codeFromDec?.numericValue, codeFromHex?.numericValue)
+
+        val codeFromNum = com.example.domain.model.PanicCode.fromNumeric(4194304L)
+        assertEquals(4194304L, codeFromNum.numericValue)
+        assertEquals("0x400000", codeFromNum.hexadecimal)
+        assertEquals("4194304", codeFromNum.decimal)
     }
 }

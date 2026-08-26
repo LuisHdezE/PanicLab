@@ -55,6 +55,9 @@ class MainActivity : ComponentActivity() {
         val settingsViewModel by viewModels<SettingsViewModel> {
             SettingsViewModelFactory(settingsRepository, kbRepository)
         }
+        val trendDashboardViewModel by viewModels<com.example.ui.trends.TrendDashboardViewModel> {
+            com.example.ui.trends.TrendDashboardViewModelFactory(diagnosticRepository, kbRepository)
+        }
 
         // Handle incoming shared file or text if opened via ACTION_SEND
         handleIncomingIntent(intent, analysisViewModel)
@@ -87,6 +90,7 @@ class MainActivity : ComponentActivity() {
                         historyViewModel = historyViewModel,
                         kbViewModel = kbViewModel,
                         settingsViewModel = settingsViewModel,
+                        trendDashboardViewModel = trendDashboardViewModel,
                         recentReports = recentReports,
                         kbVersion = kbVersion
                     )

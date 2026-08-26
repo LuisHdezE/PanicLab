@@ -1,0 +1,2 @@
+"product":"iPhone14,7"
+"panicString":"SMC PANIC - ASSERT: SMC BSC failure\nS.sensor array 0 - 5 is 0, 4194304, 0, 0, 0"

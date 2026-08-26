@@ -34,6 +34,7 @@ import com.example.ui.theme.*
 fun PasteLogScreen(
     viewModel: AnalysisViewModel,
     onNavigateBack: () -> Unit,
+    onNavigateToCameraScanner: () -> Unit,
     onAnalysisSuccess: (String) -> Unit
 ) {
     val context = LocalContext.current
@@ -147,7 +148,7 @@ fun PasteLogScreen(
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Surface(
                         onClick = {
@@ -165,13 +166,31 @@ fun PasteLogScreen(
                         modifier = Modifier.weight(1f).height(46.dp).testTag("paste_clipboard_button")
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+                            modifier = Modifier.fillMaxSize().padding(horizontal = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Icon(imageVector = Icons.Default.ContentPaste, contentDescription = null, tint = ElectricCyanLight, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("Pegar Portapapeles", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Text("Pegar", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        }
+                    }
+
+                    Surface(
+                        onClick = onNavigateToCameraScanner,
+                        shape = RoundedCornerShape(14.dp),
+                        color = TechDarkCard,
+                        border = BorderStroke(1.dp, ElectricCyanLight.copy(alpha = 0.5f)),
+                        modifier = Modifier.weight(1.2f).height(46.dp).testTag("paste_camera_scanner_button")
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxSize().padding(horizontal = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(imageVector = Icons.Default.CameraAlt, contentDescription = null, tint = ElectricCyanLight, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Text("Escanear Cámara", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ElectricCyanLight)
                         }
                     }
 
@@ -185,13 +204,13 @@ fun PasteLogScreen(
                         modifier = Modifier.weight(1f).height(46.dp).testTag("paste_sample_button")
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+                            modifier = Modifier.fillMaxSize().padding(horizontal = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Icon(imageVector = Icons.Default.AutoFixHigh, contentDescription = null, tint = Color(0xFFA855F7), modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("Cargar Ejemplo", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Text("Ejemplo", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         }
                     }
                 }
