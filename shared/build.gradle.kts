@@ -8,27 +8,33 @@ plugins {
 }
 
 kotlin {
+  jvm {
+    compilerOptions {
+      jvmTarget = JvmTarget.JVM_11
+    }
+  }
+
+  listOf(
+    iosArm64(),
+    iosSimulatorArm64()
+  ).forEach { target ->
+    target.binaries.framework {
+      baseName = "Shared"
+      isStatic = true
+    }
+  }
+
   android {
     namespace = "com.aistudio.paniclab.shared"
     compileSdk = 36
     minSdk = 24
 
-    withHostTestBuilder {}.configure {}
-
-    compilerOptions.configure {
-      jvmTarget.set(JvmTarget.JVM_11)
+    compilerOptions {
+      jvmTarget = JvmTarget.JVM_11
     }
-  }
 
-  val iosTargets = listOf(
-    iosArm64(),
-    iosSimulatorArm64()
-  )
-
-  iosTargets.forEach { target ->
-    target.binaries.framework {
-      baseName = "Shared"
-      isStatic = true
+    withHostTest {
+      isIncludeAndroidResources = false
     }
   }
 
@@ -45,6 +51,16 @@ kover {
       rule("I1 shared scaffold thresholds") {
         minBound(90)
         minBound(85, CoverageUnit.BRANCH)
+      }
+    }
+    total {
+      xml {
+        onCheck = true
+        xmlFile = layout.buildDirectory.file("reports/kover/report.xml")
+      }
+      html {
+        onCheck = true
+        htmlDir = layout.buildDirectory.dir("reports/kover/html")
       }
     }
   }
