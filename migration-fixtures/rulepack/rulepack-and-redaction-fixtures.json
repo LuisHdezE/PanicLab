@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "baselineCommit": "c165ae4283a3b592eddb2b70a1c13a9ffeb51f01",
+  "sourceTest": "app/src/test/java/com/example/RulePackManagementTest.kt",
+  "validationCases": [
+    {
+      "id": "valid-rule-pack",
+      "expected": {
+        "isValid": true,
+        "errorsCount": 0,
+        "knowledgeBaseVersion": "1.1.0",
+        "rulesCount": 1,
+        "modelsCount": 1,
+        "classifiersCount": 1,
+        "sourcesCount": 1,
+        "checksumLength": 64
+      }
+    },
+    {
+      "id": "invalid-semver-and-missing-source",
+      "mutations": [
+        { "replace": "1.1.0", "with": "1.1-beta" },
+        { "replaceSourceId": "src_ifixit_test", "with": "non_existent_source_id" }
+      ],
+      "expected": {
+        "isValid": false,
+        "errorPathsContain": ["knowledgeBaseVersion", "sourceIds"]
+      }
+    },
+    {
+      "id": "duplicate-rule-id",
+      "expected": {
+        "isValid": false,
+        "errorMessageContains": "duplicado"
+      }
+    }
+  ],
+  "diffCases": [
+    {
+      "id": "1.1.0-to-1.2.0-add-and-modify",
+      "expected": {
+        "currentVersion": "1.1.0",
+        "incomingVersion": "1.2.0",
+        "addedRulesCount": 1,
+        "modifiedRulesCount": 1,
+        "removedRulesCount": 0,
+        "ruleDiffsCount": 2,
+        "addedRuleId": "smc13_0x800_charge_port",
+        "addedChangeType": "ADDED",
+        "modifiedRuleId": "smc13_0x1000_front_sensor",
+        "modifiedChangeType": "MODIFIED",
+        "modifiedStatusContains": "VERIFIED"
+      }
+    }
+  ],
+  "redactionCases": [
+    {
+      "id": "synthetic-sensitive-data-redaction",
+      "input": "{\"incident_id\":\"A1B2C3D4-E5F6-7890-ABCD-EF1234567890\",\"crashreporter_key\":\"a1b2c3d4e5f678901234567890abcdef12345678\"}\nDate/Time: 2026-08-21 14:00:00\nIncident Identifier: A1B2C3D4-E5F6-7890-ABCD-EF1234567890\nMAC Address: 00:1A:2B:3C:4D:5E\nIMEI: 356938035643803\nSerial Number: F2LK89ABCDEF\nFilePath: /Users/john_smith/Desktop/logs/panic.ips\nS.sensor array 0 - 6 is 0x0, 0x1000, 0x0",
+      "mustNotContain": [
+        "A1B2C3D4-E5F6-7890-ABCD-EF1234567890",
+        "a1b2c3d4e5f678901234567890abcdef12345678",
+        "00:1A:2B:3C:4D:5E",
+        "356938035643803",
+        "john_smith"
+      ],
+      "mustContain": ["0x1000", "sensor array"]
+    }
+  ],
+  "notes": [
+    "The synthetic identifiers in this fixture are copied from the existing unit test and are not customer data.",
+    "The canonical full valid rule-pack JSON remains in RulePackManagementTest until I4 moves parsing semantics into common code."
+  ]
+}
