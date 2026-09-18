@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "baselineCommit": "c165ae4283a3b592eddb2b70a1c13a9ffeb51f01",
+  "sourceTest": "app/src/test/java/com/example/OcrLogExtractorTest.kt",
+  "cases": [
+    {
+      "id": "extracts-hex-code-device-and-keywords",
+      "input": "iPhone 14 Pro\nBuild: 21D61\npanic(cpu 0 caller 0xfffffff011223344): SMC PANIC - BSC failure at address 0x400000\nS.sensor array 0 - 5 is 0, 4194304, 0, 0, 0",
+      "expected": {
+        "hasValidPanicSignatures": true,
+        "detectedPanicCodesContainEquivalent": ["0x400000"],
+        "detectedDeviceModelNotNull": true,
+        "detectedKeywordsContain": ["SMC BSC Failure", "21D61"]
+      }
+    },
+    {
+      "id": "repairs-optical-artifacts",
+      "input": "panic(cpu 1): SMC PANIC - BSC failure at address Ox4OOOOO\nS . sensor array: 0x0 0xl000 0x0\nProduct: iPhone13,2",
+      "expected": {
+        "hasValidPanicSignatures": true,
+        "cleanedTextContainsIgnoreCase": ["0x400000", "0x1000", "S.sensor array"]
+      }
+    },
+    {
+      "id": "detects-decimal-sensor-code",
+      "input": "S.sensor array 0 - 5 is 0, 524288, 0, 0, 0\nSMC PANIC",
+      "expected": {
+        "hasValidPanicSignatures": true,
+        "detectedPanicCodesContainEquivalent": ["0x80000"]
+      }
+    },
+    {
+      "id": "empty-input-graceful",
+      "input": "",
+      "expected": {
+        "hasValidPanicSignatures": false,
+        "lineCount": 0,
+        "detectedPanicCodesCount": 0
+      }
+    }
+  ]
+}
