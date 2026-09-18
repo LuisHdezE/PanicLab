@@ -2,9 +2,18 @@
 
 **Reference PLAN:** `docs/features/paniclab-kmp-migration/PLAN.md`
 **PLAN version:** `4d5c70f12c68c480a930be7ede1b5451b41d1415` / approved 2026-09-18
-**Implementation authorized:** No
+**Implementation authorization:** I0, I1 and I2 explicitly authorized, completed and merged; I3 is not authorized.
 
-> These tasks translate the approved PLAN into reviewable execution increments. No task may move to `IN PROGRESS` until Luis explicitly authorizes implementation. Approval of this task list, merge of this documentation PR, repository visibility changes and application implementation are separate actions.
+> These tasks translate the approved PLAN into reviewable execution increments. No task may move to `IN PROGRESS` until Luis explicitly authorizes that implementation increment. Approval of this task list, merge of documentation PRs, repository visibility changes and application implementation remain separate actions.
+
+## Authorization and checkpoint ledger
+
+| Increment | Authorization | Execution status | Merge evidence |
+| --- | --- | --- | --- |
+| I0 | Explicitly authorized by Luis on 2026-09-18 | DONE | PR #2 merged as `a6a00ac153177dacfe7a18c229f3d48cbc16a976` |
+| I1 | Explicitly authorized by Luis on 2026-09-18 | DONE | PR #3 merged as `8d8852d0693a8c7e099cbc9a23ff48d47cba266d` |
+| I2 | Explicitly authorized by Luis on 2026-09-18 | DONE | PR #4 merged as `9b5b3ad98b8ae77016bedfa521fe6ad71c74035b` |
+| I3 | Not authorized | NOT STARTED | PENDING explicit authorization |
 
 ## Status vocabulary
 
@@ -30,7 +39,7 @@ A task is DONE only when its required implementation and validation have both be
 
 ### TASK-KMP-001 · Freeze deterministic diagnostic fixtures
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** COMMON / ANDROID
 - **RF/CA:** RF-01, RF-07 · CA-01, CA-02, CA-03, CA-11
 - **Objective:** Convert the current deterministic Android expectations into reusable migration fixtures before moving production logic.
@@ -41,12 +50,12 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** 100% of CA-01/02/03 representative scenarios mapped; no new production-code threshold yet.
 - **Regression scope:** Existing deterministic Android engine tests.
 - **Evidence required:** fixture inventory, baseline test report, mapping from fixture to expected domain outcome.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** Diagnostic fixture catalog frozen and validated; `DeterministicDiagnosticEngineTest` passed on GitHub Actions with the original Android implementation unchanged.
+- **Evidence reference:** `I0_BASELINE_FREEZE.md`; workflow run `35385085058`; PR #2; merge `a6a00ac153177dacfe7a18c229f3d48cbc16a976`.
 
 ### TASK-KMP-002 · Freeze rule-pack and OCR-text fixtures
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** COMMON / ANDROID
 - **RF/CA:** RF-04, RF-07 · CA-04, CA-11
 - **Objective:** Preserve current rule-pack validation/diff and OCR text-cleanup semantics as portable fixtures.
@@ -57,12 +66,12 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** Critical rule-pack and redaction scenario inventory approaches 95–100% of currently recognized branches where practical.
 - **Regression scope:** Rule-pack management, OCR cleanup/redaction.
 - **Evidence required:** fixture catalog + passing baseline tests.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** Rule-pack/redaction and OCR-text fixture catalogs frozen; `RulePackManagementTest` and `OcrLogExtractorTest` passed in the I0 workflow.
+- **Evidence reference:** `I0_BASELINE_FREEZE.md`; workflow run `35385085058`; PR #2; merge `a6a00ac153177dacfe7a18c229f3d48cbc16a976`.
 
 ### TASK-KMP-003 · Establish migration guard inventory
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** MULTI
 - **RF/CA:** RF-07, RF-10 · CA-11, CA-13
 - **Objective:** Define executable architecture/static guards before shared code begins moving.
@@ -73,14 +82,14 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** Not applicable; architecture rule must be fully enforced.
 - **Regression scope:** Build configuration and source dependency boundaries.
 - **Evidence required:** guard command/output and documented forbidden dependency matrix.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** Architecture guard implemented, self-tested with allowed/forbidden fixtures and executed successfully in GitHub Actions.
+- **Evidence reference:** `scripts/verify-kmp-common-boundary.sh`; `I0_BASELINE_FREEZE.md`; workflow run `35385085058`; PR #2.
 
 # I1 — KMP scaffold without product cutover
 
 ### TASK-KMP-010 · Compatibility preflight for KMP toolchain
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** MULTI
 - **RF/CA:** RF-02, RF-08, RF-09 · CA-06, CA-09, CA-14
 - **Objective:** Select a PanicLab-compatible KMP/Kotlin/AGP/Kover/serialization stack without blindly copying laboratory versions.
@@ -91,12 +100,12 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** Not applicable.
 - **Regression scope:** Android project sync/build.
 - **Evidence required:** compatibility matrix, selected versions, build command/output.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** Compatibility preflight selected Kotlin 2.4.20, AGP 9.1.1, Gradle 9.3.1, KSP 2.3.12 and Kover 0.9.8; Android baseline remained green.
+- **Evidence reference:** PR #3; I1 workflow run `35389381798`; Android regression run `35389381864`; merge `8d8852d0693a8c7e099cbc9a23ff48d47cba266d`.
 
 ### TASK-KMP-011 · Add isolated `shared` KMP scaffold
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** MULTI
 - **RF/CA:** RF-02, RF-08, RF-10 · CA-06, CA-09, CA-13
 - **Objective:** Add KMP structure without moving production behavior or altering the Android execution path.
@@ -107,12 +116,12 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** No deterministic threshold until production logic enters shared.
 - **Regression scope:** Existing Android build and tests.
 - **Evidence required:** build/test logs per target actually executed.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** Isolated `:shared` KMP scaffold added; JVM/common and Android-host tests passed; `Shared.framework` linked for `iosArm64` and `iosSimulatorArm64`; Android `app` did not depend on `shared` in I1.
+- **Evidence reference:** PR #3; workflow run `35389381798`; framework artifact recorded in PR #3; merge `8d8852d0693a8c7e099cbc9a23ff48d47cba266d`.
 
 ### TASK-KMP-012 · Establish truthful common QA gates
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** COMMON
 - **RF/CA:** RF-07, RF-09 · CA-11, CA-13, CA-14
 - **Objective:** Add common deterministic test and coverage plumbing before meaningful extraction.
@@ -123,14 +132,14 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** gate configured at >=90% line and >=85% branch for defined changed/new deterministic production scope once such code exists.
 - **Regression scope:** Build/test pipeline only.
 - **Evidence required:** coverage report path, gate output, architecture check output.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** GitHub Actions executes architecture guard, JVM/common tests, Android-host tests, Kover reports/verification and separate macOS framework compilation; 90/85 thresholds are enforced without merging Native coverage into JVM coverage.
+- **Evidence reference:** PR #3; workflow run `35389381798`; Android regression run `35389381864`.
 
 # I2 — Portable primitives and core domain
 
 ### TASK-KMP-020 · Extract portable core domain models
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** COMMON
 - **RF/CA:** RF-01, RF-10 · CA-01, CA-13
 - **Objective:** Move only the deterministic domain model required by diagnosis/rule evaluation into `shared/commonMain`.
@@ -141,12 +150,12 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** >=90% line / >=85% branch for changed deterministic behavior if behavior is introduced; pure data models judged mainly by scenario use rather than accessor coverage.
 - **Regression scope:** Android domain consumers and tests.
 - **Evidence required:** dependency graph/guard output + passing builds/tests.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** Portable diagnostic/rule domain established in `shared/commonMain` and validated in parallel. Android product models intentionally remain in place until the later cutover increment, preserving strangler sequencing.
+- **Evidence reference:** PR #4; shared workflow run `35393319172`; Android regression run `35393319211`; merge `9b5b3ad98b8ae77016bedfa521fe6ad71c74035b`.
 
 ### TASK-KMP-021 · Port deterministic primitives and nondeterminism seams
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** COMMON / MULTI
 - **RF/CA:** RF-01, RF-10 · CA-01, CA-02, CA-11, CA-13
 - **Objective:** Make `HexUtils`, `LogNormalizer`, clock/ID/hash boundaries portable and deterministic under test.
@@ -157,8 +166,8 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** >=90% line, >=85% branch; 95–100% meaningful scenario coverage for numeric normalization and critical utility branches where practical.
 - **Regression scope:** existing hex/log normalization behavior.
 - **Evidence required:** common test report + Kover report + hash vectors.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** Portable `HexUtils`, `LogNormalizer`, `Clock`, `IdGenerator` and `Sha256Hasher` contracts validated; Android/JVM target providers kept outside COMMON; Kover 90/85 gate passed and both iOS frameworks continued to link.
+- **Evidence reference:** PR #4; shared workflow run `35393319172`; Android regression run `35393319211`; coverage artifact `10567326148`; iOS artifact `10566611956`.
 
 # I3 — Deterministic parsing and engine
 
@@ -416,49 +425,51 @@ A task is DONE only when its required implementation and validation have both be
 
 | QA dimension | Target | Planned threshold / scenarios | Actual result | Status |
 | --- | --- | --- | --- | --- |
-| Requirements / CA traceability | MULTI | 100% of CA-01..CA-15 mapped | PENDING | NOT RUN |
-| Changed deterministic line coverage | COMMON/JVM-host | >= 90% | PENDING | NOT RUN |
-| Changed deterministic branch coverage | COMMON/JVM-host | >= 85% | PENDING | NOT RUN |
-| Critical deterministic scenario coverage | COMMON | 95–100% meaningful scenarios where practical for normalization, precedence, fallback, rule scope/ranking, validation/redaction | PENDING | NOT RUN |
-| Deterministic equivalence | COMMON/ANDROID/IOS | Approved fixture semantics match baseline | PENDING | NOT RUN |
-| Architecture/static | COMMON | No forbidden Android/JVM/platform leakage | PENDING | NOT RUN |
-| Android regression | ANDROID | Existing diagnostic, rule-pack, OCR handoff, Room/history and touched UI scenarios pass | PENDING | NOT RUN |
+| Requirements / CA traceability | MULTI | 100% of CA-01..CA-15 mapped | I0-I2 evidence mapped; remaining increments pending | IN PROGRESS |
+| Changed deterministic line coverage | COMMON/JVM-host | >= 90% | I2 shared scope passed Kover threshold in run `35393319172` | PASS THROUGH I2 |
+| Changed deterministic branch coverage | COMMON/JVM-host | >= 85% | I2 shared scope passed Kover threshold in run `35393319172` | PASS THROUGH I2 |
+| Critical deterministic scenario coverage | COMMON | 95–100% meaningful scenarios where practical for normalization, precedence, fallback, rule scope/ranking, validation/redaction | Baseline fixtures frozen; utility/normalization scope validated; engine scenarios continue in I3+ | IN PROGRESS |
+| Deterministic equivalence | COMMON/ANDROID/IOS | Approved fixture semantics match baseline | Android baseline remains green; full shared-engine/iOS execution equivalence pending later increments | IN PROGRESS |
+| Architecture/static | COMMON | No forbidden Android/JVM/platform leakage | Guard and repository scan pass through I2 | PASS THROUGH I2 |
+| Android regression | ANDROID | Existing diagnostic, rule-pack, OCR handoff, Room/history and touched UI scenarios pass | I0 deterministic baseline passed on I1 and I2 heads | PASS THROUGH I2 |
 | Android physical smoke | ANDROID | At least one physical-device smoke before final core cutover | PENDING | NOT RUN |
 | Persistence upgrade safety | ANDROID | 100% of verified supported schema paths preserve representative history | PENDING | NOT RUN |
-| Kotlin/Native execution | IOS/COMMON | Required common fixtures execute on Native path | PENDING | NOT RUN |
-| Native iOS build/test | IOS | Real Xcode build + target-relevant tests pass | PENDING | NOT RUN |
+| Kotlin/Native execution | IOS/COMMON | Required common fixtures execute on Native path | Framework compilation proven; fixture execution on Native still pending | IN PROGRESS |
+| Native iOS build/test | IOS | Real Xcode build + target-relevant tests pass | KMP frameworks link on macOS; native app/XCTest slice pending | IN PROGRESS |
 | iOS native UX/accessibility | IOS | text/paste diagnostic slice has native states and basic accessibility semantics | PENDING | NOT RUN |
-| CI truthfulness | MULTI | runner/visibility claims match actual evidence; USD0 private iOS not claimed without proof | PENDING | NOT RUN |
-| Security/privacy | MULTI | no secrets/raw customer logs in fixtures/artifacts; redaction scenarios pass | PENDING | NOT RUN |
+| CI truthfulness | MULTI | runner/visibility claims match actual evidence; USD0 private iOS not claimed without proof | PanicLab is public after publication-readiness audit; standard GitHub-hosted Ubuntu/macOS path validated | PASS THROUGH I2 |
+| Security/privacy | MULTI | no secrets/raw customer logs in fixtures/artifacts; redaction scenarios pass | Publication audit and sanitized fixtures passed current scope | PASS THROUGH I2 |
 | Performance/resource regression | ANDROID | no gross representative analysis latency/memory regression at cutover | PENDING | NOT RUN |
 
 ## Acceptance evidence ledger
 
 | CA | Target | Task(s) | Status | Executed evidence | Actual result |
 | --- | --- | --- | --- | --- | --- |
-| CA-01 | COMMON | 001, 020, 021, 030, 031, 050, 072 | NOT RUN | PENDING | PENDING |
-| CA-02 | COMMON | 001, 021, 030, 031 | NOT RUN | PENDING | PENDING |
-| CA-03 | COMMON | 001, 030, 031, 072 | NOT RUN | PENDING | PENDING |
-| CA-04 | COMMON | 002, 040 | NOT RUN | PENDING | PENDING |
+| CA-01 | COMMON | 001, 020, 021, 030, 031, 050, 072 | IN PROGRESS | I0 fixture baseline + I2 portable models/utilities | I0/I2 portions pass; I3/I5/I7 work pending |
+| CA-02 | COMMON | 001, 021, 030, 031 | IN PROGRESS | I0 hex/diagnostic fixtures + I2 HexUtils tests | I0/I2 portions pass; parser/engine pending |
+| CA-03 | COMMON | 001, 030, 031, 072 | IN PROGRESS | I0 deterministic fixtures | Shared parser/engine/native equivalence pending |
+| CA-04 | COMMON | 002, 040 | IN PROGRESS | I0 rule-pack fixtures | Shared rule-pack implementation pending I4 |
 | CA-05 | ANDROID | 050, 051, 052 | NOT RUN | PENDING | PENDING |
-| CA-06 | ANDROID | 010, 011, 050, 051, 052 | NOT RUN | PENDING | PENDING |
+| CA-06 | ANDROID | 010, 011, 050, 051, 052 | IN PROGRESS | I1 scaffold + repeated Android baseline regression | Cutover/regression/removal pending I5 |
 | CA-07 | ANDROID | 060, 061, 062 | NOT RUN | PENDING | PENDING |
 | CA-08 | IOS | 071, 072 | NOT RUN | PENDING | PENDING |
-| CA-09 | IOS | 010, 011, 070, 071, 072 | NOT RUN | PENDING | PENDING |
+| CA-09 | IOS | 010, 011, 070, 071, 072 | IN PROGRESS | I1/I2 macOS framework links | Native iOS slice/equivalence pending |
 | CA-10 | ANDROID/IOS | 032, 050, 051, 080 | NOT RUN | PENDING | PENDING |
-| CA-11 | COMMON | 001, 002, 003, 012, 021, 030, 031, 032, 040 | NOT RUN | PENDING | PENDING |
+| CA-11 | COMMON | 001, 002, 003, 012, 021, 030, 031, 032, 040 | IN PROGRESS | I0 fixtures/guard + I1 QA gates + I2 Kover | I3/I4 deterministic scopes pending |
 | CA-12 | ANDROID/IOS | 051, 071, 072, 080 | NOT RUN | PENDING | PENDING |
-| CA-13 | COMMON | 003, 011, 012, 020, 021, 030, 040, 041, 052, 062 | NOT RUN | PENDING | PENDING |
-| CA-14 | CI | 010, 012, 070 | NOT RUN | PENDING | PENDING |
+| CA-13 | COMMON | 003, 011, 012, 020, 021, 030, 040, 041, 052, 062 | IN PROGRESS | Architecture guard + isolated shared + I2 portable boundary | Later boundary cleanup/cutover pending |
+| CA-14 | CI | 010, 012, 070 | IN PROGRESS | Public-repo Ubuntu/macOS workflow evidence through I2 | Final iOS deployment/CI decision remains I7 |
 | CA-15 | ANDROID | 041, 060, 061, 062 | NOT RUN | PENDING | PENDING |
 
-## Outstanding checks before implementation authorization
+## Outstanding checks before next implementation authorization
 
-- Confirm PR #1 documentation diff contains only SDD artifacts.
-- Decide whether implementation authorization starts with I0 only or with a broader bounded group. Default is I0 only.
-- Do not change PanicLab repository visibility as part of generic implementation authorization.
+- I0, I1 and I2 are merged and have executable evidence recorded above.
+- This reconciliation checkpoint updates the task ledger only; it does not authorize or begin I3.
+- I3 requires a new explicit authorization from Luis before TASK-KMP-030 may move to `IN PROGRESS`.
+- PanicLab is intentionally public following the publication-readiness audit; no additional repository visibility change is implied by later implementation authorization.
 - Do not modify `SoftwareDevelopmentBlueprint` during PanicLab validation.
 - Preserve `main@c165ae4283a3b592eddb2b70a1c13a9ffeb51f01` as the verified behavioral reference for migration fixtures.
+- Preserve the approved strangler sequence: Android production cutover to shared code remains deferred to I5.
 
 ## Completion condition
 
