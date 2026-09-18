@@ -32,6 +32,7 @@ class GreetingScreenshotTest {
           onNavigateToCameraScanner = {},
           onNavigateToHistory = {},
           onNavigateToKnowledgeBase = {},
+          onNavigateToTrends = {},
           onNavigateToSettings = {},
           onNavigateToReport = {}
         )
