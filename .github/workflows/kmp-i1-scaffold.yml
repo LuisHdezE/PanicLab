@@ -1,0 +1,117 @@
+name: KMP I1 Scaffold Verification
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/kmp-i1-scaffold.yml'
+      - 'shared/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle/**'
+      - 'scripts/verify-kmp-common-boundary.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kmp-i1-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shared-jvm-android:
+    name: Shared common / Android-host / coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle 9.3.1
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.3.1'
+
+      - name: Configure Android SDK path
+        shell: bash
+        run: printf 'sdk.dir=%s\n' "$ANDROID_HOME" > local.properties
+
+      - name: Architecture guard
+        shell: bash
+        run: bash scripts/verify-kmp-common-boundary.sh
+
+      - name: Shared JVM tests
+        shell: bash
+        run: gradle :shared:jvmTest --stacktrace
+
+      - name: Shared Android host tests
+        shell: bash
+        run: gradle :shared:testAndroidHostTest --stacktrace
+
+      - name: Shared Kover reports and thresholds
+        shell: bash
+        run: |
+          gradle \
+            :shared:koverXmlReport \
+            :shared:koverHtmlReport \
+            :shared:koverVerify \
+            --stacktrace
+
+      - name: Upload shared coverage reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: kmp-i1-shared-coverage
+          path: |
+            shared/build/reports/kover/**
+            shared/build/reports/tests/**
+            shared/build/test-results/**
+          if-no-files-found: warn
+          retention-days: 7
+
+  shared-ios-compile:
+    name: Shared iOS framework compile
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle 9.3.1
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.3.1'
+
+      - name: Link iOS frameworks
+        shell: bash
+        run: |
+          gradle \
+            :shared:linkDebugFrameworkIosArm64 \
+            :shared:linkDebugFrameworkIosSimulatorArm64 \
+            --stacktrace
+
+      - name: Upload iOS frameworks
+        uses: actions/upload-artifact@v7
+        with:
+          name: kmp-i1-ios-frameworks
+          path: |
+            shared/build/bin/iosArm64/debugFramework/Shared.framework/**
+            shared/build/bin/iosSimulatorArm64/debugFramework/Shared.framework/**
+          if-no-files-found: error
+          retention-days: 7
