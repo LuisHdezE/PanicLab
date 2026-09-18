@@ -3,13 +3,16 @@
 **Branch:** `kmp/i0-baseline-freeze`  
 **Base:** `main@5a8ffffca3261b5f5aa3efd6cf2c17ba9b81e832`  
 **Behavior baseline:** `c165ae4283a3b592eddb2b70a1c13a9ffeb51f01`  
-**Implementation authorization:** I0 explicitly authorized by Luis on 2026-09-18.
+**Implementation authorization:** I0 explicitly authorized by Luis on 2026-09-18.  
+**Execution state:** COMPLETE, pending PR review/merge.
 
 ## Purpose
 
 Freeze the current deterministic Android behavior into portable fixtures and arm the architectural boundary guard before any production logic moves to Kotlin Multiplatform.
 
-I0 does **not** add a `shared` module, change production diagnosis, alter Room, introduce iOS code, change repository visibility or modify `SoftwareDevelopmentBlueprint`.
+I0 does **not** add a `shared` module, change production diagnosis, alter Room, introduce iOS code or modify `SoftwareDevelopmentBlueprint`.
+
+The repository was intentionally changed to **public** on 2026-09-18 after a publication-readiness audit so standard GitHub-hosted CI can execute the zero-cost validation path established by the KMP laboratory.
 
 ## Frozen fixture inventory
 
@@ -82,45 +85,67 @@ The guard rejects imports from future `shared/src/commonMain` that cross the app
 
 The guard intentionally passes before `shared/src/commonMain` exists and includes `--self-test`, which creates one allowed Kotlin fixture and one controlled forbidden `org.json` import. The self-test succeeds only if the allowed fixture passes and the forbidden fixture is rejected.
 
-## Validation commands
+## GitHub Actions execution
 
-Run from the repository root in the normal Linux/WSL development environment:
+Workflow: `.github/workflows/kmp-i0-baseline.yml`
 
-```bash
-./gradlew :app:testDebugUnitTest \
-  --tests 'com.example.DeterministicDiagnosticEngineTest' \
-  --tests 'com.example.RulePackManagementTest' \
-  --tests 'com.example.OcrLogExtractorTest'
+The final I0 validation executes on the standard public-repository GitHub-hosted Ubuntu runner with:
 
-bash scripts/verify-kmp-common-boundary.sh --self-test
-bash scripts/verify-kmp-common-boundary.sh
+- Ubuntu 24.04 runner;
+- Temurin JDK 21;
+- Gradle 9.3.1;
+- read-only `GITHUB_TOKEN` permissions;
+- JSON fixture syntax validation;
+- architecture guard self-test;
+- repository architecture scan;
+- selected deterministic Android/Robolectric baseline tests;
+- test-report artifact upload.
 
-python3 -m json.tool migration-fixtures/diagnostic/baseline-diagnostic-fixtures.json >/dev/null
-python3 -m json.tool migration-fixtures/rulepack/rulepack-and-redaction-fixtures.json >/dev/null
-python3 -m json.tool migration-fixtures/ocr/ocr-text-fixtures.json >/dev/null
-```
+JDK 21 is required because the existing Robolectric 4.16.1 tests explicitly target Android API 36. The test SDK was not lowered to make CI pass.
 
-## Evidence state
+The workflow triggers on pull requests to `main` plus manual `workflow_dispatch`; the redundant branch-push trigger was removed so a PR update does not execute the same validation twice.
+
+## Executed evidence
+
+**Successful workflow run:** `35385085058`  
+**Validated head:** `9e387b852c913f716267324e826e08e210ebf029`  
+**Run URL:** `https://github.com/LuisHdezE/PanicLab/actions/runs/35385085058`  
+**Result:** SUCCESS  
+**Gradle result:** `BUILD SUCCESSFUL`  
+**Artifact:** `kmp-i0-unit-test-reports`  
+**Artifact ID:** `10563322749`  
+**Artifact SHA-256:** `a3344fd9bae73034e1ad5cc8358ab11ceb8309c6f310edea2d9185b758b2c30c`
 
 | Evidence | Status | Result |
 | --- | --- | --- |
-| Diagnostic fixture inventory | CREATED | Portable expected-output catalog created from baseline tests |
-| Rule-pack/redaction fixture inventory | CREATED | Portable expected-output catalog created from baseline tests |
-| OCR text fixture inventory | CREATED | Portable expected-output catalog created from baseline tests |
-| Architecture guard | CREATED | Guard + self-test added |
-| JSON syntax validation | NOT RUN | Requires command execution |
-| Baseline Android/JVM tests | NOT RUN | Requires Gradle execution in development environment |
-| Guard self-test | NOT RUN | Requires shell execution in development environment |
-| Future commonMain guard | ARMED | No `shared` module exists in I0 |
+| Diagnostic fixture inventory | PASS | Portable expected-output catalog frozen from baseline tests |
+| Rule-pack/redaction fixture inventory | PASS | Portable expected-output catalog frozen from baseline tests |
+| OCR text fixture inventory | PASS | Portable expected-output catalog frozen from baseline tests |
+| JSON syntax validation | PASS | All three fixture files parsed successfully in GitHub Actions |
+| Baseline Android/JVM tests | PASS | `DeterministicDiagnosticEngineTest`, `RulePackManagementTest`, and `OcrLogExtractorTest` completed successfully |
+| Guard self-test | PASS | Allowed fixture accepted and controlled forbidden `org.json` import rejected |
+| Future commonMain guard | PASS / ARMED | Repository scan passes; `shared/src/commonMain` does not exist yet |
+| Test report artifact | PASS | Uploaded by GitHub Actions with recorded digest |
+
+## Baseline defects discovered and contained during I0
+
+I0 exposed two infrastructure/test-harness defects before any KMP production migration:
+
+1. `GreetingScreenshotTest` had not been updated after `HomeScreen` gained `onNavigateToTrends`; the test-only call site was corrected with an empty navigation callback. No production code changed.
+2. The initial CI runner used JDK 17. Robolectric 4.16.1 supports API 36, but API 36 execution requires JDK 21. The workflow was corrected to JDK 21 rather than lowering the tested Android SDK or changing diagnostic behavior.
+
+The architecture guard self-test also exposed a `set -u` cleanup bug in its first implementation. The guard was corrected and then proven by both positive and controlled-negative cases.
+
+These findings are part of the methodology evidence: baseline CI must be executable and truthful before shared-code extraction begins.
 
 ## I0 completion gate
 
-I0 can be marked complete only when:
+All I0 completion conditions are now satisfied:
 
 1. all three JSON fixture files parse successfully;
-2. `DeterministicDiagnosticEngineTest`, `RulePackManagementTest` and `OcrLogExtractorTest` pass against the unchanged Android implementation;
+2. `DeterministicDiagnosticEngineTest`, `RulePackManagementTest` and `OcrLogExtractorTest` pass against the unchanged Android diagnostic implementation;
 3. `scripts/verify-kmp-common-boundary.sh --self-test` passes;
 4. the normal architecture guard command passes;
-5. the executed evidence is recorded in `TASKS.md` or this evidence document.
+5. executable evidence is recorded above.
 
-Until those commands are actually executed, TASK-KMP-001/002/003 remain **IN PROGRESS**, not `DONE`.
+Therefore TASK-KMP-001, TASK-KMP-002 and TASK-KMP-003 are considered **DONE for I0 execution**, subject only to PR #2 review and explicit merge approval.
