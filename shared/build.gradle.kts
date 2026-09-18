@@ -39,6 +39,9 @@ kotlin {
   }
 
   sourceSets {
+    commonMain.dependencies {
+      implementation(libs.kotlinx.serialization.json)
+    }
     commonTest.dependencies {
       implementation(kotlin("test"))
     }
@@ -53,12 +56,21 @@ kover {
           "com.example.util.HexUtils*",
           "com.example.parser.LogNormalizer*",
           "com.example.platform.JvmSha256Hasher*",
-          "com.example.platform.AndroidSha256Hasher*"
+          "com.example.platform.AndroidSha256Hasher*",
+          "com.example.parser.MetadataExtractor*",
+          "com.example.parser.PanicClassifier*",
+          "com.example.parser.DeviceResolver*",
+          "com.example.parser.EvidenceExtractor*",
+          "com.example.diagnostic.SensorExtractor*",
+          "com.example.diagnostic.DiagnosticRulesEngine*",
+          "com.example.diagnostic.CandidateRanker*",
+          "com.example.diagnostic.DiagnosticReportBuilder*",
+          "com.example.ocr.OcrLogExtractor*"
         )
       }
     }
     verify {
-      rule("I2 deterministic shared thresholds") {
+      rule("I3 deterministic shared thresholds") {
         minBound(90)
         minBound(85, CoverageUnit.BRANCH)
       }
