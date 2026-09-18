@@ -36,8 +36,10 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Set up Gradle
+      - name: Set up Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.3.1'
 
       - name: Configure Android SDK path
         shell: bash
@@ -50,7 +52,7 @@ jobs:
       - name: Validate shared tests and coverage
         shell: bash
         run: |
-          ./gradlew \
+          gradle \
             :shared:check \
             :shared:koverXmlReport \
             :shared:koverHtmlReport \
@@ -84,13 +86,15 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Set up Gradle
+      - name: Set up Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.3.1'
 
       - name: Link iOS frameworks
         shell: bash
         run: |
-          ./gradlew \
+          gradle \
             :shared:linkDebugFrameworkIosArm64 \
             :shared:linkDebugFrameworkIosSimulatorArm64 \
             --stacktrace
