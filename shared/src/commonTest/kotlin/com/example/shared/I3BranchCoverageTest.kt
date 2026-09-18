@@ -328,7 +328,12 @@ class I3BranchCoverageTest {
         panicFamilies = families,
         sensorTokens = emptyList(),
         sensorCodesExact = codes,
-        diagnosis = DiagnosisDefinition(label = id, subsystem = "TEST", interpretation = "test"),
+        diagnosis = DiagnosisDefinition(
+            label = id,
+            subsystem = "TEST",
+            suspectedComponents = emptyList(),
+            interpretation = "test"
+        ),
         confidence = confidence,
         verificationStatus = VerificationStatus.VERIFIED,
         primaryEligible = primary,
