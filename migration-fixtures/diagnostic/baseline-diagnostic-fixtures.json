@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "baselineCommit": "c165ae4283a3b592eddb2b70a1c13a9ffeb51f01",
+  "sourceTest": "app/src/test/java/com/example/DeterministicDiagnosticEngineTest.kt",
+  "purpose": "Portable expected outcomes frozen before KMP extraction. Generated IDs and timestamps are intentionally excluded.",
+  "hexEquivalences": [
+    { "hex": "0x1000", "decimal": "4096" },
+    { "hex": "0x80000", "decimal": "524288" },
+    { "hex": "0x100000", "decimal": "1048576" },
+    { "hex": "0x200000", "decimal": "2097152" },
+    { "hex": "0x300000", "decimal": "3145728" },
+    { "hex": "0x400000", "decimal": "4194304" },
+    { "hex": "0x500000", "decimal": "5242880" }
+  ],
+  "diagnosticCases": [
+    {
+      "id": "iphone13-mini-0x1000-dock-mic",
+      "rawLog": "{\"bug_type\":\"210\",\"os_version\":\"iPhone OS 17.4 (21E236)\",\"product\":\"iPhone14,4\",\"build\":\"21E236\"}\npanic(cpu 0): \"SMC PANIC - BSC failure at address 0x1000 - S.sensor array 0 - 6 is 0x0, 0x1000, 0x0, 0x0\"",
+      "expected": {
+        "product": "iPhone14,4",
+        "panicFamiliesContains": ["SMC_BSC_FAILURE"],
+        "sensorCodesContainEquivalent": ["0x1000"],
+        "primaryLabel": "Micrófono Inferior / Flex de Carga (Mic1 / Dock)",
+        "confidence": "HIGH",
+        "verificationStatus": "VERIFIED",
+        "primaryComponent": "Flex de puerto de carga (Dock Connector)"
+      }
+    },
+    {
+      "id": "iphone14-0x500000-battery",
+      "rawLog": "{\"bug_type\":\"210\",\"product\":\"iPhone14,7\",\"os_version\":\"17.3\"}\npanic(cpu 1): \"SMC PANIC - ASSERTION FAILED: S.sensor array is 0x0, 0x500000, 0x0\"",
+      "expected": {
+        "product": "iPhone14,7",
+        "panicFamiliesContains": ["SMC_ASSERTION"],
+        "sensorCodesContainEquivalent": ["0x500000"],
+        "primaryLabel": "Batería / Línea I2C Gas Gauge (BATT_HDQ / BATT_SWI)",
+        "confidence": "HIGH"
+      }
+    },
+    {
+      "id": "iphone16-pro-decimal-3145728",
+      "rawLog": "{\"bug_type\":\"210\",\"product\":\"iPhone17,1\",\"os_version\":\"18.0\"}\npanic(cpu 2): \"SMC PANIC - BSC failure: S.sensor array 0 - 7 is 0, 3145728, 0, 0, 0\"",
+      "expected": {
+        "product": "iPhone17,1",
+        "panicFamiliesContains": ["SMC_BSC_FAILURE"],
+        "sensorCodesContainEquivalent": ["0x300000"],
+        "primaryLabel": "Batería + Sensor Proximidad / Auricular Superior"
+      }
+    },
+    {
+      "id": "iphone-x-missing-prs0",
+      "rawLog": "{\"bug_type\":\"210\",\"product\":\"iPhone10,3\"}\npanic(cpu 0): \"thermalmonitord: Missing sensor(s): PRS0, thermal runaway\"",
+      "expected": {
+        "product": "iPhone10,3",
+        "panicFamiliesContains": ["THERMAL_MISSING_SENSOR"],
+        "sensorTokensContain": ["PRS0"],
+        "primaryLabel": "Barómetro / Flex de Carga (PRS0)"
+      }
+    },
+    {
+      "id": "unknown-smc-safe-fallback",
+      "rawLog": "{\"bug_type\":\"210\",\"product\":\"iPhone14,7\"}\npanic(cpu 0): \"SMC PANIC - BSC failure at address 0x987654 - S.sensor array is 0x0, 0x987654\"",
+      "expected": {
+        "product": "iPhone14,7",
+        "panicFamiliesContains": ["SMC_BSC_FAILURE"],
+        "sensorCodesContainEquivalent": ["0x987654"],
+        "primaryLabel": "Diagnóstico no concluyente (Código no catalogado)",
+        "confidence": "UNKNOWN",
+        "suspectedComponentsCount": 0
+      }
+    },
+    {
+      "id": "iphone14-wireless-coil-decimal-regression",
+      "rawLog": "\"product\":\"iPhone14,7\"\n\"panicString\":\"SMC PANIC - ASSERT: SMC BSC failure\\nS.sensor array 0 - 5 is 0, 4194304, 0, 0, 0\"",
+      "expected": {
+        "product": "iPhone14,7",
+        "deviceMarketingName": "iPhone 14",
+        "diagnosticProfile": "SMC_14_BASE",
+        "panicFamiliesContains": ["SMC_BSC_FAILURE"],
+        "sensorCodesContainEquivalent": ["0x400000"],
+        "primaryLabel": "Wireless Charging Coil",
+        "confidence": "HIGH",
+        "verificationStatus": "VERIFIED",
+        "primaryComponent": "Wireless Charging Coil",
+        "smcEvidenceRawValue": "4194304",
+        "smcEvidenceNormalizedValue": "0x400000"
+      }
+    }
+  ],
+  "sensorArrayCases": [
+    {
+      "id": "range-0-5-decimal",
+      "input": "S.sensor array 0 - 5 is 0, 4194304, 0, 0, 0",
+      "expectedRawCodes": ["4194304"],
+      "expectedCanonicalHex": ["0x400000"]
+    },
+    {
+      "id": "range-0-6-hex",
+      "input": "S.sensor array 0 - 6 is 0x0, 0x1000, 0x0, 0x0, 0x0, 0x0, 0x0",
+      "expectedRawCodes": ["0x1000"],
+      "expectedCanonicalHex": ["0x1000"]
+    },
+    {
+      "id": "range-0-7-decimal",
+      "input": "S.sensor array 0 - 7 is 0, 3145728, 0, 0, 0, 0, 0",
+      "expectedRawCodes": ["3145728"],
+      "expectedCanonicalHex": ["0x300000"]
+    },
+    {
+      "id": "range-0-12-double-digit",
+      "input": "S.sensor array 0 - 12 is 0x0, 0x2000, 0x0",
+      "expectedRawCodes": ["0x2000"],
+      "expectedCanonicalHex": ["0x2000"]
+    },
+    {
+      "id": "mixed-hex-decimal",
+      "input": "S.sensor array 0 - 4 is 0x0, 4194304, 0x1000, 0",
+      "expectedRawCodes": ["4194304", "0x1000"],
+      "expectedCanonicalHex": ["0x400000", "0x1000"]
+    }
+  ]
+}
