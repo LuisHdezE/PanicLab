@@ -108,13 +108,15 @@ The workflow triggers on pull requests to `main` plus manual `workflow_dispatch`
 ## Executed evidence
 
 **Successful workflow run:** `35385085058`  
-**Validated head:** `9e387b852c913f716267324e826e08e210ebf029`  
+**Validated executable head:** `9e387b852c913f716267324e826e08e210ebf029`  
 **Run URL:** `https://github.com/LuisHdezE/PanicLab/actions/runs/35385085058`  
 **Result:** SUCCESS  
 **Gradle result:** `BUILD SUCCESSFUL`  
 **Artifact:** `kmp-i0-unit-test-reports`  
 **Artifact ID:** `10563322749`  
 **Artifact SHA-256:** `a3344fd9bae73034e1ad5cc8358ab11ceb8309c6f310edea2d9185b758b2c30c`
+
+The commit immediately after that green run changed **only this evidence document**. No executable source, fixture, test, script, workflow or build configuration changed after the validated head; therefore the green execution remains the applicable I0 runtime evidence.
 
 | Evidence | Status | Result |
 | --- | --- | --- |
