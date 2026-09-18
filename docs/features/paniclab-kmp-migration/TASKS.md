@@ -2,7 +2,7 @@
 
 **Reference PLAN:** `docs/features/paniclab-kmp-migration/PLAN.md`
 **PLAN version:** `4d5c70f12c68c480a930be7ede1b5451b41d1415` / approved 2026-09-18
-**Implementation authorization:** I0, I1 and I2 explicitly authorized, completed and merged; I3 is not authorized.
+**Implementation authorization:** I0, I1, I2 and I3 explicitly authorized, completed and merged; I4 is not authorized.
 
 > These tasks translate the approved PLAN into reviewable execution increments. No task may move to `IN PROGRESS` until Luis explicitly authorizes that implementation increment. Approval of this task list, merge of documentation PRs, repository visibility changes and application implementation remain separate actions.
 
@@ -13,7 +13,8 @@
 | I0 | Explicitly authorized by Luis on 2026-09-18 | DONE | PR #2 merged as `a6a00ac153177dacfe7a18c229f3d48cbc16a976` |
 | I1 | Explicitly authorized by Luis on 2026-09-18 | DONE | PR #3 merged as `8d8852d0693a8c7e099cbc9a23ff48d47cba266d` |
 | I2 | Explicitly authorized by Luis on 2026-09-18 | DONE | PR #4 merged as `9b5b3ad98b8ae77016bedfa521fe6ad71c74035b` |
-| I3 | Not authorized | NOT STARTED | PENDING explicit authorization |
+| I3 | Explicitly authorized by Luis on 2026-09-18 | DONE | PR #6 merged as `623aa9da0d4b6f1005d2a00039bd9e71a9c2f6a9` |
+| I4 | Not authorized | NOT STARTED | PENDING explicit authorization |
 
 ## Status vocabulary
 
@@ -173,7 +174,7 @@ A task is DONE only when its required implementation and validation have both be
 
 ### TASK-KMP-030 · Port deterministic parsing pipeline
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** COMMON
 - **RF/CA:** RF-01, RF-07, RF-10 · CA-01, CA-02, CA-03, CA-11, CA-13
 - **Objective:** Move metadata extraction, panic classification, sensor extraction, static device resolution and evidence extraction to portable code without semantic drift.
@@ -184,12 +185,12 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** >=90% line, >=85% branch; critical parsing fallback scenarios targeted at 95–100% meaningful coverage.
 - **Regression scope:** deterministic parsing fixtures and existing Android tests.
 - **Evidence required:** equivalence matrix + common/Kover reports.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** Metadata extraction, panic classification, sensor extraction, static device resolution and evidence extraction were ported to COMMON with Kotlin Regex / `kotlinx.serialization.json` and injected IDs. Frozen I0 representative parsing cases passed in shared JVM/Android-host tests while the Android baseline remained green.
+- **Evidence reference:** `I3_EXECUTION.md`; PR #6; shared/macOS run `35404168248`; Android regression run `35404168170`; merge `623aa9da0d4b6f1005d2a00039bd9e71a9c2f6a9`.
 
 ### TASK-KMP-031 · Port diagnostic rules engine, ranking and report construction
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** COMMON
 - **RF/CA:** RF-01, RF-07 · CA-01, CA-02, CA-03, CA-11
 - **Objective:** Move the central deterministic diagnostic brain into shared code.
@@ -200,12 +201,12 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** >=90% line, >=85% branch; 95–100% meaningful scenario coverage for exact/bitmask precedence, unknown fallback, scope/ranking where practical.
 - **Regression scope:** all deterministic diagnostic scenarios.
 - **Evidence required:** differential result matrix, test report, Kover report.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** Rule evaluation, exact-before-bitmask behavior, scope matching, unknown-SMC safe fallback, candidate ranking and report construction with controlled clock/IDs were ported to COMMON and validated. Final I3 deterministic coverage reached 98.9011% lines and 88.7776% branches without lowering the 90/85 gates or excluding I3 production classes.
+- **Evidence reference:** `I3_EXECUTION.md`; PR #6; shared/macOS run `35404168248`; coverage artifact `10571499130` SHA-256 `9d1de44ec130f33387d54790836c5b3dc7176d8051ba6f8fdaabe4cd47ebfa8f`; merge `623aa9da0d4b6f1005d2a00039bd9e71a9c2f6a9`.
 
 ### TASK-KMP-032 · Port OCR text cleanup only
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** COMMON
 - **RF/CA:** RF-06, RF-07 · CA-10, CA-11, CA-13
 - **Objective:** Share post-OCR text normalization while leaving image acquisition native.
@@ -216,8 +217,8 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** >=90% line / >=85% branch for changed deterministic cleanup code.
 - **Regression scope:** Android OCR-to-text-to-diagnosis path.
 - **Evidence required:** common tests + Android regression result.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** Deterministic OCR text cleanup/signature/code extraction was ported to COMMON and passed frozen/common tests. CameraX and ML Kit image acquisition remain Android-native, and the existing Android `OcrLogExtractorTest` remained green.
+- **Evidence reference:** `I3_EXECUTION.md`; PR #6; shared/macOS run `35404168248`; Android regression run `35404168170`; merge `623aa9da0d4b6f1005d2a00039bd9e71a9c2f6a9`.
 
 # I4 — Rule-pack core and boundary cleanup
 
@@ -425,47 +426,47 @@ A task is DONE only when its required implementation and validation have both be
 
 | QA dimension | Target | Planned threshold / scenarios | Actual result | Status |
 | --- | --- | --- | --- | --- |
-| Requirements / CA traceability | MULTI | 100% of CA-01..CA-15 mapped | I0-I2 evidence mapped; remaining increments pending | IN PROGRESS |
-| Changed deterministic line coverage | COMMON/JVM-host | >= 90% | I2 shared scope passed Kover threshold in run `35393319172` | PASS THROUGH I2 |
-| Changed deterministic branch coverage | COMMON/JVM-host | >= 85% | I2 shared scope passed Kover threshold in run `35393319172` | PASS THROUGH I2 |
-| Critical deterministic scenario coverage | COMMON | 95–100% meaningful scenarios where practical for normalization, precedence, fallback, rule scope/ranking, validation/redaction | Baseline fixtures frozen; utility/normalization scope validated; engine scenarios continue in I3+ | IN PROGRESS |
-| Deterministic equivalence | COMMON/ANDROID/IOS | Approved fixture semantics match baseline | Android baseline remains green; full shared-engine/iOS execution equivalence pending later increments | IN PROGRESS |
-| Architecture/static | COMMON | No forbidden Android/JVM/platform leakage | Guard and repository scan pass through I2 | PASS THROUGH I2 |
-| Android regression | ANDROID | Existing diagnostic, rule-pack, OCR handoff, Room/history and touched UI scenarios pass | I0 deterministic baseline passed on I1 and I2 heads | PASS THROUGH I2 |
+| Requirements / CA traceability | MULTI | 100% of CA-01..CA-15 mapped | I0-I3 evidence mapped; remaining increments pending | IN PROGRESS |
+| Changed deterministic line coverage | COMMON/JVM-host | >= 90% | I3 deterministic scope reached 98.9011% in run `35404168248` | PASS THROUGH I3 |
+| Changed deterministic branch coverage | COMMON/JVM-host | >= 85% | I3 deterministic scope reached 88.7776% in run `35404168248`; initial 73.5471% failure was corrected by adding branch tests without lowering the threshold | PASS THROUGH I3 |
+| Critical deterministic scenario coverage | COMMON | 95–100% meaningful scenarios where practical for normalization, precedence, fallback, rule scope/ranking, validation/redaction | I3 covers exact/bitmask precedence, unknown fallback, scope/ranking, representative parsing and OCR branches; rule-pack validation/redaction shared implementation remains I4 | IN PROGRESS |
+| Deterministic equivalence | COMMON/ANDROID/IOS | Approved fixture semantics match baseline | Shared I3 fixture scenarios passed while the original Android baseline suites also passed; Kotlin/Native/iOS execution equivalence remains pending | IN PROGRESS |
+| Architecture/static | COMMON | No forbidden Android/JVM/platform leakage | COMMON guard and repository scan pass through I3 | PASS THROUGH I3 |
+| Android regression | ANDROID | Existing diagnostic, rule-pack, OCR handoff, Room/history and touched UI scenarios pass | I0 deterministic baseline (`DeterministicDiagnosticEngineTest`, `RulePackManagementTest`, `OcrLogExtractorTest`) passed on I3 head in run `35404168170` | PASS THROUGH I3 |
 | Android physical smoke | ANDROID | At least one physical-device smoke before final core cutover | PENDING | NOT RUN |
 | Persistence upgrade safety | ANDROID | 100% of verified supported schema paths preserve representative history | PENDING | NOT RUN |
-| Kotlin/Native execution | IOS/COMMON | Required common fixtures execute on Native path | Framework compilation proven; fixture execution on Native still pending | IN PROGRESS |
-| Native iOS build/test | IOS | Real Xcode build + target-relevant tests pass | KMP frameworks link on macOS; native app/XCTest slice pending | IN PROGRESS |
+| Kotlin/Native execution | IOS/COMMON | Required common fixtures execute on Native path | Framework compilation with I3 engine code is proven; fixture execution on Native remains pending | IN PROGRESS |
+| Native iOS build/test | IOS | Real Xcode build + target-relevant tests pass | `iosArm64` and `iosSimulatorArm64` frameworks link on macOS through I3; native app/XCTest slice remains pending | IN PROGRESS |
 | iOS native UX/accessibility | IOS | text/paste diagnostic slice has native states and basic accessibility semantics | PENDING | NOT RUN |
-| CI truthfulness | MULTI | runner/visibility claims match actual evidence; USD0 private iOS not claimed without proof | PanicLab is public after publication-readiness audit; standard GitHub-hosted Ubuntu/macOS path validated | PASS THROUGH I2 |
-| Security/privacy | MULTI | no secrets/raw customer logs in fixtures/artifacts; redaction scenarios pass | Publication audit and sanitized fixtures passed current scope | PASS THROUGH I2 |
+| CI truthfulness | MULTI | runner/visibility claims match actual evidence; USD0 private iOS not claimed without proof | PanicLab is public after publication-readiness audit; standard GitHub-hosted Ubuntu/macOS execution validated through I3 | PASS THROUGH I3 |
+| Security/privacy | MULTI | no secrets/raw customer logs in fixtures/artifacts; redaction scenarios pass | Publication audit and sanitized fixtures remain valid; I3 added no secrets or raw customer logs | PASS THROUGH I3 |
 | Performance/resource regression | ANDROID | no gross representative analysis latency/memory regression at cutover | PENDING | NOT RUN |
 
 ## Acceptance evidence ledger
 
 | CA | Target | Task(s) | Status | Executed evidence | Actual result |
 | --- | --- | --- | --- | --- | --- |
-| CA-01 | COMMON | 001, 020, 021, 030, 031, 050, 072 | IN PROGRESS | I0 fixture baseline + I2 portable models/utilities | I0/I2 portions pass; I3/I5/I7 work pending |
-| CA-02 | COMMON | 001, 021, 030, 031 | IN PROGRESS | I0 hex/diagnostic fixtures + I2 HexUtils tests | I0/I2 portions pass; parser/engine pending |
-| CA-03 | COMMON | 001, 030, 031, 072 | IN PROGRESS | I0 deterministic fixtures | Shared parser/engine/native equivalence pending |
+| CA-01 | COMMON | 001, 020, 021, 030, 031, 050, 072 | IN PROGRESS | I0 fixture baseline + I2 portable models/utilities + I3 shared parser/engine fixtures | I0-I3 portions pass; Android cutover and iOS execution equivalence remain pending |
+| CA-02 | COMMON | 001, 021, 030, 031 | DONE | I0 decimal/hex fixtures + I2 HexUtils + I3 parser/engine exact/decimal cases | Required COMMON decimal/hex deterministic semantics pass through I3 |
+| CA-03 | COMMON | 001, 030, 031, 072 | IN PROGRESS | I0 deterministic fixtures + I3 shared parsing/engine scenarios | Shared JVM/Android-host semantics pass; Native/iOS equivalence remains pending |
 | CA-04 | COMMON | 002, 040 | IN PROGRESS | I0 rule-pack fixtures | Shared rule-pack implementation pending I4 |
 | CA-05 | ANDROID | 050, 051, 052 | NOT RUN | PENDING | PENDING |
-| CA-06 | ANDROID | 010, 011, 050, 051, 052 | IN PROGRESS | I1 scaffold + repeated Android baseline regression | Cutover/regression/removal pending I5 |
+| CA-06 | ANDROID | 010, 011, 050, 051, 052 | IN PROGRESS | I1 scaffold + repeated Android baseline regression through I3 | Cutover/regression/removal pending I5 |
 | CA-07 | ANDROID | 060, 061, 062 | NOT RUN | PENDING | PENDING |
 | CA-08 | IOS | 071, 072 | NOT RUN | PENDING | PENDING |
-| CA-09 | IOS | 010, 011, 070, 071, 072 | IN PROGRESS | I1/I2 macOS framework links | Native iOS slice/equivalence pending |
-| CA-10 | ANDROID/IOS | 032, 050, 051, 080 | NOT RUN | PENDING | PENDING |
-| CA-11 | COMMON | 001, 002, 003, 012, 021, 030, 031, 032, 040 | IN PROGRESS | I0 fixtures/guard + I1 QA gates + I2 Kover | I3/I4 deterministic scopes pending |
+| CA-09 | IOS | 010, 011, 070, 071, 072 | IN PROGRESS | I1-I3 macOS framework links | Native iOS slice/equivalence pending |
+| CA-10 | ANDROID/IOS | 032, 050, 051, 080 | IN PROGRESS | I3 COMMON OCR text cleanup + Android OCR baseline regression | Android shared-engine handoff and iOS capability backlog remain pending |
+| CA-11 | COMMON | 001, 002, 003, 012, 021, 030, 031, 032, 040 | IN PROGRESS | I0 fixtures/guard + I1 QA gates + I2 portable core + I3 Kover 98.9011/88.7776 | I3 scope passes; I4 rule-pack deterministic scope remains pending |
 | CA-12 | ANDROID/IOS | 051, 071, 072, 080 | NOT RUN | PENDING | PENDING |
-| CA-13 | COMMON | 003, 011, 012, 020, 021, 030, 040, 041, 052, 062 | IN PROGRESS | Architecture guard + isolated shared + I2 portable boundary | Later boundary cleanup/cutover pending |
-| CA-14 | CI | 010, 012, 070 | IN PROGRESS | Public-repo Ubuntu/macOS workflow evidence through I2 | Final iOS deployment/CI decision remains I7 |
+| CA-13 | COMMON | 003, 011, 012, 020, 021, 030, 040, 041, 052, 062 | IN PROGRESS | Architecture guard + isolated shared + I2 portable boundary + I3 parser boundary | Rule-pack boundary cleanup and later duplication removal/persistence decision remain pending |
+| CA-14 | CI | 010, 012, 070 | IN PROGRESS | Public-repo Ubuntu/macOS workflow evidence through I3 | Final iOS deployment/CI decision remains I7 |
 | CA-15 | ANDROID | 041, 060, 061, 062 | NOT RUN | PENDING | PENDING |
 
 ## Outstanding checks before next implementation authorization
 
-- I0, I1 and I2 are merged and have executable evidence recorded above.
-- This reconciliation checkpoint updates the task ledger only; it does not authorize or begin I3.
-- I3 requires a new explicit authorization from Luis before TASK-KMP-030 may move to `IN PROGRESS`.
+- I0, I1, I2 and I3 are merged and have executable evidence recorded above.
+- This reconciliation checkpoint updates the task ledger only; it does not authorize or begin I4.
+- I4 requires a new explicit authorization from Luis before TASK-KMP-040 may move to `IN PROGRESS`.
 - PanicLab is intentionally public following the publication-readiness audit; no additional repository visibility change is implied by later implementation authorization.
 - Do not modify `SoftwareDevelopmentBlueprint` during PanicLab validation.
 - Preserve `main@c165ae4283a3b592eddb2b70a1c13a9ffeb51f01` as the verified behavioral reference for migration fixtures.
