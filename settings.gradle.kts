@@ -25,3 +25,4 @@ dependencyResolutionManagement {
 rootProject.name = "PanicLab"
 
 include(":app")
+include(":shared")
