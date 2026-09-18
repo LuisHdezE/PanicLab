@@ -1,6 +1,8 @@
 # SPEC: PanicLab KMP Migration
 
-**State:** In review
+**State:** Approved
+**Approved by:** Luis
+**Approval date:** 2026-09-18
 
 > This document defines WHAT must be true. It does not authorize implementation and does not define source-set layout, classes, framework wiring, adapters or file structure. Only Luis can approve this SPEC.
 
@@ -172,6 +174,6 @@ These decisions are intentionally not made by this SPEC and require PLAN-level o
 
 ## Approval gate
 
-This SPEC remains **In review** until Luis explicitly approves it.
+**Approved by Luis on 2026-09-18.**
 
-After approval, and only then, the next SDD artifact is the technical PLAN. No implementation is authorized by this document alone.
+The next SDD artifact is the technical PLAN. Approval of this SPEC authorizes PLAN design only; it does not authorize implementation or merge.
