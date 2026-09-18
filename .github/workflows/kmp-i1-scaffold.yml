@@ -49,11 +49,18 @@ jobs:
         shell: bash
         run: bash scripts/verify-kmp-common-boundary.sh
 
-      - name: Validate shared tests and coverage
+      - name: Shared JVM tests
+        shell: bash
+        run: gradle :shared:jvmTest --stacktrace
+
+      - name: Shared Android host tests
+        shell: bash
+        run: gradle :shared:testAndroidHostTest --stacktrace
+
+      - name: Shared Kover reports and thresholds
         shell: bash
         run: |
           gradle \
-            :shared:check \
             :shared:koverXmlReport \
             :shared:koverHtmlReport \
             :shared:koverVerify \
