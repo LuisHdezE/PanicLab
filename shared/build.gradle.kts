@@ -47,8 +47,18 @@ kotlin {
 
 kover {
   reports {
+    filters {
+      includes {
+        classes(
+          "com.example.util.HexUtils*",
+          "com.example.parser.LogNormalizer*",
+          "com.example.platform.JvmSha256Hasher*",
+          "com.example.platform.AndroidSha256Hasher*"
+        )
+      }
+    }
     verify {
-      rule("I1 shared scaffold thresholds") {
+      rule("I2 deterministic shared thresholds") {
         minBound(90)
         minBound(85, CoverageUnit.BRANCH)
       }

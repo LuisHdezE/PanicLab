@@ -1,11 +1,7 @@
 package com.example.util
 
-import java.security.MessageDigest
+import com.example.platform.AndroidSha256Hasher
 
 object HashUtils {
-    fun sha256(text: String): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        val bytes = digest.digest(text.toByteArray(Charsets.UTF_8))
-        return bytes.joinToString("") { "%02x".format(it) }
-    }
+    fun sha256(text: String): String = AndroidSha256Hasher.sha256(text)
 }

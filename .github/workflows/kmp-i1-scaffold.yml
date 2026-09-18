@@ -1,4 +1,4 @@
-name: KMP I1 Scaffold Verification
+name: KMP Shared Verification
 
 on:
   pull_request:
@@ -7,6 +7,12 @@ on:
     paths:
       - '.github/workflows/kmp-i1-scaffold.yml'
       - 'shared/**'
+      - 'app/build.gradle.kts'
+      - 'app/src/main/java/com/example/domain/**'
+      - 'app/src/main/java/com/example/diagnostic/**'
+      - 'app/src/main/java/com/example/parser/**'
+      - 'app/src/main/java/com/example/util/**'
+      - 'app/src/test/java/com/example/NondeterminismSeamsTest.kt'
       - 'build.gradle.kts'
       - 'settings.gradle.kts'
       - 'gradle/**'
@@ -17,7 +23,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: kmp-i1-${{ github.workflow }}-${{ github.ref }}
+  group: kmp-shared-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -57,6 +63,13 @@ jobs:
         shell: bash
         run: gradle :shared:testAndroidHostTest --stacktrace
 
+      - name: Android nondeterminism seam integration tests
+        shell: bash
+        run: |
+          gradle :app:testDebugUnitTest \
+            --tests 'com.example.NondeterminismSeamsTest' \
+            --stacktrace
+
       - name: Shared Kover reports and thresholds
         shell: bash
         run: |
@@ -70,11 +83,13 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: kmp-i1-shared-coverage
+          name: kmp-shared-coverage
           path: |
             shared/build/reports/kover/**
             shared/build/reports/tests/**
             shared/build/test-results/**
+            app/build/reports/tests/testDebugUnitTest/**
+            app/build/test-results/testDebugUnitTest/**
           if-no-files-found: warn
           retention-days: 7
 
@@ -109,7 +124,7 @@ jobs:
       - name: Upload iOS frameworks
         uses: actions/upload-artifact@v7
         with:
-          name: kmp-i1-ios-frameworks
+          name: kmp-shared-ios-frameworks
           path: |
             shared/build/bin/iosArm64/debugFramework/Shared.framework/**
             shared/build/bin/iosSimulatorArm64/debugFramework/Shared.framework/**

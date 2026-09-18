@@ -1,7 +1,10 @@
 package com.example.diagnostic
 
 import com.example.domain.model.*
-import java.util.UUID
+import com.example.platform.Clock
+import com.example.platform.IdGenerator
+import com.example.platform.SystemEpochClock
+import com.example.platform.UuidIdGenerator
 
 object DiagnosticReportBuilder {
 
@@ -15,7 +18,9 @@ object DiagnosticReportBuilder {
         primaryCandidate: DiagnosisCandidate?,
         alternativeCandidates: List<DiagnosisCandidate>,
         kbVersion: String,
-        saveRawLogsPreference: Boolean
+        saveRawLogsPreference: Boolean,
+        clock: Clock = SystemEpochClock,
+        idGenerator: IdGenerator = UuidIdGenerator
     ): DiagnosticReport {
         val resolvedConfidence = primaryCandidate?.confidence ?: ConfidenceLevel.UNKNOWN
         val resolvedVerification = primaryCandidate?.verificationStatus ?: VerificationStatus.UNKNOWN
@@ -34,8 +39,8 @@ object DiagnosticReportBuilder {
         }
 
         return DiagnosticReport(
-            id = UUID.randomUUID().toString(),
-            createdAt = System.currentTimeMillis(),
+            id = idGenerator.nextId(),
+            createdAt = clock.nowEpochMillis(),
             sourceFilename = sourceFilename,
             deviceModel = deviceModel,
             productCode = metadata.product ?: deviceModel?.productCode ?: "Desconocido",
