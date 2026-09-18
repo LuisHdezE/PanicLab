@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - 'docs/features/paniclab-kmp-migration/I0_BASELINE_FREEZE.md'
   workflow_dispatch:
 
 permissions:
