@@ -58,7 +58,6 @@ check_dir() {
 self_test() {
   local tmp
   tmp="$(mktemp -d)"
-  trap 'rm -rf "$tmp"' EXIT
 
   mkdir -p "$tmp/safe" "$tmp/bad"
   cat > "$tmp/safe/Safe.kt" <<'EOF'
@@ -75,10 +74,12 @@ EOF
   check_dir "$tmp/safe"
 
   if check_dir "$tmp/bad" >/dev/null 2>&1; then
+    rm -rf -- "$tmp"
     echo "FAIL: guard self-test expected forbidden import rejection" >&2
-    exit 1
+    return 1
   fi
 
+  rm -rf -- "$tmp"
   echo "PASS: guard self-test rejected a controlled forbidden import"
 }
 
