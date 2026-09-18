@@ -4,9 +4,8 @@ import com.example.diagnostic.ExtractedSensors
 import com.example.domain.model.DiagnosticEvidence
 import com.example.domain.model.PanicFamily
 import com.example.domain.model.ParsedMetadata
-import com.example.platform.IdGenerator
-import com.example.platform.UuidIdGenerator
 import com.example.util.HexUtils
+import java.util.UUID
 
 object EvidenceExtractor {
 
@@ -14,17 +13,17 @@ object EvidenceExtractor {
         logText: String,
         metadata: ParsedMetadata,
         panicFamilies: List<PanicFamily>,
-        extractedSensors: ExtractedSensors,
-        idGenerator: IdGenerator = UuidIdGenerator
+        extractedSensors: ExtractedSensors
     ): List<DiagnosticEvidence> {
         val evidences = mutableListOf<DiagnosticEvidence>()
         val lines = logText.lines()
 
+        // 1. Missing Sensor Evidences
         for (sensor in extractedSensors.missingSensorTokens) {
             val (lineIndex, excerpt) = findLineWithContext(lines, sensor)
             evidences.add(
                 DiagnosticEvidence(
-                    id = idGenerator.nextId(),
+                    id = UUID.randomUUID().toString(),
                     type = "MISSING_SENSOR",
                     title = "Sensor Térmico Faltante: $sensor",
                     rawValue = sensor,
@@ -35,6 +34,7 @@ object EvidenceExtractor {
             )
         }
 
+        // 2. SMC Sensor Array Code Evidences
         for (code in extractedSensors.smcSensorCodes) {
             val (lineIndex, excerpt) = findLineWithContext(lines, code)
             val canonicalHex = HexUtils.toCanonicalHex(code)
@@ -43,7 +43,7 @@ object EvidenceExtractor {
 
             evidences.add(
                 DiagnosticEvidence(
-                    id = idGenerator.nextId(),
+                    id = UUID.randomUUID().toString(),
                     type = "SMC_CODE",
                     title = "Código SMC Sensor Array: $codeDesc",
                     rawValue = code,
@@ -54,6 +54,7 @@ object EvidenceExtractor {
             )
         }
 
+        // 3. Panic Signature / Subsystem Excerpts
         for (family in panicFamilies) {
             if (family == PanicFamily.UNKNOWN) continue
             val keyword = when (family) {
@@ -78,7 +79,7 @@ object EvidenceExtractor {
                 if (excerpt != null) {
                     evidences.add(
                         DiagnosticEvidence(
-                            id = idGenerator.nextId(),
+                            id = UUID.randomUUID().toString(),
                             type = "PANIC_SIGNATURE",
                             title = "Firma de Pánico: ${family.name}",
                             rawValue = keyword,
@@ -91,11 +92,12 @@ object EvidenceExtractor {
             }
         }
 
+        // 4. Product / Hardware identifier evidence
         if (!metadata.product.isNullOrBlank()) {
             val (lineIndex, excerpt) = findLineWithContext(lines, metadata.product)
             evidences.add(
                 DiagnosticEvidence(
-                    id = idGenerator.nextId(),
+                    id = UUID.randomUUID().toString(),
                     type = "PRODUCT_CODE",
                     title = "Identificador de Hardware: ${metadata.product}",
                     rawValue = metadata.product,

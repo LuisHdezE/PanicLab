@@ -4,15 +4,17 @@
 **Base:** `main@8d8852d0693a8c7e099cbc9a23ff48d47cba266d`  
 **Authorization:** I2 explicitly authorized by Luis on 2026-09-18.  
 **Authorized tasks:** TASK-KMP-020 and TASK-KMP-021 only.  
-**Product diagnostic-engine cutover:** Not authorized in I2.
+**Android product cutover:** Not authorized in I2.
 
 ## Objective
 
-Extract the portable domain types and deterministic primitives needed by the future shared diagnostic engine while preserving the current Android execution path and behavior.
+Create and validate the portable domain types and deterministic primitives needed by the future shared diagnostic engine while preserving the current Android execution path unchanged.
+
+I2 follows the strangler sequence from the approved PLAN: shared types are established beside the Android implementation first. Android will consume the shared engine during the later cutover increment, not during this extraction step.
 
 ## Domain boundary
 
-Moved to `shared/commonMain` under their existing `com.example.domain.model` package so Android consumers keep stable type names:
+Added to `shared/commonMain` under the existing `com.example.domain.model` naming so semantics remain traceable to the Android baseline:
 
 - panic families;
 - confidence and verification enums;
@@ -22,19 +24,19 @@ Moved to `shared/commonMain` under their existing `com.example.domain.model` pac
 - diagnostic report;
 - rule-pack domain/validation/diff models.
 
-The shared `DiagnosticReport` no longer reads wall-clock time through a default constructor value. `createdAt` is explicit.
+The shared `DiagnosticReport` requires `createdAt` explicitly and therefore cannot read wall-clock time implicitly.
 
-Intentionally retained in the Android `app` module:
+Android retains its existing domain models in I2. This is deliberate. Moving Android consumers to the shared types would be a product cutover and would force cross-module consumer adaptations before the approved cutover phase.
 
-- `SearchGroundingSource`;
-- `GroundedRepairSuggestion`;
-- `RepairSuggestionUiState`.
+The following concerns remain outside the deterministic shared domain:
 
-These models belong to remote grounding/presentation concerns rather than the deterministic diagnostic core.
+- remote search grounding;
+- repair-suggestion presentation state;
+- Android UI state.
 
 ## Portable deterministic primitives
 
-Moved to `shared/commonMain`:
+Added to `shared/commonMain`:
 
 - `HexUtils`, with Java `Locale` removed;
 - `LogNormalizer`;
@@ -42,36 +44,22 @@ Moved to `shared/commonMain`:
 - `IdGenerator` contract;
 - `Sha256Hasher` contract.
 
-`PanicCode` continues to preserve the existing decimal/hex semantics by consuming the shared `HexUtils`.
+`PanicCode` preserves the existing decimal/hex semantics through the portable shared `HexUtils`.
+
+Android keeps its current production `HexUtils`, `LogNormalizer`, `HashUtils`, report builder and evidence extractor in I2. Those remain the behavioral baseline until the later Android cutover.
 
 ## Platform seams
 
-Android-specific implementations live outside COMMON:
+Target-specific implementations are isolated outside COMMON:
 
-- `SystemEpochClock` uses `System.currentTimeMillis()`;
-- `UuidIdGenerator` uses `UUID.randomUUID()`;
-- `AndroidSha256Hasher` uses `MessageDigest`.
+- Android `SystemEpochClock` uses `System.currentTimeMillis()`;
+- Android `UuidIdGenerator` uses `UUID.randomUUID()`;
+- Android `AndroidSha256Hasher` uses `MessageDigest`;
+- JVM `JvmSha256Hasher` exists for deterministic known-vector verification in CI.
 
-A JVM-only `JvmSha256Hasher` exists for deterministic known-vector verification in CI. No Java/JVM hashing API is imported by COMMON.
+No Java/JVM hashing, UUID or wall-clock API is imported by COMMON.
 
-The current Android `HashUtils.sha256()` API remains available and delegates to `AndroidSha256Hasher`, so rule-pack parsing behavior is preserved without migrating the parser early.
-
-## Android compatibility wiring
-
-`app` now depends on `:shared` to consume the extracted domain/primitives. This is a type/utility extraction only. Android still owns and executes:
-
-- diagnostic orchestration;
-- metadata/panic/sensor/evidence parsing other than `LogNormalizer`;
-- rules engine/ranking/report assembly implementation;
-- Room/DataStore;
-- CameraX/ML Kit;
-- Firebase/Gemini;
-- Compose/navigation;
-- export/share/PDF.
-
-`DiagnosticReportBuilder` accepts injectable `Clock` and `IdGenerator` with Android-compatible defaults.
-
-`EvidenceExtractor` accepts an injectable `IdGenerator` with the same Android UUID default.
+These implementations prove the boundary contracts without changing PanicLab's current Android production path.
 
 ## QA design
 
@@ -80,20 +68,27 @@ COMMON/JVM/Android-host validation includes:
 - frozen decimal/hex equivalence values from I0;
 - canonical hex, invalid/overflow parsing and bitmask branches;
 - escaped text and line-ending normalization;
-- explicit/fixed clock and ID providers;
+- fixed clock and ID providers;
 - explicit report timestamp construction;
 - SHA-256 known vectors;
-- Android SHA-256 parity;
-- Android builder/evidence fixed-provider integration;
+- Android SHA-256 provider verification;
+- Android runtime-provider smoke coverage;
 - COMMON architecture guard;
 - Kover >=90% line and >=85% branch for the deterministic I2 utility/hash scope;
 - existing I0 Android deterministic regression workflow;
 - iOS Arm64 + Simulator Arm64 framework compilation.
 
+## Cross-module preflight finding
+
+An initial I2 attempt wired `app -> :shared` immediately. Kotlin correctly rejected several existing Android smart-casts because nullable public properties from another module are not considered stable smart-cast targets.
+
+That result exposed a sequencing issue rather than a domain defect. Adapting UI/services now would perform part of the Android cutover before its approved increment. I2 therefore keeps Android on its existing models while validating the portable parallel boundary. The smart-cast adaptations are deferred to the actual Android cutover, where they can be reviewed as one explicit migration step.
+
 ## Non-goals
 
 I2 does not:
 
+- switch Android production code to shared domain types;
 - port metadata extraction, panic classification, sensor extraction or evidence extraction logic to COMMON;
 - port the rules engine, ranking or report builder to COMMON;
 - port rule-pack JSON parsing;
@@ -104,4 +99,4 @@ I2 does not:
 
 ## Evidence status
 
-Implementation prepared. GitHub Actions evidence is PENDING until the I2 PR executes on the final implementation HEAD.
+Implementation prepared. Final GitHub Actions evidence is pending on the corrected I2 HEAD.
