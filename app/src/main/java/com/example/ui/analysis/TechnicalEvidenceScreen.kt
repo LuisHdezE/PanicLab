@@ -46,6 +46,8 @@ fun TechnicalEvidenceScreen(
         return
     }
 
+    val primaryCandidate = report.primaryCandidate
+
     Scaffold(
         containerColor = TechDarkBg,
         topBar = {
@@ -122,7 +124,6 @@ fun TechnicalEvidenceScreen(
             verticalArrangement = Arrangement.spacedBy(14.dp),
             contentPadding = PaddingValues(top = 10.dp, bottom = 24.dp)
         ) {
-            // Header summary banner
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -173,7 +174,6 @@ fun TechnicalEvidenceScreen(
                 }
             }
 
-            // Core Metadata Tokens
             item {
                 Text(
                     text = "METADATOS DEL DISPOSITIVO Y PÁNICO",
@@ -200,15 +200,14 @@ fun TechnicalEvidenceScreen(
                         EvidenceRow(label = "OS_VERSION", value = "iOS ${report.osVersion} (${report.build})", description = "Versión del sistema operativo")
                         HorizontalDivider(color = TechDarkBorder)
                         EvidenceRow(label = "PANIC_FAMILY", value = report.panicFamilies.joinToString(", ") { it.name }, description = "Familia clasificada por motor determinista")
-                        if (report.primaryCandidate != null) {
+                        if (primaryCandidate != null) {
                             HorizontalDivider(color = TechDarkBorder)
-                            EvidenceRow(label = "REGLA_APLICADA", value = report.primaryCandidate.ruleId, description = "Regla de microelectrónica activada")
+                            EvidenceRow(label = "REGLA_APLICADA", value = primaryCandidate.ruleId, description = "Regla de microelectrónica activada")
                         }
                     }
                 }
             }
 
-            // Extracted sensor & panic evidences list
             item {
                 Text(
                     text = "LÍNEAS DE EVIDENCIA EXTRAÍDAS",
