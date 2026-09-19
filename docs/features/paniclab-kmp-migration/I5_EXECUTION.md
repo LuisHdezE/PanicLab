@@ -14,10 +14,11 @@ I6, I7, Blueprint changes, Room schema migration, DataStore migration, Compose r
 
 - Base: `main@2c2c9025b969d8c76e5ec1fa0e6ea1dd2bae4ccc`.
 - Final validated executable head: `1c58931acf9051de93914758dacd29270df51562`.
+- Physical-smoke packaging head: `06a339808e861e4a737e62cf27a2ef1080d71820`.
 - Pull request: #10, `kmp/i5-android-shared-cutover`.
-- At validation time the branch was 19 commits ahead and 0 behind the base.
+- At executable validation time the branch was 19 commits ahead and 0 behind the base.
 
-Commits after the validated executable head are documentation/cleanup-only and do not change executable production/test behavior.
+Commits after the validated executable head are documentation, cleanup or CI-only changes and do not change product executable behavior.
 
 ## TASK-KMP-050 — Android cutover
 
@@ -142,6 +143,31 @@ Artifact:
 - artifact ID `10575586401`;
 - digest `sha256:75389d053f8eaeb15f55f0236d89c3ec738d79e12cbae6ad944a790503b00827`.
 
+## Physical-smoke APK packaging evidence
+
+A CI-produced debug APK was added so the physical smoke can use the exact I5 branch build rather than an independently compiled local binary.
+
+The first packaging run `35415807909` passed all I0/I5 tests but failed only at `:app:validateSigningDebug` because the repository intentionally did not contain the root `debug.keystore` expected by the existing `debugConfig`.
+
+The CI fix did not modify release signing or add a persistent private key. The workflow now generates an ephemeral Android debug keystore using the standard non-secret debug credentials (`android` / `androiddebugkey`) and then assembles the debug APK.
+
+Final packaging evidence on head `06a339808e861e4a737e62cf27a2ef1080d71820`:
+
+- Android run `35416104717` — SUCCESS;
+- frozen fixtures / architecture guard / I0 + I5 cutover tests — PASS;
+- ephemeral debug keystore generation — PASS;
+- `:app:assembleDebug` — PASS;
+- APK artifact upload — PASS;
+- artifact name: `paniclab-i5-physical-smoke-apk`;
+- artifact ID: `10576026106`;
+- artifact ZIP digest: `sha256:c39b103c490ba433a99e0dcec4ea575e84a7fd53f5840cdae2104b621a8c3205`;
+- raw `app-debug.apk` size: `69074454` bytes;
+- raw APK SHA-256: `8ead753861eee499d27caa3bb1626a8073385f87555f4ff83da11da4e1473aaf`.
+
+The checksum file packaged by CI was independently compared with the downloaded APK and matched exactly.
+
+On the same packaging head, `KMP I1 Scaffold Verification` run `35416104730` also completed SUCCESS for shared JVM, Android-host, Kover gate and both iOS framework links.
+
 ## CI truthfulness improvement
 
 The shared verification workflow now also triggers when the Android cutover boundary changes:
@@ -151,6 +177,8 @@ The shared verification workflow now also triggers when the Android cutover boun
 - `AndroidSharedCutoverIntegrationTest.kt`.
 
 This prevents future Android-to-shared boundary changes from bypassing shared JVM/Android-host/Kover/iOS-link validation merely because `shared/**` itself was not edited.
+
+The Android baseline workflow also builds and publishes a signed debug APK for the I5 physical smoke using only an ephemeral CI debug key. Release signing remains untouched.
 
 ## Remaining acceptance gate — physical Android smoke
 
@@ -171,6 +199,7 @@ Until that smoke is reported PASS, PR #10 remains Draft.
 - TASK-KMP-050: automated implementation/validation **DONE**.
 - TASK-KMP-051: automated implementation/validation **DONE**.
 - TASK-KMP-052: duplicate removal and full automated post-removal matrix **DONE**.
+- Physical-smoke APK packaging: **DONE**.
 - Physical Android smoke: **PENDING**.
 - PR #10: **Draft / not merged**.
 - I6: **not authorized**.
