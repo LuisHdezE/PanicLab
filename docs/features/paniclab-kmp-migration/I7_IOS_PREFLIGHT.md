@@ -46,13 +46,37 @@ Official references:
 1. records the actual runner architecture, macOS version, Xcode version and installed SDK list;
 2. configures JDK 21 and Gradle 9.3.1, matching the existing KMP lane;
 3. links `Shared.framework` for `iosArm64` and `iosSimulatorArm64`;
-4. inspects each produced Mach-O binary with `xcrun vtool -show-build`;
-5. fails if either effective `minos` is not exactly `15.0`;
+4. recognizes that the produced framework is static and therefore contains an `ar` archive rather than one Mach-O executable;
+5. inspects the archive members with `xcrun otool -l`, collects all `LC_BUILD_VERSION` `minos` values and fails unless the unique value is exactly `15.0`;
 6. records the environment and framework evidence in the GitHub Actions job summary;
 7. uses no Apple certificate, provisioning profile, Team ID, App Store credential or signing secret;
 8. uploads no custom artifact in this preflight lane, avoiding unnecessary Actions storage consumption.
 
-A green PR run is mandatory before TASK-KMP-070 can be considered DONE.
+## Executable evidence
+
+PR #18 preflight run `35443705583` (`KMP I7 iOS Preflight`, run #2) completed **SUCCESS** after correcting the archive-inspection probe.
+
+Observed runner/toolchain:
+
+- runner OS: macOS;
+- runner architecture: ARM64;
+- GitHub image: `macos-26-arm64`;
+- macOS: `26.6.2` (`25G83`);
+- Xcode: `26.6` (`17F113`);
+- installed iOS SDK: `26.5`;
+- installed iOS Simulator SDK: `26.5`;
+- Kotlin/Native framework linking: PASS for `iosArm64` and `iosSimulatorArm64`.
+
+Effective deployment target evidence:
+
+| Target | Framework binary form | `LC_BUILD_VERSION` minos entries | Unique `minos` |
+| --- | --- | ---: | ---: |
+| `iosArm64` | static `ar` archive | 286 | `15.0` |
+| `iosSimulatorArm64` | static `ar` archive | 286 | `15.0` |
+
+The first probe attempt used `vtool` as if the static framework contained a single Mach-O binary. Framework linking itself succeeded, but `vtool` correctly rejected the `ar` archive. The guard was corrected to use `otool` across archive members; no product or shared-code change was required.
+
+The final PR head must remain green before TASK-KMP-070 is merged and recorded as DONE.
 
 ## USD0 guardrail
 
