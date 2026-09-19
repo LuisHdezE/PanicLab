@@ -5,7 +5,7 @@ struct ContentView: View {
     @StateObject private var viewModel = DiagnosticViewModel()
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     header
@@ -17,6 +17,7 @@ struct ContentView: View {
             .background(Color(.systemGroupedBackground))
             .navigationTitle("PanicLab")
         }
+        .navigationViewStyle(.stack)
     }
 
     private var header: some View {
@@ -40,10 +41,10 @@ struct ContentView: View {
                 .padding(8)
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
-                .overlay {
+                .overlay(
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Color.secondary.opacity(0.22), lineWidth: 1)
-                }
+                )
                 .accessibilityIdentifier("paniclab.logInput")
                 .accessibilityLabel("Contenido del Panic Full")
 
@@ -139,7 +140,7 @@ struct ContentView: View {
                     .clipShape(Capsule())
             }
 
-            Grid(alignment: .leading, horizontalSpacing: 14, verticalSpacing: 8) {
+            VStack(alignment: .leading, spacing: 8) {
                 infoRow("Dispositivo", result.deviceName)
                 infoRow("Producto", result.productCode)
                 infoRow("iOS", result.osVersion)
@@ -181,12 +182,14 @@ struct ContentView: View {
     }
 
     private func infoRow(_ label: String, _ value: String) -> some View {
-        GridRow {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
             Text(label)
                 .foregroundStyle(.secondary)
+                .frame(width: 96, alignment: .leading)
             Text(value)
                 .fontWeight(.medium)
                 .textSelection(.enabled)
+            Spacer(minLength: 0)
         }
     }
 
