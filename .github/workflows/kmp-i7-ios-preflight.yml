@@ -1,0 +1,132 @@
+name: KMP I7 iOS Preflight
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/kmp-i7-ios-preflight.yml'
+      - 'shared/**'
+      - 'gradle/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'docs/features/paniclab-kmp-migration/I7_IOS_PREFLIGHT.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kmp-i7-preflight-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios-preflight:
+    name: iOS toolchain and framework preflight
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Capture runner and Xcode environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "## Runner"
+            echo "RUNNER_OS=${RUNNER_OS}"
+            echo "RUNNER_ARCH=${RUNNER_ARCH}"
+            echo
+            echo "## macOS"
+            sw_vers
+            echo
+            echo "## Xcode"
+            xcodebuild -version
+            echo
+            echo "## SDKs"
+            xcodebuild -showsdks
+          } | tee /tmp/paniclab-i7-environment.txt
+
+          {
+            echo "## I7 iOS preflight environment"
+            echo '```text'
+            cat /tmp/paniclab-i7-environment.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle 9.3.1
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.3.1'
+
+      - name: Link device and Apple Silicon simulator frameworks
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle \
+            :shared:linkDebugFrameworkIosArm64 \
+            :shared:linkDebugFrameworkIosSimulatorArm64 \
+            --stacktrace
+
+      - name: Verify effective iOS minimum deployment target
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          expected="15.0"
+          device="shared/build/bin/iosArm64/debugFramework/Shared.framework/Shared"
+          simulator="shared/build/bin/iosSimulatorArm64/debugFramework/Shared.framework/Shared"
+
+          inspect_binary() {
+            local label="$1"
+            local binary="$2"
+
+            test -f "$binary"
+
+            echo "### ${label}" | tee -a /tmp/paniclab-i7-minos.txt
+            file "$binary" | tee -a /tmp/paniclab-i7-minos.txt
+
+            local build_info
+            build_info="$(xcrun vtool -show-build "$binary")"
+            printf '%s\n' "$build_info" | tee -a /tmp/paniclab-i7-minos.txt
+
+            local minos
+            minos="$(printf '%s\n' "$build_info" | awk '$1 == "minos" { print $2; exit }')"
+
+            if [[ -z "$minos" ]]; then
+              echo "Unable to read minos from ${label}" >&2
+              exit 1
+            fi
+
+            if [[ "$minos" != "$expected" ]]; then
+              echo "Expected iOS minos ${expected}, got ${minos} for ${label}" >&2
+              exit 1
+            fi
+          }
+
+          : > /tmp/paniclab-i7-minos.txt
+          inspect_binary "iosArm64" "$device"
+          inspect_binary "iosSimulatorArm64" "$simulator"
+
+          {
+            echo
+            echo "## Effective framework deployment target"
+            echo "Expected and verified: iOS ${expected}"
+            echo '```text'
+            cat /tmp/paniclab-i7-minos.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Confirm no signing credentials are required for preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "TASK-KMP-070 links unsigned Kotlin/Native frameworks only; no Apple signing identity, provisioning profile, certificate, Team ID or App Store credential is used." | tee -a "$GITHUB_STEP_SUMMARY"
