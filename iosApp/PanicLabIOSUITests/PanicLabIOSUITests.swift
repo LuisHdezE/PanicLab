@@ -16,6 +16,8 @@ final class PanicLabIOSUITests: XCTestCase {
         XCTAssertTrue(analyze.exists)
         analyze.tap()
 
-        XCTAssertTrue(app.otherElements["paniclab.state.error"].waitForExistence(timeout: 5))
+        let errorState = app.descendants(matching: .any)["paniclab.state.error"]
+        XCTAssertTrue(errorState.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["No se pudo analizar"].waitForExistence(timeout: 5))
     }
 }
