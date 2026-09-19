@@ -2,7 +2,7 @@
 
 **Reference PLAN:** `docs/features/paniclab-kmp-migration/PLAN.md`
 **PLAN version:** `4d5c70f12c68c480a930be7ede1b5451b41d1415` / approved 2026-09-18
-**Implementation authorization:** I0, I1, I2, I3, I4 and I5 explicitly authorized, completed and merged; I6 is not authorized.
+**Implementation authorization:** I0, I1, I2, I3, I4 and I5 explicitly authorized, completed and merged; I6 explicitly authorized on 2026-09-19, with TASK-KMP-060 and TASK-KMP-061 completed and merged while TASK-KMP-062 remains pending.
 
 > These tasks translate the approved PLAN into reviewable execution increments. No task may move to `IN PROGRESS` until Luis explicitly authorizes that implementation increment. Approval of this task list, merge of documentation PRs, repository visibility changes and application implementation remain separate actions.
 
@@ -16,7 +16,7 @@
 | I3 | Explicitly authorized by Luis on 2026-09-18 | DONE | PR #6 merged as `623aa9da0d4b6f1005d2a00039bd9e71a9c2f6a9` |
 | I4 | Explicitly authorized by Luis on 2026-09-18 | DONE | PR #8 merged as `b50e23cf879e191b531cf0c3ca7080b6300f5e41` |
 | I5 | Explicitly authorized by Luis before implementation | DONE | PR #10 merged as `40cdc6006a0884465aa0cd92b89a3a1ae74638b2` |
-| I6 | Not authorized | NOT STARTED | PENDING explicit authorization |
+| I6 | Explicitly authorized by Luis on 2026-09-19 | IN PROGRESS | PR #13 merged as `425c59017f0368833416f8b83925b4b099558073`; PR #14 merged as `cd63f4f9a790ead3199bc1d1e063c5e905c5e82f`; TASK-KMP-062 pending |
 
 ## Status vocabulary
 
@@ -130,7 +130,7 @@ A task is DONE only when its required implementation and validation have both be
 - **Objective:** Add common deterministic test and coverage plumbing before meaningful extraction.
 - **Scope:** `kotlin-test`, test fixtures, Kover JVM/Android-host reporting, architecture guard integration, threshold configuration ready for changed deterministic scope.
 - **Dependencies:** TASK-KMP-011
-- **Files/components expected:** `shared` test config, Kover/verification config, QA scripts/workflows as appropriate.
+- **Files/components expected:** shared test config, Kover/verification config, QA scripts/workflows as appropriate.
 - **Validation method:** intentionally small sample test passes; coverage report generated; architecture guard executes.
 - **Coverage expectation:** gate configured at >=90% line and >=85% branch for defined changed/new deterministic production scope once such code exists.
 - **Regression scope:** Build/test pipeline only.
@@ -310,7 +310,7 @@ A task is DONE only when its required implementation and validation have both be
 
 ### TASK-KMP-060 · Recover and verify Room schema lineage
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** ANDROID
 - **RF/CA:** RF-05 · CA-07, CA-15
 - **Objective:** Determine what historical installed schemas can actually be proven before any database migration decision.
@@ -321,12 +321,12 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** Not applicable.
 - **Regression scope:** none, read-only investigation.
 - **Evidence required:** lineage table with VERIFIED/UNKNOWN states and source references.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** Room v1, v2 and current v3 declarations were recovered and source-verified. Historical declarations used `exportSchema = false`; no registered `addMigrations(...)` path, historical DB artifact or GitHub Release carrying a recoverable database was found. Historical non-destructive v1→v2 and v2→v3 upgrade behavior therefore remains unsupported/not proven and was not fabricated.
+- **Evidence reference:** `I6_SCHEMA_LINEAGE.md`; PR #13; merge `425c59017f0368833416f8b83925b4b099558073`.
 
 ### TASK-KMP-061 · Add non-destructive upgrade test harness
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** ANDROID
 - **RF/CA:** RF-05, RF-07 · CA-07, CA-15
 - **Objective:** Prove supported installed data survives any future schema change.
@@ -337,8 +337,8 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** scenario completeness for every supported verified upgrade path.
 - **Regression scope:** Room storage/history tests.
 - **Evidence required:** upgrade test logs and retained-row assertions.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** `RoomUpgradeSafetyTest` proves reconstructed source-derived v1/v2 fixtures fail closed under a strict current-v3 Room opener when no migration exists and that their sentinel rows plus `user_version` remain intact. A current v3 database preserves representative session, evidence, candidate, technician notes and customer name across close/reopen. This is preservation evidence, not proof of historical v1→v2 or v2→v3 migrations. Production `fallbackToDestructiveMigration()` remains unchanged.
+- **Evidence reference:** `I6_UPGRADE_HARNESS.md`; PR #14; final run `35423527938` SUCCESS; unit-test artifact `10578726388`; merge `cd63f4f9a790ead3199bc1d1e063c5e905c5e82f`.
 
 ### TASK-KMP-062 · Decide Room KMP adoption separately
 
@@ -428,20 +428,20 @@ A task is DONE only when its required implementation and validation have both be
 
 | QA dimension | Target | Planned threshold / scenarios | Actual result | Status |
 | --- | --- | --- | --- | --- |
-| Requirements / CA traceability | MULTI | 100% of CA-01..CA-15 mapped | I0-I5 evidence mapped; remaining increments pending | IN PROGRESS |
+| Requirements / CA traceability | MULTI | 100% of CA-01..CA-15 mapped | I0-I5 evidence mapped; I6 schema-lineage and upgrade-safety evidence mapped through TASK-KMP-061; TASK-KMP-062 and later increments pending | IN PROGRESS |
 | Changed deterministic line coverage | COMMON/JVM-host | >= 90% | I5 deterministic scope remains 99.2513% (928/935); final pre-merge shared run `35418051651` passed | PASS THROUGH I5 |
 | Changed deterministic branch coverage | COMMON/JVM-host | >= 85% | I5 deterministic scope remains 87.6582% (554/632); threshold unchanged and green | PASS THROUGH I5 |
 | Critical deterministic scenario coverage | COMMON | 95–100% meaningful scenarios where practical for normalization, precedence, fallback, rule scope/ranking, validation/redaction | I0-I5 protect normalization, exact/bitmask precedence, unknown fallback, scope/ranking, rule-pack validation/diff and Android repository→shared→Room scenarios | IN PROGRESS |
 | Deterministic equivalence | COMMON/ANDROID/IOS | Approved fixture semantics match baseline | Shared semantics and Android cutover are proven through I5; Kotlin/Native/iOS executable equivalence remains pending | IN PROGRESS |
 | Architecture/static | COMMON | No forbidden Android/JVM/platform leakage | COMMON guard and repository scan pass through I5; `:shared` is the single migrated deterministic implementation | PASS THROUGH I5 |
-| Android regression | ANDROID | Existing diagnostic, rule-pack, OCR handoff, Room/history and touched UI scenarios pass | Final I5 Android matrix and physical smoke passed; final pre-merge run `35418051596` SUCCESS | PASS THROUGH I5 |
+| Android regression | ANDROID | Existing diagnostic, rule-pack, OCR handoff, Room/history and touched UI scenarios pass | I5 Android matrix/physical smoke remain green; I6 `RoomUpgradeSafetyTest` final run `35423527938` also passed | PASS THROUGH I6-061 |
 | Android physical smoke | ANDROID | At least one physical-device smoke before final core cutover | Real-device CI APK smoke reported `Smoke I5 PASS` on 2026-09-19, including diagnosis, History/reopen, Evidence/Log and lifecycle checks | PASS |
-| Persistence upgrade safety | ANDROID | 100% of verified supported schema paths preserve representative history | I5 made no Room schema or DAO migration; historical lineage/upgrade proof remains I6 | IN PROGRESS |
+| Persistence upgrade safety | ANDROID | 100% of verified supported schema paths preserve representative history | Source lineage v1/v2/v3 recovered; reconstructed v1/v2 fixtures fail closed without mutation when migrations are absent; current v3 preserves representative history across strict reopen. Historical v1→v2 and v2→v3 migrations remain unsupported/not proven; TASK-KMP-062 strategy decision pending | IN PROGRESS |
 | Kotlin/Native execution | IOS/COMMON | Required common fixtures execute on Native path | Framework compilation/linking remains proven; fixture execution on Native remains pending | IN PROGRESS |
 | Native iOS build/test | IOS | Real Xcode build + target-relevant tests pass | `iosArm64` and `iosSimulatorArm64` frameworks link on macOS through I5; native app/XCTest slice remains pending | IN PROGRESS |
 | iOS native UX/accessibility | IOS | text/paste diagnostic slice has native states and basic accessibility semantics | PENDING | NOT RUN |
-| CI truthfulness | MULTI | runner/visibility claims match actual evidence; USD0 private iOS not claimed without proof | Public-repo Ubuntu/macOS execution plus Android smoke APK packaging validated through I5 | PASS THROUGH I5 |
-| Security/privacy | MULTI | no secrets/raw customer logs in fixtures/artifacts; redaction scenarios pass | I5 used sanitized automated fixtures; physical real-log evidence was not committed as a fixture; release signing remained untouched | PASS THROUGH I5 |
+| CI truthfulness | MULTI | runner/visibility claims match actual evidence; USD0 private iOS not claimed without proof | Public-repo Ubuntu/macOS execution plus Android smoke APK packaging validated through I5; I6-061 Android CI evidence recorded separately | PASS THROUGH I6-061 |
+| Security/privacy | MULTI | no secrets/raw customer logs in fixtures/artifacts; redaction scenarios pass | I5 used sanitized automated fixtures; physical real-log evidence was not committed as a fixture; I6 safety fixtures are synthetic/source-derived; release signing remained untouched | PASS THROUGH I6-061 |
 | Performance/resource regression | ANDROID | no gross representative analysis latency/memory regression at cutover | Physical smoke showed no gross lifecycle/product regression, but no dedicated latency/memory benchmark was captured | IN PROGRESS |
 
 ## Acceptance evidence ledger
@@ -454,28 +454,31 @@ A task is DONE only when its required implementation and validation have both be
 | CA-04 | COMMON | 002, 040 | DONE | I0 rule-pack fixtures + I4 shared parser/validator/diff tests and Kover evidence | Required COMMON rule-pack parse/validate/diff semantics pass through I4 |
 | CA-05 | ANDROID | 050, 051, 052 | DONE | I5 repository→shared→Room integration, duplicate removal, final Android regression and physical smoke | Android cutover completed with single shared deterministic implementation and physical acceptance PASS |
 | CA-06 | ANDROID | 010, 011, 050, 051, 052 | DONE | I1 scaffold + I5 Android cutover/regression/duplicate removal | Android remains functional after shared-engine cutover; I5 physical smoke PASS |
-| CA-07 | ANDROID | 060, 061, 062 | NOT RUN | PENDING | PENDING |
+| CA-07 | ANDROID | 060, 061, 062 | IN PROGRESS | I6 schema lineage (`I6_SCHEMA_LINEAGE.md`) + strict upgrade safety harness (`I6_UPGRADE_HARNESS.md`, run `35423527938`) | Source lineage and preservation/fail-closed behavior are evidenced; Room KMP strategy decision remains TASK-KMP-062 |
 | CA-08 | IOS | 071, 072 | NOT RUN | PENDING | PENDING |
 | CA-09 | IOS | 010, 011, 070, 071, 072 | IN PROGRESS | I1-I5 macOS framework links | Native iOS slice/equivalence pending |
 | CA-10 | ANDROID/IOS | 032, 050, 051, 080 | IN PROGRESS | I3 COMMON OCR cleanup + I5 Android shared-engine handoff/regression | Android portion passes; iOS capability backlog remains pending |
 | CA-11 | COMMON | 001, 002, 003, 012, 021, 030, 031, 032, 040 | DONE | I0 fixtures/guard + I1 QA gates + I2 portable core + I3 parser/engine/OCR + I4 rule-pack Kover 99.2513/87.6582 | Required COMMON changed deterministic coverage gates remain green through I5 |
 | CA-12 | ANDROID/IOS | 051, 071, 072, 080 | IN PROGRESS | I5 Android physical lifecycle/navigation smoke | Android portion passes; native iOS behavior remains pending |
-| CA-13 | COMMON | 003, 011, 012, 020, 021, 030, 040, 041, 052, 062 | IN PROGRESS | Architecture guard + isolated shared + I2/I3/I4 boundary work + I5 duplicate removal | Single shared deterministic implementation proven; persistence strategy decision remains pending I6 |
+| CA-13 | COMMON | 003, 011, 012, 020, 021, 030, 040, 041, 052, 062 | IN PROGRESS | Architecture guard + isolated shared + I2/I3/I4 boundary work + I5 duplicate removal | Single shared deterministic implementation proven; persistence strategy decision remains TASK-KMP-062 |
 | CA-14 | CI | 010, 012, 070 | IN PROGRESS | Public-repo Ubuntu/macOS workflow evidence through I5 | Final iOS deployment/CI decision remains I7 |
-| CA-15 | ANDROID | 041, 060, 061, 062 | IN PROGRESS | I4 boundary cleanup and I5 cutover preserved Room schema/DAOs | Schema lineage, upgrade harness and Room KMP decision remain pending I6 |
+| CA-15 | ANDROID | 041, 060, 061, 062 | IN PROGRESS | I4 boundary cleanup + I6 source lineage + I6 strict fail-closed/current-v3 preservation harness | Schema evidence and safety harness are complete; historical migration support is not claimed and persistence strategy decision remains TASK-KMP-062 |
 
 ## Outstanding checks before next implementation authorization
 
-- I0, I1, I2, I3, I4 and I5 are merged and have executable evidence recorded above.
-- PR #10 merged as `40cdc6006a0884465aa0cd92b89a3a1ae74638b2` after physical Android smoke PASS and final exact-head CI SUCCESS.
-- This post-merge reconciliation updates documentation only; it does not authorize or begin I6.
-- I6 requires a new explicit authorization from Luis before TASK-KMP-060 may move to `IN PROGRESS`.
+- I0, I1, I2, I3, I4 and I5 are merged with executable evidence recorded above.
+- I6 was explicitly authorized by Luis on 2026-09-19.
+- TASK-KMP-060 is DONE via `I6_SCHEMA_LINEAGE.md`, PR #13 and merge `425c59017f0368833416f8b83925b4b099558073`.
+- TASK-KMP-061 is DONE via `I6_UPGRADE_HARNESS.md`, final run `35423527938`, PR #14 and merge `cd63f4f9a790ead3199bc1d1e063c5e905c5e82f`.
+- TASK-KMP-062 is the next I6 task and is an evidence-based architecture decision only. Choosing Room KMP later would still require its own separately approved implementation scope.
+- No historical `Migration(1,2)` or `Migration(2,3)` has been invented; historical non-destructive upgrade paths remain unsupported/not proven.
+- Production `fallbackToDestructiveMigration()` remains unchanged; no Room version/entity/DAO/schema change has been made in I6 through TASK-KMP-061.
 - PanicLab remains intentionally public; no repository visibility change is implied by later implementation authorization.
 - Do not modify `SoftwareDevelopmentBlueprint` during PanicLab validation.
 - Preserve `main@c165ae4283a3b592eddb2b70a1c13a9ffeb51f01` as the verified behavioral reference for migration fixtures.
 - Preserve the approved strangler sequence and Android-native Compose/Room/DataStore/CameraX/ML Kit/Gemini/PDF/share/navigation boundaries unless separately approved.
 - Track the real-smoke hardening findings separately: character-spaced log ingestion, broad secondary panic-family false positives, fallback SMC-code false positives and cosmetic OS-version duplication.
-- Issue #11 tracks the separate future `Panic Full Findings Inbox`; it does not alter I5 or authorize implementation.
+- Issue #11 tracks the separate future `Panic Full Findings Inbox`; it does not alter I5/I6 or authorize implementation.
 
 ## Completion condition
 
