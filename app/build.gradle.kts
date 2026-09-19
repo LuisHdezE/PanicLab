@@ -57,29 +57,6 @@ android {
     buildConfig = true
   }
 
-  // I5 cutover safety net: keep the superseded Android deterministic sources in the
-  // repository while compiling the shared implementations instead. TASK-KMP-052
-  // removes these files only after the cutover regression matrix is green.
-  sourceSets {
-    getByName("main") {
-      java.exclude(
-        "com/example/domain/model/DomainModels.kt",
-        "com/example/domain/model/RulePackMetadata.kt",
-        "com/example/diagnostic/CandidateRanker.kt",
-        "com/example/diagnostic/DiagnosticReportBuilder.kt",
-        "com/example/diagnostic/DiagnosticRulesEngine.kt",
-        "com/example/diagnostic/SensorExtractor.kt",
-        "com/example/parser/DeviceResolver.kt",
-        "com/example/parser/EvidenceExtractor.kt",
-        "com/example/parser/LogNormalizer.kt",
-        "com/example/parser/MetadataExtractor.kt",
-        "com/example/parser/PanicClassifier.kt",
-        "com/example/ocr/OcrLogExtractor.kt",
-        "com/example/util/HexUtils.kt"
-      )
-    }
-  }
-
   testOptions { unitTests { isIncludeAndroidResources = true } }
   dependenciesInfo {
     includeInApk = false
