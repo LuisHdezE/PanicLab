@@ -24,7 +24,10 @@ import org.robolectric.annotation.Config
  * TASK-KMP-051: proves the Android product path is wired through the shared
  * deterministic engine while Room and bundled rule-pack persistence stay native.
  *
- * The diagnostic input and expected outcome are frozen from the I0 baseline.
+ * Diagnostic inputs come from the frozen I0 behavior baseline. Repository-facing
+ * rule IDs and labels intentionally follow the bundled product rule pack from the
+ * pre-cutover main branch, while the unit-level I0 fixtures continue protecting
+ * deterministic engine semantics independently.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [36])
@@ -66,9 +69,10 @@ class AndroidSharedCutoverIntegrationTest {
         assertEquals("iPhone 14", report.deviceModel?.marketingName)
         assertTrue(report.panicFamilies.contains(PanicFamily.SMC_ASSERTION))
         assertEquals(
-            "Batería / Línea I2C Gas Gauge (BATT_HDQ / BATT_SWI)",
-            report.primaryCandidate?.label
+            "smc14base_0x500000_battery___battery_data_path",
+            report.primaryCandidate?.ruleId
         )
+        assertEquals("Batería", report.primaryCandidate?.label)
         assertEquals(ConfidenceLevel.HIGH, report.confidence)
         assertTrue(
             report.evidences.any {
@@ -92,11 +96,12 @@ class AndroidSharedCutoverIntegrationTest {
         val history = repository.getSessionHistory().first()
         assertEquals(1, history.size)
         assertEquals(report.id, history.single().id)
+        assertEquals(report.primaryCandidate?.ruleId, history.single().primaryCandidate?.ruleId)
         assertEquals(report.primaryCandidate?.label, history.single().primaryCandidate?.label)
     }
 
     @Test
-    fun decimalSensorFixture_keepsFrozenSharedDiagnosticSemantics() = runBlocking {
+    fun decimalSensorFixture_keepsProductRulePackSemanticsThroughSharedEngine() = runBlocking {
         val rawLog = """
             "product":"iPhone14,7"
             "panicString":"SMC PANIC - ASSERT: SMC BSC failure\nS.sensor array 0 - 5 is 0, 4194304, 0, 0, 0"
@@ -112,7 +117,11 @@ class AndroidSharedCutoverIntegrationTest {
         assertEquals("iPhone 14", report.deviceModel?.marketingName)
         assertEquals("SMC_14_BASE", report.deviceModel?.diagnosticProfile)
         assertTrue(report.panicFamilies.contains(PanicFamily.SMC_BSC_FAILURE))
-        assertEquals("Wireless Charging Coil", report.primaryCandidate?.label)
+        assertEquals(
+            "smc14base_0x400000_wireless_charge_coil",
+            report.primaryCandidate?.ruleId
+        )
+        assertEquals("Bobina de carga inalámbrica", report.primaryCandidate?.label)
         assertEquals(ConfidenceLevel.HIGH, report.confidence)
         assertTrue(
             report.evidences.any {
@@ -126,7 +135,11 @@ class AndroidSharedCutoverIntegrationTest {
 
         val persisted = repository.getSessionById(report.id)
         assertNotNull(persisted)
-        assertEquals("Wireless Charging Coil", persisted?.primaryCandidate?.label)
+        assertEquals(
+            "smc14base_0x400000_wireless_charge_coil",
+            persisted?.primaryCandidate?.ruleId
+        )
+        assertEquals("Bobina de carga inalámbrica", persisted?.primaryCandidate?.label)
         assertTrue(persisted?.rawLogSaved == false)
         assertEquals(null, persisted?.rawLog)
     }
