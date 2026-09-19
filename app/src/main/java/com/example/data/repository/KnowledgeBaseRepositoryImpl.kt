@@ -3,7 +3,7 @@ package com.example.data.repository
 import android.content.Context
 import androidx.room.withTransaction
 import com.example.data.local.AppDatabase
-import com.example.data.local.entity.RulePackEntity
+import com.example.data.mapper.RulePackPersistenceMapper
 import com.example.domain.model.*
 import com.example.domain.repository.KnowledgeBaseRepository
 import com.example.util.RulePackDiffCalculator
@@ -27,40 +27,44 @@ class KnowledgeBaseRepositoryImpl(
 
     override fun getAllRules(): Flow<List<DiagnosticRule>> {
         return ruleDao.getAllActiveRules().map { list ->
-            list.map { RulePackJsonParser.entityToDomain(it) }
+            list.map { RulePackPersistenceMapper.toDomainRule(it) }
         }
     }
 
     override suspend fun getAllRulesDirect(): List<DiagnosticRule> = withContext(Dispatchers.IO) {
-        ruleDao.getAllRulesDirect().map { RulePackJsonParser.entityToDomain(it) }
+        ruleDao.getAllRulesDirect().map { RulePackPersistenceMapper.toDomainRule(it) }
     }
 
     override fun searchRules(query: String): Flow<List<DiagnosticRule>> {
         return ruleDao.searchRules(query).map { list ->
-            list.map { RulePackJsonParser.entityToDomain(it) }
+            list.map { RulePackPersistenceMapper.toDomainRule(it) }
         }
     }
 
     override suspend fun getRuleById(id: String): DiagnosticRule? = withContext(Dispatchers.IO) {
-        ruleDao.getRuleById(id)?.let { RulePackJsonParser.entityToDomain(it) }
+        ruleDao.getRuleById(id)?.let { RulePackPersistenceMapper.toDomainRule(it) }
     }
 
     override fun getAllDevices(): Flow<List<DeviceModel>> {
         return deviceDao.getAllDevices().map { list ->
-            list.map { RulePackJsonParser.entityToDevice(it) }
+            list.map { RulePackPersistenceMapper.toDomainDevice(it) }
         }
     }
 
     override suspend fun findDevice(query: String): DeviceModel? = withContext(Dispatchers.IO) {
-        deviceDao.findDevice(query)?.let { RulePackJsonParser.entityToDevice(it) }
+        deviceDao.findDevice(query)?.let { RulePackPersistenceMapper.toDomainDevice(it) }
     }
 
-    override fun getActiveRulePackEntity(): Flow<RulePackEntity?> {
-        return rulePackDao.getActiveRulePackFlow()
+    override fun getActiveRulePack(): Flow<RulePackMetadata?> {
+        return rulePackDao.getActiveRulePackFlow().map { entity ->
+            entity?.let { RulePackPersistenceMapper.toMetadata(it) }
+        }
     }
 
-    override fun getAllRulePackEntities(): Flow<List<RulePackEntity>> {
-        return rulePackDao.getAllRulePacks()
+    override fun getAllRulePacks(): Flow<List<RulePackMetadata>> {
+        return rulePackDao.getAllRulePacks().map { packs ->
+            packs.map { RulePackPersistenceMapper.toMetadata(it) }
+        }
     }
 
     override suspend fun initializeDefaultRulePackIfNeeded(): Boolean = withContext(Dispatchers.IO) {
@@ -137,7 +141,6 @@ class KnowledgeBaseRepositoryImpl(
 
     override suspend fun computeDiffWithCurrent(incomingPack: ParsedRulePack): RulePackDiffSummary = withContext(Dispatchers.IO) {
         val currentRules = getAllRulesDirect()
-        val currentDevices = deviceDao.getAllDevices()
         val activePack = rulePackDao.getActiveRulePack()
 
         val currentParsed = if (activePack != null && currentRules.isNotEmpty()) {
@@ -153,7 +156,7 @@ class KnowledgeBaseRepositoryImpl(
                         generatedAt = activePack.generatedAt,
                         locale = "es-UY",
                         sources = emptyList(),
-                        deviceModels = currentDevices.map { list -> list.map { RulePackJsonParser.entityToDevice(it) } }.let { emptyList() },
+                        deviceModels = emptyList(),
                         panicClassifiers = emptyList(),
                         bitmaskPolicies = emptyList(),
                         diagnosticRules = currentRules
@@ -185,7 +188,6 @@ class KnowledgeBaseRepositoryImpl(
         filename: String?
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
-            // Re-validate to guarantee absolute safety
             val validation = RulePackValidator.validate(parsedPack)
             if (!validation.isValid) {
                 return@withContext Result.failure(
@@ -203,18 +205,14 @@ class KnowledgeBaseRepositoryImpl(
             val previousVer = currentActive?.version
 
             database.withTransaction {
-                // 1. Wipe previous rule & device tables
                 deviceDao.deleteAll()
                 ruleDao.deleteAll()
 
-                // 2. Insert new models & rules
                 deviceDao.insertAll(parseResult.deviceModelEntities)
                 ruleDao.insertAll(parseResult.diagnosticRuleEntities)
 
-                // 3. Update previous active packs
                 rulePackDao.deactivateAllPacks()
 
-                // 4. Insert or update the new rule pack entry and mark active
                 val newPackEntity = parseResult.rulePackEntity.copy(
                     isActive = true,
                     previousVersion = previousVer

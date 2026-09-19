@@ -13,8 +13,8 @@ interface KnowledgeBaseRepository {
     suspend fun initializeDefaultRulePackIfNeeded(): Boolean
     suspend fun importRulePackJson(jsonContent: String): Result<String>
     suspend fun getCurrentRulePackVersion(): String
-    fun getActiveRulePackEntity(): Flow<com.example.data.local.entity.RulePackEntity?>
-    fun getAllRulePackEntities(): Flow<List<com.example.data.local.entity.RulePackEntity>>
+    fun getActiveRulePack(): Flow<RulePackMetadata?>
+    fun getAllRulePacks(): Flow<List<RulePackMetadata>>
     suspend fun validateRulePack(jsonContent: String, origin: RulePackOrigin, filename: String?): Pair<RulePackValidationResult, ParsedRulePack?>
     suspend fun computeDiffWithCurrent(incomingPack: ParsedRulePack): RulePackDiffSummary
     suspend fun installRulePackAtomic(parsedPack: ParsedRulePack, filename: String?): Result<String>

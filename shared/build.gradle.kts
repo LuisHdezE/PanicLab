@@ -65,12 +65,15 @@ kover {
           "com.example.diagnostic.DiagnosticRulesEngine*",
           "com.example.diagnostic.CandidateRanker*",
           "com.example.diagnostic.DiagnosticReportBuilder*",
-          "com.example.ocr.OcrLogExtractor*"
+          "com.example.ocr.OcrLogExtractor*",
+          "com.example.rulepack.RulePackJsonParser*",
+          "com.example.rulepack.RulePackValidator*",
+          "com.example.rulepack.RulePackDiffCalculator*"
         )
       }
     }
     verify {
-      rule("I3 deterministic shared thresholds") {
+      rule("I4 deterministic shared thresholds") {
         minBound(90)
         minBound(85, CoverageUnit.BRANCH)
       }
