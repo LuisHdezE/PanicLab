@@ -15,7 +15,9 @@ I6, I7, Blueprint changes, Room schema migration, DataStore migration, Compose r
 - Base: `main@2c2c9025b969d8c76e5ec1fa0e6ea1dd2bae4ccc`.
 - Final validated executable head: `1c58931acf9051de93914758dacd29270df51562`.
 - Physical-smoke packaging head: `06a339808e861e4a737e62cf27a2ef1080d71820`.
+- Physical-smoke evidence reconciliation head: `6bd6a03e7ed4eea2703142cb8ececb04c461a7f9`.
 - Pull request: #10, `kmp/i5-android-shared-cutover`.
+- Merge commit on `main`: `40cdc6006a0884465aa0cd92b89a3a1ae74638b2`.
 
 Commits after the validated executable head are documentation, cleanup or CI-only changes and do not change product executable behavior.
 
@@ -155,6 +157,23 @@ The shared verification workflow now also triggers when the Android cutover boun
 
 The Android baseline workflow also builds and publishes the signed debug APK used for physical I5 smoke with only an ephemeral CI debug key. Release signing remains untouched.
 
+## Final-head verification before merge
+
+After the physical-smoke evidence reconciliation commit `6bd6a03e7ed4eea2703142cb8ececb04c461a7f9`, both required workflows were rerun on that exact PR head and completed successfully:
+
+- `KMP I0 Baseline Verification` run `35418051596` — SUCCESS;
+- `KMP I1 Scaffold Verification` run `35418051651` — SUCCESS, including shared JVM/Android-host/Kover and both iOS framework links.
+
+## Merge evidence
+
+PR #10 was explicitly approved for merge and merged on 2026-09-19.
+
+- PR #10 final head: `6bd6a03e7ed4eea2703142cb8ececb04c461a7f9`;
+- merge commit: `40cdc6006a0884465aa0cd92b89a3a1ae74638b2`;
+- PR state after merge: closed / merged;
+- `main` immediately after merge: `40cdc6006a0884465aa0cd92b89a3a1ae74638b2`;
+- merge signature: verified / valid.
+
 ## Checkpoint state
 
 - TASK-KMP-050: **DONE**.
@@ -163,8 +182,6 @@ The Android baseline workflow also builds and publishes the signed debug APK use
 - Physical-smoke APK packaging: **DONE**.
 - Physical Android smoke: **PASS / DONE**.
 - I5 acceptance gate: **CLOSED**.
-- PR #10: **Ready for review / not merged**.
+- PR #10: **MERGED** as `40cdc6006a0884465aa0cd92b89a3a1ae74638b2`.
 - I6: **not authorized**.
 - Blueprint: **untouched**.
-
-Merge still requires explicit `Apruebo merge PR #10`.
