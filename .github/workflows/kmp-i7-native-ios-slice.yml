@@ -43,7 +43,7 @@ jobs:
       - name: Link Shared frameworks
         run: |
           set -euo pipefail
-          ./gradlew \
+          gradle \
             :shared:linkDebugFrameworkIosArm64 \
             :shared:linkDebugFrameworkIosSimulatorArm64 \
             --stacktrace
