@@ -59,10 +59,13 @@ class KnowledgeBaseViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val allRulePacks: StateFlow<List<RulePackEntity>> = kbRepository.getAllRulePackEntities()
+    // Presentation compatibility only. The domain repository no longer exposes Room entities.
+    val allRulePacks: StateFlow<List<RulePackEntity>> = kbRepository.getAllRulePacks()
+        .map { packs -> packs.map { it.toPresentationEntity() } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val activeRulePack: StateFlow<RulePackEntity?> = kbRepository.getActiveRulePackEntity()
+    val activeRulePack: StateFlow<RulePackEntity?> = kbRepository.getActiveRulePack()
+        .map { it?.toPresentationEntity() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     val currentVersion: StateFlow<String> = activeRulePack.map { it?.version ?: "1.0.0" }
@@ -169,6 +172,26 @@ class KnowledgeBaseViewModel(
             onResult(result)
         }
     }
+
+    private fun RulePackMetadata.toPresentationEntity() = RulePackEntity(
+        version = version,
+        title = title,
+        generatedAt = generatedAt,
+        schemaVersion = schemaVersion,
+        rulesCount = rulesCount,
+        modelsCount = modelsCount,
+        classifiersCount = classifiersCount,
+        sourcesCount = sourcesCount,
+        bitmaskCount = bitmaskCount,
+        origin = origin.name,
+        sourceFilename = sourceFilename,
+        checksum = checksum,
+        isActive = isActive,
+        isDefault = isDefault,
+        previousVersion = previousVersion,
+        rawJson = null,
+        importedAt = importedAt
+    )
 }
 
 class KnowledgeBaseViewModelFactory(
