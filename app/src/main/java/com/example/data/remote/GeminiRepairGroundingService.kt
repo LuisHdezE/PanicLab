@@ -25,7 +25,6 @@ class GeminiRepairGroundingService(
 
     companion object {
         private const val TAG = "GeminiGroundingService"
-        // Target model: gemini-3.5-flash as specified by guidelines
         private const val MODEL_NAME = "gemini-3.5-flash"
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
@@ -54,7 +53,6 @@ class GeminiRepairGroundingService(
             ""
         }
 
-        // If key is empty or default placeholder, provide intelligent offline/fallback guide
         if (apiKey.isBlank() || apiKey == "MY_GEMINI_API_KEY") {
             logWarning("Gemini API key is not configured. Falling back to local offline repair suggestions.")
             return@withContext Result.success(generateOfflineRepairSuggestion(report, "Clave API de Gemini no configurada en Secrets panel."))
@@ -65,7 +63,6 @@ class GeminiRepairGroundingService(
         try {
             val url = "$BASE_URL/$MODEL_NAME:generateContent?key=$apiKey"
             val requestJson = JSONObject().apply {
-                // Contents
                 put("contents", JSONArray().apply {
                     put(JSONObject().apply {
                         put("parts", JSONArray().apply {
@@ -76,14 +73,12 @@ class GeminiRepairGroundingService(
                     })
                 })
 
-                // Tools with Google Search Grounding
                 put("tools", JSONArray().apply {
                     put(JSONObject().apply {
                         put("googleSearch", JSONObject())
                     })
                 })
 
-                // System Instruction
                 put("systemInstruction", JSONObject().apply {
                     put("parts", JSONArray().apply {
                         put(JSONObject().apply {
@@ -143,13 +138,11 @@ class GeminiRepairGroundingService(
             }
             val responseText = rawTextBuilder.toString().ifBlank { "No se obtuvieron detalles de la consulta." }
 
-            // Extract Google Search Grounding metadata
             val searchSources = mutableListOf<SearchGroundingSource>()
             val searchQueries = mutableListOf<String>()
 
             val groundingMetadata = firstCandidate.optJSONObject("groundingMetadata")
             if (groundingMetadata != null) {
-                // Web search queries
                 val webQueries = groundingMetadata.optJSONArray("webSearchQueries")
                 if (webQueries != null) {
                     for (i in 0 until webQueries.length()) {
@@ -157,7 +150,6 @@ class GeminiRepairGroundingService(
                     }
                 }
 
-                // Grounding chunks (Sources)
                 val groundingChunks = groundingMetadata.optJSONArray("groundingChunks")
                 if (groundingChunks != null) {
                     for (i in 0 until groundingChunks.length()) {
@@ -238,21 +230,11 @@ class GeminiRepairGroundingService(
 
             val upper = trimmed.uppercase()
             when {
-                upper.contains("RESUMEN") || upper.contains("CAUSA RAÍZ") -> {
-                    currentSection = "SUMMARY"
-                }
-                upper.contains("PASOS") || upper.contains("PROCEDIMIENTO") || upper.contains("VERIFICACIÓN") -> {
-                    currentSection = "STEPS"
-                }
-                upper.contains("LÍNEAS") || upper.contains("COMPONENTES") || upper.contains("ESQUEMÁTICO") -> {
-                    currentSection = "COMPONENTS"
-                }
-                upper.contains("DIODO") || upper.contains("MEDICIÓN") || upper.contains("VOLTAJE") -> {
-                    currentSection = "DIODE"
-                }
-                upper.contains("PRECAUCI") || upper.contains("CUIDADO") || upper.contains("ADVERTENCIA") -> {
-                    currentSection = "CAUTIONS"
-                }
+                upper.contains("RESUMEN") || upper.contains("CAUSA RAÍZ") -> currentSection = "SUMMARY"
+                upper.contains("PASOS") || upper.contains("PROCEDIMIENTO") || upper.contains("VERIFICACIÓN") -> currentSection = "STEPS"
+                upper.contains("LÍNEAS") || upper.contains("COMPONENTES") || upper.contains("ESQUEMÁTICO") -> currentSection = "COMPONENTS"
+                upper.contains("DIODO") || upper.contains("MEDICIÓN") || upper.contains("VOLTAJE") -> currentSection = "DIODE"
+                upper.contains("PRECAUCI") || upper.contains("CUIDADO") || upper.contains("ADVERTENCIA") -> currentSection = "CAUTIONS"
                 else -> {
                     val cleanBullet = trimmed.removePrefix("-").removePrefix("*").removePrefix("•").trim()
                     if (cleanBullet.length > 3) {
@@ -267,13 +249,13 @@ class GeminiRepairGroundingService(
             }
         }
 
-        // If extraction is empty, seed with structured defaults
         if (detailedSteps.isEmpty()) {
             detailedSteps.addAll(report.repairFlow.firstChecks)
         }
 
-        if (suspectedComponents.isEmpty() && report.primaryCandidate?.suspectedComponents?.isNotEmpty() == true) {
-            report.primaryCandidate.suspectedComponents.forEach {
+        val primaryCandidate = report.primaryCandidate
+        if (suspectedComponents.isEmpty() && primaryCandidate?.suspectedComponents?.isNotEmpty() == true) {
+            primaryCandidate.suspectedComponents.forEach {
                 suspectedComponents.add("${it.name} (${it.role})")
             }
         }
@@ -321,7 +303,6 @@ class GeminiRepairGroundingService(
             )
         )
 
-        // Custom contextual steps based on diagnosis
         when {
             diag.contains("Micrófono", ignoreCase = true) || diag.contains("mic2", ignoreCase = true) -> {
                 steps.add("Desconectar el flex de puerto de carga/micrófono inferior y encender la placa conectada a fuente.")
