@@ -55,7 +55,7 @@ jobs:
         shell: bash
         run: bash scripts/verify-kmp-common-boundary.sh
 
-      - name: Run deterministic I0 baseline tests
+      - name: Run deterministic I0 baseline and I5 cutover tests
         shell: bash
         run: |
           gradle :app:testDebugUnitTest \
@@ -63,6 +63,7 @@ jobs:
             --tests 'com.example.RulePackManagementTest' \
             --tests 'com.example.RulePackBoundaryTest' \
             --tests 'com.example.OcrLogExtractorTest' \
+            --tests 'com.example.AndroidSharedCutoverIntegrationTest' \
             --stacktrace
 
       - name: Upload unit-test reports
