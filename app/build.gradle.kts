@@ -56,6 +56,30 @@ android {
     compose = true
     buildConfig = true
   }
+
+  // I5 cutover safety net: keep the superseded Android deterministic sources in the
+  // repository while compiling the shared implementations instead. TASK-KMP-052
+  // removes these files only after the cutover regression matrix is green.
+  sourceSets {
+    getByName("main") {
+      java.exclude(
+        "com/example/domain/model/DomainModels.kt",
+        "com/example/domain/model/RulePackMetadata.kt",
+        "com/example/diagnostic/CandidateRanker.kt",
+        "com/example/diagnostic/DiagnosticReportBuilder.kt",
+        "com/example/diagnostic/DiagnosticRulesEngine.kt",
+        "com/example/diagnostic/SensorExtractor.kt",
+        "com/example/parser/DeviceResolver.kt",
+        "com/example/parser/EvidenceExtractor.kt",
+        "com/example/parser/LogNormalizer.kt",
+        "com/example/parser/MetadataExtractor.kt",
+        "com/example/parser/PanicClassifier.kt",
+        "com/example/ocr/OcrLogExtractor.kt",
+        "com/example/util/HexUtils.kt"
+      )
+    }
+  }
+
   testOptions { unitTests { isIncludeAndroidResources = true } }
   dependenciesInfo {
     includeInApk = false
@@ -76,13 +100,14 @@ googleServices { missingGoogleServicesStrategy = MissingGoogleServicesStrategy.W
 // Some unused dependencies are commented out below instead of being removed.
 // This makes it easy to add them back in the future if needed.
 dependencies {
+  implementation(project(":shared"))
   implementation(platform(libs.androidx.compose.bom))
   implementation(platform(libs.firebase.bom))
   // implementation(libs.accompanist.permissions)
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.camera.camera2)
-  implementation(libs.androidx.camera.core)
-  implementation(libs.androidx.camera.lifecycle)
+  implementation(libs.androidx.camera.camera.core)
+  implementation(libs.androidx.camera.camera.lifecycle)
   implementation(libs.androidx.camera.view)
   implementation(libs.google.mlkit.text.recognition)
   implementation(libs.androidx.compose.material.icons.core)
