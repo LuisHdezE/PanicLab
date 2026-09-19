@@ -45,6 +45,9 @@ fun RuleDetailScreen(
         return
     }
 
+    val knownGoodTest = rule.repairFlow.knownGoodTest
+    val notes = rule.notes
+
     Scaffold(
         containerColor = TechDarkBg,
         topBar = {
@@ -91,7 +94,6 @@ fun RuleDetailScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(top = 10.dp, bottom = 32.dp)
         ) {
-            // Header Verdict Card
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -138,7 +140,6 @@ fun RuleDetailScreen(
                 }
             }
 
-            // Suspected Components
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -189,7 +190,6 @@ fun RuleDetailScreen(
                 }
             }
 
-            // Trigger & Matching Parameters Card
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -241,7 +241,6 @@ fun RuleDetailScreen(
                 }
             }
 
-            // Repair Protocol
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -266,7 +265,7 @@ fun RuleDetailScreen(
                             )
                         }
 
-                        if (!rule.repairFlow.knownGoodTest.isNullOrBlank()) {
+                        if (!knownGoodTest.isNullOrBlank()) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = "Prueba con repuesto conocido:",
@@ -275,7 +274,7 @@ fun RuleDetailScreen(
                                 color = Color.White
                             )
                             Text(
-                                text = rule.repairFlow.knownGoodTest,
+                                text = knownGoodTest,
                                 fontSize = 12.sp,
                                 color = Color(0xFF94A3B8)
                             )
@@ -302,8 +301,7 @@ fun RuleDetailScreen(
                 }
             }
 
-            // Citations & Notes
-            if (!rule.notes.isNullOrBlank() || rule.sourceIds.isNotEmpty()) {
+            if (!notes.isNullOrBlank() || rule.sourceIds.isNotEmpty()) {
                 item {
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
@@ -318,8 +316,8 @@ fun RuleDetailScreen(
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
-                            if (!rule.notes.isNullOrBlank()) {
-                                Text(text = rule.notes, fontSize = 12.sp, color = Color(0xFF94A3B8))
+                            if (!notes.isNullOrBlank()) {
+                                Text(text = notes, fontSize = 12.sp, color = Color(0xFF94A3B8))
                             }
                             if (rule.sourceIds.isNotEmpty()) {
                                 Text(

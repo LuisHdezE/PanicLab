@@ -55,7 +55,7 @@ jobs:
         shell: bash
         run: bash scripts/verify-kmp-common-boundary.sh
 
-      - name: Run deterministic I0 baseline tests
+      - name: Run deterministic I0 baseline and I5 cutover tests
         shell: bash
         run: |
           gradle :app:testDebugUnitTest \
@@ -63,7 +63,38 @@ jobs:
             --tests 'com.example.RulePackManagementTest' \
             --tests 'com.example.RulePackBoundaryTest' \
             --tests 'com.example.OcrLogExtractorTest' \
+            --tests 'com.example.AndroidSharedCutoverIntegrationTest' \
             --stacktrace
+
+      - name: Generate ephemeral Android debug keystore
+        shell: bash
+        run: |
+          keytool -genkeypair \
+            -keystore debug.keystore \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -dname 'CN=Android Debug,O=Android,C=US' \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000
+
+      - name: Assemble I5 physical-smoke APK
+        shell: bash
+        run: |
+          gradle :app:assembleDebug --stacktrace
+          sha256sum app/build/outputs/apk/debug/app-debug.apk \
+            | tee app/build/outputs/apk/debug/app-debug.apk.sha256
+
+      - name: Upload I5 physical-smoke APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: paniclab-i5-physical-smoke-apk
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/debug/app-debug.apk.sha256
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Upload unit-test reports
         if: always()

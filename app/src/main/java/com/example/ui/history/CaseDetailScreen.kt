@@ -201,7 +201,6 @@ fun CaseDetailScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp)
         ) {
-            // KB Version Discrepancy Banner (if current active rule pack differs)
             if (isKbNewer) {
                 item {
                     Surface(
@@ -244,7 +243,6 @@ fun CaseDetailScreen(
                 }
             }
 
-            // Summary Header Card with Reanalysis tracking
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -333,7 +331,6 @@ fun CaseDetailScreen(
                 }
             }
 
-            // Device & Main Verdict Card
             item {
                 Surface(
                     modifier = Modifier
@@ -395,7 +392,7 @@ fun CaseDetailScreen(
                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                report.primaryCandidate.suspectedComponents.forEach { comp ->
+                                report.primaryCandidate?.suspectedComponents?.forEach { comp ->
                                     Box(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(8.dp))
@@ -417,7 +414,6 @@ fun CaseDetailScreen(
                 }
             }
 
-            // Real-Time Google Search Grounding Repair Suggestions
             item {
                 RepairSuggestionsSection(
                     report = report,
@@ -432,7 +428,6 @@ fun CaseDetailScreen(
                 )
             }
 
-            // Action: Reanalyze & Evidence Buttons
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -482,7 +477,6 @@ fun CaseDetailScreen(
                 }
             }
 
-            // Community Unknown Case Export Card (Phase 3)
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -531,7 +525,6 @@ fun CaseDetailScreen(
                 }
             }
 
-            // Technician Notes Field
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),

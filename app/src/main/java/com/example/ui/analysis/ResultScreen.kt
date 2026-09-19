@@ -180,7 +180,6 @@ fun ResultScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp)
         ) {
-            // Device & Panic Identifiers Strip
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -234,7 +233,6 @@ fun ResultScreen(
                 }
             }
 
-            // Main Diagnostic Verdict Card
             item {
                 Surface(
                     modifier = Modifier
@@ -260,8 +258,8 @@ fun ResultScreen(
                                 color = ElectricCyanLight,
                                 letterSpacing = 1.sp
                             )
-                            if (report.primaryCandidate != null) {
-                                VerificationBadge(status = report.primaryCandidate.verificationStatus)
+                            report.primaryCandidate?.let { candidate ->
+                                VerificationBadge(status = candidate.verificationStatus)
                             }
                         }
 
@@ -279,7 +277,6 @@ fun ResultScreen(
                             lineHeight = 18.sp
                         )
 
-                        // Suspected components chips
                         if (report.primaryCandidate?.suspectedComponents?.isNotEmpty() == true) {
                             HorizontalDivider(color = TechDarkBorder)
                             Text(
@@ -293,7 +290,7 @@ fun ResultScreen(
                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                report.primaryCandidate.suspectedComponents.forEach { comp ->
+                                report.primaryCandidate?.suspectedComponents?.forEach { comp ->
                                     Box(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(8.dp))
@@ -315,7 +312,6 @@ fun ResultScreen(
                 }
             }
 
-            // Recommended First Checks (Repair Flow)
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -349,7 +345,7 @@ fun ResultScreen(
                                     color = Color.White
                                 )
                                 Text(
-                                    text = report.repairFlow.knownGoodTest,
+                                    text = report.repairFlow.knownGoodTest.orEmpty(),
                                     fontSize = 12.sp,
                                     color = Color(0xFF94A3B8),
                                     lineHeight = 16.sp
@@ -360,7 +356,6 @@ fun ResultScreen(
                 }
             }
 
-            // Real-Time Google Search Grounding Repair Suggestions
             item {
                 RepairSuggestionsSection(
                     report = report,
@@ -374,7 +369,6 @@ fun ResultScreen(
                 )
             }
 
-            // KB Version & Anonymized Community Export Card
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -444,7 +438,6 @@ fun ResultScreen(
                 }
             }
 
-            // Log Viewer Quick Action Card
             item {
                 Surface(
                     onClick = { onNavigateToLogViewer(-1) },
@@ -487,7 +480,6 @@ fun ResultScreen(
                 }
             }
 
-            // Shareable Text Diagnostic Summary for Customers Card
             item {
                 val quickSummaryText = remember(report, customerName, technicianName, technicianNotes, includeRepairSteps, includeEvidences) {
                     TextSummaryReportGenerator.generateCustomerSummary(
@@ -567,7 +559,6 @@ fun ResultScreen(
                             lineHeight = 16.sp
                         )
 
-                        // Quick action buttons row
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -731,7 +722,6 @@ private fun CustomerReportBottomSheet(
                 .navigationBarsPadding(),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -762,7 +752,6 @@ private fun CustomerReportBottomSheet(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
-                // Fields
                 item {
                     OutlinedTextField(
                         value = customerName,
@@ -836,7 +825,6 @@ private fun CustomerReportBottomSheet(
                     )
                 }
 
-                // Toggles
                 item {
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
@@ -885,7 +873,6 @@ private fun CustomerReportBottomSheet(
                     }
                 }
 
-                // Text preview
                 item {
                     Text(
                         text = "VISTA PREVIA DEL TEXTO A ENVIAR",
@@ -915,7 +902,6 @@ private fun CustomerReportBottomSheet(
                 }
             }
 
-            // Bottom action buttons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
