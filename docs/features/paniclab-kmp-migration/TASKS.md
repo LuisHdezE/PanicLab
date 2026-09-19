@@ -2,7 +2,7 @@
 
 **Reference PLAN:** `docs/features/paniclab-kmp-migration/PLAN.md`
 **PLAN version:** `4d5c70f12c68c480a930be7ede1b5451b41d1415` / approved 2026-09-18
-**Implementation authorization:** I0, I1, I2, I3, I4 and I5 explicitly authorized, completed and merged; I6 explicitly authorized on 2026-09-19, with TASK-KMP-060 and TASK-KMP-061 completed and merged while TASK-KMP-062 remains pending.
+**Implementation authorization:** I0, I1, I2, I3, I4, I5 and I6 explicitly authorized, completed and merged; I7 is not yet authorized.
 
 > These tasks translate the approved PLAN into reviewable execution increments. No task may move to `IN PROGRESS` until Luis explicitly authorizes that implementation increment. Approval of this task list, merge of documentation PRs, repository visibility changes and application implementation remain separate actions.
 
@@ -16,7 +16,7 @@
 | I3 | Explicitly authorized by Luis on 2026-09-18 | DONE | PR #6 merged as `623aa9da0d4b6f1005d2a00039bd9e71a9c2f6a9` |
 | I4 | Explicitly authorized by Luis on 2026-09-18 | DONE | PR #8 merged as `b50e23cf879e191b531cf0c3ca7080b6300f5e41` |
 | I5 | Explicitly authorized by Luis before implementation | DONE | PR #10 merged as `40cdc6006a0884465aa0cd92b89a3a1ae74638b2` |
-| I6 | Explicitly authorized by Luis on 2026-09-19 | IN PROGRESS | PR #13 merged as `425c59017f0368833416f8b83925b4b099558073`; PR #14 merged as `cd63f4f9a790ead3199bc1d1e063c5e905c5e82f`; TASK-KMP-062 pending |
+| I6 | Explicitly authorized by Luis on 2026-09-19 | DONE | PR #13 merged as `425c59017f0368833416f8b83925b4b099558073`; PR #14 merged as `cd63f4f9a790ead3199bc1d1e063c5e905c5e82f`; PR #16 merged as `a97e4afdf25f8f5feb9b1900b6d9116a7d391e9f` |
 
 ## Status vocabulary
 
@@ -342,7 +342,7 @@ A task is DONE only when its required implementation and validation have both be
 
 ### TASK-KMP-062 · Decide Room KMP adoption separately
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** MULTI
 - **RF/CA:** RF-05, RF-10 · CA-07, CA-13, CA-15
 - **Objective:** Decide from evidence whether moving persistence to Room KMP adds enough value to justify migration risk.
@@ -353,8 +353,8 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** Not applicable.
 - **Regression scope:** Not applicable.
 - **Evidence required:** explicit KEEP / ADOPT LATER decision with rationale.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** Decision is **ADOPT LATER**. Room KMP is technically viable and officially supported, but PanicLab keeps Android Room unchanged through I7. Room KMP may be reconsidered only as a separately approved I8 persistence/history capability after a real native iOS persistence need exists and Android schema/data-preservation prerequisites are strengthened.
+- **Evidence reference:** `I6_ROOM_KMP_DECISION.md`; PR #16; workflow run `35427718202` SUCCESS; merge `a97e4afdf25f8f5feb9b1900b6d9116a7d391e9f`.
 
 # I7 — Native iOS diagnostic slice
 
@@ -428,20 +428,20 @@ A task is DONE only when its required implementation and validation have both be
 
 | QA dimension | Target | Planned threshold / scenarios | Actual result | Status |
 | --- | --- | --- | --- | --- |
-| Requirements / CA traceability | MULTI | 100% of CA-01..CA-15 mapped | I0-I5 evidence mapped; I6 schema-lineage and upgrade-safety evidence mapped through TASK-KMP-061; TASK-KMP-062 and later increments pending | IN PROGRESS |
+| Requirements / CA traceability | MULTI | 100% of CA-01..CA-15 mapped | I0-I6 evidence mapped, including Room lineage, upgrade-safety and the Room KMP ADOPT LATER decision; I7/I8 evidence remains pending | IN PROGRESS |
 | Changed deterministic line coverage | COMMON/JVM-host | >= 90% | I5 deterministic scope remains 99.2513% (928/935); final pre-merge shared run `35418051651` passed | PASS THROUGH I5 |
 | Changed deterministic branch coverage | COMMON/JVM-host | >= 85% | I5 deterministic scope remains 87.6582% (554/632); threshold unchanged and green | PASS THROUGH I5 |
 | Critical deterministic scenario coverage | COMMON | 95–100% meaningful scenarios where practical for normalization, precedence, fallback, rule scope/ranking, validation/redaction | I0-I5 protect normalization, exact/bitmask precedence, unknown fallback, scope/ranking, rule-pack validation/diff and Android repository→shared→Room scenarios | IN PROGRESS |
 | Deterministic equivalence | COMMON/ANDROID/IOS | Approved fixture semantics match baseline | Shared semantics and Android cutover are proven through I5; Kotlin/Native/iOS executable equivalence remains pending | IN PROGRESS |
-| Architecture/static | COMMON | No forbidden Android/JVM/platform leakage | COMMON guard and repository scan pass through I5; `:shared` is the single migrated deterministic implementation | PASS THROUGH I5 |
-| Android regression | ANDROID | Existing diagnostic, rule-pack, OCR handoff, Room/history and touched UI scenarios pass | I5 Android matrix/physical smoke remain green; I6 `RoomUpgradeSafetyTest` final run `35423527938` also passed | PASS THROUGH I6-061 |
+| Architecture/static | COMMON | No forbidden Android/JVM/platform leakage | COMMON guard and repository scan pass through I6 decision validation; `:shared` remains the single migrated deterministic implementation and free of Room/SQLite persistence dependencies | PASS THROUGH I6 |
+| Android regression | ANDROID | Existing diagnostic, rule-pack, OCR handoff, Room/history and touched UI scenarios pass | I5 Android matrix/physical smoke remain green; I6 Room safety tests also pass, including final decision validation run `35427718202` | PASS THROUGH I6 |
 | Android physical smoke | ANDROID | At least one physical-device smoke before final core cutover | Real-device CI APK smoke reported `Smoke I5 PASS` on 2026-09-19, including diagnosis, History/reopen, Evidence/Log and lifecycle checks | PASS |
-| Persistence upgrade safety | ANDROID | 100% of verified supported schema paths preserve representative history | Source lineage v1/v2/v3 recovered; reconstructed v1/v2 fixtures fail closed without mutation when migrations are absent; current v3 preserves representative history across strict reopen. Historical v1→v2 and v2→v3 migrations remain unsupported/not proven; TASK-KMP-062 strategy decision pending | IN PROGRESS |
+| Persistence upgrade safety | ANDROID | 100% of verified supported schema paths preserve representative history | Source lineage v1/v2/v3 recovered; reconstructed v1/v2 fixtures fail closed without mutation when migrations are absent; current v3 preserves representative history across strict reopen. Historical v1→v2 and v2→v3 migrations remain unsupported/not proven. TASK-KMP-062 chose ADOPT LATER, so no persistence migration is authorized in I6 | PASS THROUGH I6 |
 | Kotlin/Native execution | IOS/COMMON | Required common fixtures execute on Native path | Framework compilation/linking remains proven; fixture execution on Native remains pending | IN PROGRESS |
 | Native iOS build/test | IOS | Real Xcode build + target-relevant tests pass | `iosArm64` and `iosSimulatorArm64` frameworks link on macOS through I5; native app/XCTest slice remains pending | IN PROGRESS |
 | iOS native UX/accessibility | IOS | text/paste diagnostic slice has native states and basic accessibility semantics | PENDING | NOT RUN |
-| CI truthfulness | MULTI | runner/visibility claims match actual evidence; USD0 private iOS not claimed without proof | Public-repo Ubuntu/macOS execution plus Android smoke APK packaging validated through I5; I6-061 Android CI evidence recorded separately | PASS THROUGH I6-061 |
-| Security/privacy | MULTI | no secrets/raw customer logs in fixtures/artifacts; redaction scenarios pass | I5 used sanitized automated fixtures; physical real-log evidence was not committed as a fixture; I6 safety fixtures are synthetic/source-derived; release signing remained untouched | PASS THROUGH I6-061 |
+| CI truthfulness | MULTI | runner/visibility claims match actual evidence; USD0 private iOS not claimed without proof | Public-repo Ubuntu/macOS execution plus Android smoke APK packaging validated; I6 final decision validation run `35427718202` passed on the exact PR #16 head | PASS THROUGH I6 |
+| Security/privacy | MULTI | no secrets/raw customer logs in fixtures/artifacts; redaction scenarios pass | I5 used sanitized automated fixtures; physical real-log evidence was not committed as a fixture; I6 safety fixtures are synthetic/source-derived and the I6 decision PR was documentation-only; release signing remained untouched | PASS THROUGH I6 |
 | Performance/resource regression | ANDROID | no gross representative analysis latency/memory regression at cutover | Physical smoke showed no gross lifecycle/product regression, but no dedicated latency/memory benchmark was captured | IN PROGRESS |
 
 ## Acceptance evidence ledger
@@ -454,25 +454,27 @@ A task is DONE only when its required implementation and validation have both be
 | CA-04 | COMMON | 002, 040 | DONE | I0 rule-pack fixtures + I4 shared parser/validator/diff tests and Kover evidence | Required COMMON rule-pack parse/validate/diff semantics pass through I4 |
 | CA-05 | ANDROID | 050, 051, 052 | DONE | I5 repository→shared→Room integration, duplicate removal, final Android regression and physical smoke | Android cutover completed with single shared deterministic implementation and physical acceptance PASS |
 | CA-06 | ANDROID | 010, 011, 050, 051, 052 | DONE | I1 scaffold + I5 Android cutover/regression/duplicate removal | Android remains functional after shared-engine cutover; I5 physical smoke PASS |
-| CA-07 | ANDROID | 060, 061, 062 | IN PROGRESS | I6 schema lineage (`I6_SCHEMA_LINEAGE.md`) + strict upgrade safety harness (`I6_UPGRADE_HARNESS.md`, run `35423527938`) | Source lineage and preservation/fail-closed behavior are evidenced; Room KMP strategy decision remains TASK-KMP-062 |
+| CA-07 | ANDROID | 060, 061, 062 | DONE | I6 schema lineage (`I6_SCHEMA_LINEAGE.md`) + strict upgrade safety harness (`I6_UPGRADE_HARNESS.md`, run `35423527938`) + Room KMP decision (`I6_ROOM_KMP_DECISION.md`, run `35427718202`) | Source lineage and current-v3/fail-closed preservation are evidenced; historical migration support is not invented; persistence strategy is ADOPT LATER |
 | CA-08 | IOS | 071, 072 | NOT RUN | PENDING | PENDING |
 | CA-09 | IOS | 010, 011, 070, 071, 072 | IN PROGRESS | I1-I5 macOS framework links | Native iOS slice/equivalence pending |
 | CA-10 | ANDROID/IOS | 032, 050, 051, 080 | IN PROGRESS | I3 COMMON OCR cleanup + I5 Android shared-engine handoff/regression | Android portion passes; iOS capability backlog remains pending |
 | CA-11 | COMMON | 001, 002, 003, 012, 021, 030, 031, 032, 040 | DONE | I0 fixtures/guard + I1 QA gates + I2 portable core + I3 parser/engine/OCR + I4 rule-pack Kover 99.2513/87.6582 | Required COMMON changed deterministic coverage gates remain green through I5 |
 | CA-12 | ANDROID/IOS | 051, 071, 072, 080 | IN PROGRESS | I5 Android physical lifecycle/navigation smoke | Android portion passes; native iOS behavior remains pending |
-| CA-13 | COMMON | 003, 011, 012, 020, 021, 030, 040, 041, 052, 062 | IN PROGRESS | Architecture guard + isolated shared + I2/I3/I4 boundary work + I5 duplicate removal | Single shared deterministic implementation proven; persistence strategy decision remains TASK-KMP-062 |
-| CA-14 | CI | 010, 012, 070 | IN PROGRESS | Public-repo Ubuntu/macOS workflow evidence through I5 | Final iOS deployment/CI decision remains I7 |
-| CA-15 | ANDROID | 041, 060, 061, 062 | IN PROGRESS | I4 boundary cleanup + I6 source lineage + I6 strict fail-closed/current-v3 preservation harness | Schema evidence and safety harness are complete; historical migration support is not claimed and persistence strategy decision remains TASK-KMP-062 |
+| CA-13 | COMMON | 003, 011, 012, 020, 021, 030, 040, 041, 052, 062 | DONE | Architecture guard + isolated shared + I2/I3/I4 boundary work + I5 duplicate removal + I6 Room KMP ADR | Single shared deterministic implementation is proven; persistence remains outside COMMON through I7 by explicit ADOPT LATER decision |
+| CA-14 | CI | 010, 012, 070 | IN PROGRESS | Public-repo Ubuntu/macOS workflow evidence through I6 | Final iOS deployment/CI decision remains I7 |
+| CA-15 | ANDROID | 041, 060, 061, 062 | DONE | I4 boundary cleanup + I6 source lineage + strict fail-closed/current-v3 preservation harness + Room KMP ADR | Schema evidence and safety harness are complete; historical migration support is not claimed; persistence migration is deferred by explicit ADOPT LATER decision |
 
 ## Outstanding checks before next implementation authorization
 
-- I0, I1, I2, I3, I4 and I5 are merged with executable evidence recorded above.
-- I6 was explicitly authorized by Luis on 2026-09-19.
+- I0, I1, I2, I3, I4, I5 and I6 are merged with their evidence recorded above.
+- I6 was explicitly authorized by Luis on 2026-09-19 and is DONE.
 - TASK-KMP-060 is DONE via `I6_SCHEMA_LINEAGE.md`, PR #13 and merge `425c59017f0368833416f8b83925b4b099558073`.
 - TASK-KMP-061 is DONE via `I6_UPGRADE_HARNESS.md`, final run `35423527938`, PR #14 and merge `cd63f4f9a790ead3199bc1d1e063c5e905c5e82f`.
-- TASK-KMP-062 is the next I6 task and is an evidence-based architecture decision only. Choosing Room KMP later would still require its own separately approved implementation scope.
+- TASK-KMP-062 is DONE via `I6_ROOM_KMP_DECISION.md`, final run `35427718202`, PR #16 and merge `a97e4afdf25f8f5feb9b1900b6d9116a7d391e9f`; decision: **ADOPT LATER**.
+- Room KMP implementation is not authorized by I6. Any future persistence/history implementation under I8 requires its own explicit approved scope and must satisfy the ADR re-entry gates.
+- I7 is the next migration increment and is not yet authorized. TASK-KMP-070/071/072 remain TODO.
 - No historical `Migration(1,2)` or `Migration(2,3)` has been invented; historical non-destructive upgrade paths remain unsupported/not proven.
-- Production `fallbackToDestructiveMigration()` remains unchanged; no Room version/entity/DAO/schema change has been made in I6 through TASK-KMP-061.
+- Production `fallbackToDestructiveMigration()` remains unchanged; no Room version/entity/DAO/schema change was made in I6.
 - PanicLab remains intentionally public; no repository visibility change is implied by later implementation authorization.
 - Do not modify `SoftwareDevelopmentBlueprint` during PanicLab validation.
 - Preserve `main@c165ae4283a3b592eddb2b70a1c13a9ffeb51f01` as the verified behavioral reference for migration fixtures.
