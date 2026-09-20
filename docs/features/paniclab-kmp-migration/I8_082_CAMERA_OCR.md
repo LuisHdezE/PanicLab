@@ -2,7 +2,7 @@
 
 ## Status
 
-**IMPLEMENTED / AUTOMATED VALIDATION PENDING / PHYSICAL IPHONE SMOKE PENDING**
+**IMPLEMENTED / FIXES IN AUTOMATED REVALIDATION / PHYSICAL IPHONE SMOKE ROUND 1 FAILED**
 
 Implementation branch: `kmp/i8-082-ios-camera-ocr`.
 
@@ -132,7 +132,9 @@ Added coverage for:
 - gallery success using an injected recognizer;
 - gallery recognizer failure;
 - real `VNRecognizeTextRequest` against a high-contrast rendered Panic Full image;
-- Vision output passed into COMMON cleanup.
+- Vision output passed into COMMON cleanup;
+- malformed Rule Pack errors exported to Swift instead of escaping the Kotlin boundary;
+- a large physical-style SMC BSC / TAOJ Panic Full input through the native diagnostic facade.
 
 ### XCUITest
 
@@ -144,6 +146,28 @@ Added controlled simulator evidence for:
 - review text editable;
 - explicit diagnosis reaches existing diagnostic states;
 - scanner cancellation preserves existing input.
+
+## Physical iPhone smoke — Round 1
+
+Round 1 was executed on the dedicated physical iPhone using the unsigned physical-smoke IPA produced from PR #28.
+
+Observed results:
+
+1. app installation and launch succeeded;
+2. file import succeeded and the selected Panic Full was loaded into the UI;
+3. **FAIL:** the log `TextEditor` expanded with the imported content, forcing excessive outer-page scrolling before reaching the actions;
+4. **FAIL:** tapping `Analizar` terminated the app instead of returning a diagnostic result or a recoverable error.
+
+No customer/private image or Panic Full contents are committed as evidence.
+
+Remediation applied after Round 1:
+
+- constrain the log editor to a fixed 220-point viewport so long logs scroll internally;
+- harden `NativeDiagnosticFacade` so operational COMMON exceptions are converted to the declared `IllegalArgumentException` Swift error boundary;
+- add XCTest proving malformed Rule Pack failures are catchable from Swift;
+- add a large synthetic physical-style `iPhone14,7` SMC BSC / TAOJ stress case through the same native diagnostic facade.
+
+Round 2 requires a fresh exact-head IPA after all automated gates return green.
 
 ## Required exact-head acceptance before merge
 
@@ -163,7 +187,7 @@ Any code change after a green run invalidates that run for final approval.
 
 ## Physical iPhone smoke gate
 
-Even if all automated gates are green, TASK-KMP-082 must remain **PHYSICAL SMOKE PENDING** until the dedicated iPhone executes the approved checklist:
+Even if all automated gates are green, TASK-KMP-082 must remain **PHYSICAL SMOKE PENDING** until the dedicated iPhone executes the approved checklist without blocking failures:
 
 1. first camera permission prompt;
 2. live rear-camera preview;
@@ -175,6 +199,8 @@ Even if all automated gates are green, TASK-KMP-082 must remain **PHYSICAL SMOKE
 8. background/resume;
 9. torch if available;
 10. no unexpected photo persistence.
+
+The physical smoke also verifies that imported long Panic Full content keeps the action controls usable and that `Analizar` does not terminate the app.
 
 No customer/private image or panic log is to be committed as evidence.
 
