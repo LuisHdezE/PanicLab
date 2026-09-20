@@ -114,6 +114,38 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             test
 
+      - name: Package unsigned physical-smoke IPA
+        run: |
+          set -euo pipefail
+          APP_PATH=$(find "$HOME/Library/Developer/Xcode/DerivedData" \
+            -path '*/Build/Products/Debug-iphoneos/PanicLabIOS.app' \
+            -print -quit)
+          test -n "$APP_PATH"
+          test -d "$APP_PATH"
+
+          rm -rf "$RUNNER_TEMP/paniclab-physical-smoke-ipa"
+          mkdir -p \
+            "$RUNNER_TEMP/paniclab-physical-smoke-ipa/Payload" \
+            "$GITHUB_WORKSPACE/ci-artifacts"
+          ditto "$APP_PATH" \
+            "$RUNNER_TEMP/paniclab-physical-smoke-ipa/Payload/PanicLabIOS.app"
+
+          cd "$RUNNER_TEMP/paniclab-physical-smoke-ipa"
+          ditto -c -k --sequesterRsrc --keepParent \
+            Payload \
+            "$GITHUB_WORKSPACE/ci-artifacts/PanicLab-I8-082-physical-smoke-unsigned.ipa"
+
+          shasum -a 256 \
+            "$GITHUB_WORKSPACE/ci-artifacts/PanicLab-I8-082-physical-smoke-unsigned.ipa"
+
+      - name: Upload unsigned physical-smoke IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: paniclab-i8-082-physical-smoke-ipa
+          path: ci-artifacts/PanicLab-I8-082-physical-smoke-unsigned.ipa
+          retention-days: 7
+          if-no-files-found: error
+
       - name: Archive XCTest result bundle
         if: always()
         run: |
