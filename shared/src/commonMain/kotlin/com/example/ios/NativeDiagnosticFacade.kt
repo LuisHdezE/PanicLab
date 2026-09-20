@@ -28,6 +28,26 @@ class NativeDiagnosticFacade {
         rawLog: String,
         rulePackJson: String,
         rulePackChecksum: String
+    ): NativeDiagnosticResult = try {
+        analyzeInternal(
+            rawLog = rawLog,
+            rulePackJson = rulePackJson,
+            rulePackChecksum = rulePackChecksum
+        )
+    } catch (error: IllegalArgumentException) {
+        throw error
+    } catch (error: Exception) {
+        throw IllegalArgumentException(
+            error.message?.takeIf { it.isNotBlank() }
+                ?: "El motor de diagnóstico no pudo procesar el Panic Full.",
+            error
+        )
+    }
+
+    private fun analyzeInternal(
+        rawLog: String,
+        rulePackJson: String,
+        rulePackChecksum: String
     ): NativeDiagnosticResult {
         require(rawLog.isNotBlank()) { "El log no puede estar vacío." }
         require(rulePackJson.isNotBlank()) { "El Rule Pack no puede estar vacío." }
