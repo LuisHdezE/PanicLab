@@ -23,7 +23,9 @@ The SwiftUI surface uses the native iOS document importer. The selected file is 
 ### Safety boundaries
 
 - maximum imported file size: **5 MiB**;
-- accepted encodings: **UTF-8 and UTF-16** (including little/big endian variants);
+- accepted encodings: **UTF-8**, plus **UTF-16 little-endian or big-endian only when an explicit BOM is present**;
+- arbitrary non-UTF-8 bytes are not treated as UTF-16 merely because Foundation can heuristically decode them;
+- the UTF-16 BOM is consumed before decoding the text payload;
 - empty or whitespace-only files are rejected;
 - unsupported extensions are rejected;
 - unreadable/missing/non-regular selections fail safely;
@@ -44,6 +46,7 @@ These limits are intentionally local to TASK-KMP-081 and do not alter Android in
 - `iosApp/PanicLabIOS/DiagnosticViewModel.swift`
   - security-scoped document access;
   - extension/size/encoding/content validation;
+  - UTF-16 BOM-gated decoding;
   - cancellation and read-error handling;
   - imported text feeds existing `logText` pipeline.
 - `iosApp/PanicLabIOSTests/DiagnosticBridgeTests.swift`
@@ -52,7 +55,8 @@ These limits are intentionally local to TASK-KMP-081 and do not alter Android in
   - unsupported extension;
   - empty input;
   - oversized input;
-  - undecodable input;
+  - positive UTF-16 little-endian input with BOM;
+  - rejection of undecodable/non-BOM binary input;
   - missing/unreadable input.
 - `iosApp/PanicLabIOSUITests/PanicLabIOSUITests.swift`
   - accessibility smoke now requires the Import control.
@@ -65,14 +69,17 @@ These limits are intentionally local to TASK-KMP-081 and do not alter Android in
 | cancellation path | `testImportCancellationPreservesExistingInputAndReturnsIdle` |
 | unreadable/unsupported/empty input | dedicated XCTest cases for missing file, extension and empty text |
 | imported fixture same diagnosis as paste input | `testImportedFixtureMatchesPastePathDiagnosis` compares canonical result fields |
-| encoding/oversized behavior | dedicated undecodable and >5 MiB XCTest cases |
+| UTF-16 contract | `testImportAcceptsUtf16LittleEndianWithBom` proves explicit BOM-marked UTF-16 succeeds |
+| unsafe binary/encoding behavior | `testImportRejectsUndecodableText` proves arbitrary non-UTF-8 bytes without a valid BOM fail closed |
+| oversized behavior | dedicated >5 MiB XCTest case |
 | Android regressions remain green | PR exact-head GitHub Actions evidence required before merge |
 
 ## Validation required before merge
 
 1. `KMP I0 Baseline Verification` SUCCESS on exact PR HEAD.
-2. `KMP I7 Native iOS Slice` SUCCESS on exact PR HEAD, including simulator/device compilation and XCTest/XCUITest.
-3. Any additional exact-head workflows triggered by shared/ios paths must be green.
-4. Review PR diff to confirm no Room/schema, deterministic engine, Rule Pack, Android behavior or Blueprint modification.
+2. `KMP I7 Native Equivalence` SUCCESS on exact PR HEAD.
+3. `KMP I7 Native iOS Slice` SUCCESS on exact PR HEAD, including simulator/device compilation and XCTest/XCUITest.
+4. Any additional exact-head workflows triggered by shared/ios paths must be green.
+5. Review PR diff to confirm no Room/schema, deterministic engine, Rule Pack, Android behavior or Blueprint modification.
 
 Until those gates pass, TASK-KMP-081 is implemented but not DONE.
