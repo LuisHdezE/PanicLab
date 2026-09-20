@@ -79,11 +79,18 @@ struct ContentView: View {
                     .accessibilityIdentifier("paniclab.import.status")
             }
 
-            HStack(spacing: 10) {
+            LazyVGrid(
+                columns: [
+                    GridItem(.flexible(), spacing: 10),
+                    GridItem(.flexible(), spacing: 10)
+                ],
+                spacing: 10
+            ) {
                 Button {
                     isScannerPresented = true
                 } label: {
                     Label("Escanear", systemImage: "camera.viewfinder")
+                        .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.bordered)
                 .disabled(isLoading)
@@ -93,6 +100,7 @@ struct ContentView: View {
                     isFileImporterPresented = true
                 } label: {
                     Label("Importar", systemImage: "doc.badge.plus")
+                        .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.bordered)
                 .disabled(isLoading)
@@ -102,17 +110,22 @@ struct ContentView: View {
                     viewModel.pasteFromClipboard()
                 } label: {
                     Label("Pegar", systemImage: "doc.on.clipboard")
+                        .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.bordered)
                 .disabled(isLoading)
                 .accessibilityIdentifier("paniclab.pasteButton")
-            }
 
-            Button("Limpiar") {
-                viewModel.clear()
+                Button {
+                    viewModel.clear()
+                } label: {
+                    Label("Limpiar", systemImage: "trash")
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.bordered)
+                .disabled(viewModel.logText.isEmpty || isLoading)
+                .accessibilityIdentifier("paniclab.clearButton")
             }
-            .buttonStyle(.bordered)
-            .disabled(viewModel.logText.isEmpty || isLoading)
 
             Button {
                 viewModel.analyze()
