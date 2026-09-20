@@ -5,12 +5,16 @@ final class PanicLabIOSUITests: XCTestCase {
         continueAfterFailure = false
     }
 
-    func testNativeSliceExposesAccessibleInputAndErrorState() throws {
+    func testNativeSliceExposesAccessibleInputImportAndErrorState() throws {
         let app = XCUIApplication()
         app.launch()
 
         let input = app.textViews["paniclab.logInput"]
         XCTAssertTrue(input.waitForExistence(timeout: 10))
+
+        let importButton = app.buttons["paniclab.importButton"]
+        XCTAssertTrue(importButton.exists)
+        XCTAssertTrue(importButton.isEnabled)
 
         let analyze = app.buttons["paniclab.analyzeButton"]
         XCTAssertTrue(analyze.exists)
