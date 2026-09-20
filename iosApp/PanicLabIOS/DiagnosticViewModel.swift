@@ -54,6 +54,12 @@ final class DiagnosticViewModel: ObservableObject {
         state = .idle
     }
 
+    func acceptReviewedOcrText(_ text: String) {
+        logText = text
+        importedFileName = nil
+        state = .idle
+    }
+
     func clear() {
         logText = ""
         importedFileName = nil
@@ -145,7 +151,7 @@ final class DiagnosticViewModel: ObservableObject {
     func analyze() {
         let rawLog = logText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !rawLog.isEmpty else {
-            state = .error("Pega, escribe o importa un Panic Full antes de analizar.")
+            state = .error("Pega, escribe, importa o escanea un Panic Full antes de analizar.")
             return
         }
 

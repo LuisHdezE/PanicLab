@@ -1,15 +1,15 @@
+import AVFoundation
 import CryptoKit
 import Foundation
 import Shared
+import UIKit
+import Vision
 import XCTest
 @testable import PanicLabIOS
 
 final class DiagnosticBridgeTests: XCTestCase {
     func testSharedFacadeMatchesAndroidProvenCanonicalDiagnosis() throws {
         let (rulePack, checksum) = try canonicalRulePack()
-
-        // Same canonical product-rule-pack case proven through the Android
-        // repository -> shared engine -> Room integration path in TASK-KMP-051.
         let rawLog = "{\"bug_type\":\"210\",\"product\":\"iPhone14,7\",\"os_version\":\"17.3\"}\npanic(cpu 1): \"SMC PANIC - ASSERTION FAILED: S.sensor array is 0x0, 0x500000, 0x0\""
 
         let result = try NativeDiagnosticFacade().analyze(
@@ -29,9 +29,6 @@ final class DiagnosticBridgeTests: XCTestCase {
 
     func testSharedFacadeMatchesAndroidProvenCanonicalDecimalWirelessDiagnosis() throws {
         let (rulePack, checksum) = try canonicalRulePack()
-
-        // Same decimal-normalization product case proven by
-        // AndroidSharedCutoverIntegrationTest in TASK-KMP-051.
         let rawLog = "\"product\":\"iPhone14,7\"\n\"panicString\":\"SMC PANIC - ASSERT: SMC BSC failure\\nS.sensor array 0 - 5 is 0, 4194304, 0, 0, 0\""
 
         let result = try NativeDiagnosticFacade().analyze(
@@ -51,7 +48,6 @@ final class DiagnosticBridgeTests: XCTestCase {
 
     func testSharedFacadeReturnsNonConclusiveUnknownCode() throws {
         let (rulePack, checksum) = try canonicalRulePack()
-
         let rawLog = "{\"bug_type\":\"210\",\"product\":\"iPhone14,7\"}\npanic(cpu 0): \"SMC PANIC - BSC failure at address 0x987654 - S.sensor array is 0x0, 0x987654\""
 
         let result = try NativeDiagnosticFacade().analyze(
@@ -193,6 +189,89 @@ final class DiagnosticBridgeTests: XCTestCase {
         XCTAssertTrue(viewModel.logText.isEmpty)
     }
 
+    func testNativeOcrFacadePreservesCommonCleanupForSwift() {
+        let raw = "iPhone14,7\nSMC PANIC\nS.sensor array is 0x0, 0x500000, 0x0"
+        let result = NativeOcrFacade().process(rawText: raw)
+
+        XCTAssertTrue(result.cleanedText.contains("0x500000"))
+        XCTAssertTrue(result.hasValidPanicSignatures)
+        XCTAssertTrue(result.keywordsText.contains("SMC"))
+        XCTAssertEqual(result.detectedDeviceModel, "iPhone14,7")
+    }
+
+    func testPermissionStateMappingIsDeterministic() {
+        XCTAssertEqual(CameraPermissionState.from(.notDetermined), .notDetermined)
+        XCTAssertEqual(CameraPermissionState.from(.authorized), .authorized)
+        XCTAssertEqual(CameraPermissionState.from(.denied), .denied)
+        XCTAssertEqual(CameraPermissionState.from(.restricted), .restricted)
+    }
+
+    @MainActor
+    func testReviewedOcrTextIsPreservedWithoutAutomaticDiagnosis() {
+        let viewModel = DiagnosticViewModel()
+        let edited = "iPhone14,7\nSMC PANIC\nS.sensor array is 0x0, 0x500000, 0x0\nTECHNICIAN EDIT"
+
+        viewModel.acceptReviewedOcrText(edited)
+
+        XCTAssertEqual(viewModel.logText, edited)
+        XCTAssertNil(viewModel.importedFileName)
+        guard case .idle = viewModel.state else {
+            return XCTFail("Accepting reviewed OCR must not auto-diagnose")
+        }
+    }
+
+    func testGalleryPipelineUsesInjectedRecognizerAndCommonCleanup() throws {
+        let recognizer = StubRecognizer(result: .success("iPhone14,7\nSMC PANIC\nS.sensor array is 0x0, 0x500000, 0x0"))
+        let controller = CameraScannerController(recognizer: recognizer, cleaner: SharedOcrCleaner())
+        let image = solidImage()
+        let expectation = expectation(description: "gallery OCR")
+
+        controller.processGalleryImage(image) { result in
+            switch result {
+            case .success(let cleaned):
+                XCTAssertTrue(cleaned.hasValidPanicSignatures)
+                XCTAssertTrue(cleaned.cleanedText.contains("0x500000"))
+            case .failure(let error):
+                XCTFail("Unexpected failure: \(error)")
+            }
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 5)
+    }
+
+    func testGalleryPipelineSurfacesRecognizerFailure() {
+        let recognizer = StubRecognizer(result: .failure(TestScannerError.expected))
+        let controller = CameraScannerController(recognizer: recognizer, cleaner: SharedOcrCleaner())
+        let image = solidImage()
+        let expectation = expectation(description: "gallery OCR failure")
+
+        controller.processGalleryImage(image) { result in
+            if case .success = result {
+                XCTFail("Expected OCR failure")
+            }
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 5)
+    }
+
+    func testRealVisionStillImageRecognizesStablePanicTokenAndCommonCleanupAcceptsIt() throws {
+        let image = renderedPanicImage()
+        let cgImage = try XCTUnwrap(image.cgImage)
+
+        let raw = try VisionTextRecognizer().recognize(
+            cgImage: cgImage,
+            orientation: .up,
+            recognitionLevel: .accurate
+        )
+
+        XCTAssertTrue(raw.uppercased().contains("SMC"), "Vision output: \(raw)")
+        let cleaned = NativeOcrFacade().process(rawText: raw)
+        XCTAssertFalse(cleaned.cleanedText.isEmpty)
+        XCTAssertTrue(cleaned.keywordsText.contains("SMC"), "Cleaned OCR: \(cleaned.cleanedText)")
+    }
+
     private func canonicalRulePack() throws -> (String, String) {
         let bundle = Bundle(for: DiagnosticBridgeTests.self)
         let rulePack = try RulePackLoader.loadCanonicalRulePack(bundle: bundle)
@@ -210,6 +289,34 @@ final class DiagnosticBridgeTests: XCTestCase {
         return url
     }
 
+    private func solidImage() -> UIImage {
+        UIGraphicsImageRenderer(size: CGSize(width: 100, height: 100)).image { context in
+            UIColor.white.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 100, height: 100))
+        }
+    }
+
+    private func renderedPanicImage() -> UIImage {
+        let size = CGSize(width: 1600, height: 700)
+        return UIGraphicsImageRenderer(size: size).image { context in
+            UIColor.white.setFill()
+            context.fill(CGRect(origin: .zero, size: size))
+
+            let paragraph = NSMutableParagraphStyle()
+            paragraph.lineSpacing = 18
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont.monospacedSystemFont(ofSize: 70, weight: .bold),
+                .foregroundColor: UIColor.black,
+                .paragraphStyle: paragraph
+            ]
+            let text = "iPhone14,7\nSMC PANIC\nS.sensor array 0x500000"
+            text.draw(
+                in: CGRect(x: 80, y: 80, width: 1440, height: 540),
+                withAttributes: attributes
+            )
+        }
+    }
+
     @MainActor
     private func errorMessage(from state: DiagnosticViewModel.State) -> String? {
         if case .error(let message) = state {
@@ -217,4 +324,28 @@ final class DiagnosticBridgeTests: XCTestCase {
         }
         return nil
     }
+}
+
+private struct StubRecognizer: VisionTextRecognizing {
+    let result: Result<String, Error>
+
+    func recognize(
+        pixelBuffer: CVPixelBuffer,
+        orientation: CGImagePropertyOrientation,
+        recognitionLevel: VNRequestTextRecognitionLevel
+    ) throws -> String {
+        try result.get()
+    }
+
+    func recognize(
+        cgImage: CGImage,
+        orientation: CGImagePropertyOrientation,
+        recognitionLevel: VNRequestTextRecognitionLevel
+    ) throws -> String {
+        try result.get()
+    }
+}
+
+private enum TestScannerError: Error {
+    case expected
 }
