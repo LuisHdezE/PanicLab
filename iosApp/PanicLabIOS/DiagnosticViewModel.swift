@@ -28,7 +28,7 @@ final class DiagnosticViewModel: ObservableObject {
                 let maxMiB = maxBytes / (1024 * 1024)
                 return "El archivo supera el límite de \(maxMiB) MiB."
             case .unsupportedEncoding:
-                return "No se pudo decodificar el archivo como UTF-8 o UTF-16."
+                return "No se pudo decodificar el archivo como UTF-8 o UTF-16 con BOM."
             case .empty:
                 return "El archivo está vacío o no contiene texto útil."
             case .unreadable(let detail):
@@ -117,10 +117,16 @@ final class DiagnosticViewModel: ObservableObject {
                 throw ImportError.tooLarge(maxImportBytes)
             }
 
-            let decoded = String(data: data, encoding: .utf8)
-                ?? String(data: data, encoding: .utf16)
-                ?? String(data: data, encoding: .utf16LittleEndian)
-                ?? String(data: data, encoding: .utf16BigEndian)
+            let decoded: String?
+            if let utf8 = String(data: data, encoding: .utf8) {
+                decoded = utf8
+            } else if data.starts(with: [0xFF, 0xFE]) {
+                decoded = String(data: data, encoding: .utf16LittleEndian)
+            } else if data.starts(with: [0xFE, 0xFF]) {
+                decoded = String(data: data, encoding: .utf16BigEndian)
+            } else {
+                decoded = nil
+            }
 
             guard let text = decoded else {
                 throw ImportError.unsupportedEncoding
