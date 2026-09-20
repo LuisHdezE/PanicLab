@@ -1,0 +1,200 @@
+name: KMP I7 Native Equivalence
+
+on:
+  pull_request:
+    paths:
+      - 'shared/**'
+      - 'iosApp/PanicLabIOSTests/**'
+      - 'app/src/main/assets/paniclab_rules_v1.json'
+      - '.github/workflows/kmp-i7-native-equivalence.yml'
+      - 'docs/features/paniclab-kmp-migration/I7_NATIVE_EQUIVALENCE.md'
+      - 'docs/features/paniclab-kmp-migration/TASKS.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-equivalence:
+    runs-on: macos-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle 9.3.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
+
+      - name: Record Apple toolchain
+        run: |
+          set -euo pipefail
+          uname -a
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
+          xcrun --sdk iphonesimulator --show-sdk-version
+
+      - name: Select and boot iPhone simulator
+        id: simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          UDID=$(python3 - <<'PY'
+          import json, subprocess
+          data = json.loads(subprocess.check_output(['xcrun','simctl','list','devices','available','-j']))
+          candidates = []
+          for runtime, devices in data.get('devices', {}).items():
+              if 'iOS' not in runtime:
+                  continue
+              for device in devices:
+                  if device.get('isAvailable') and device.get('name','').startswith('iPhone'):
+                      candidates.append((runtime, device['name'], device['udid']))
+          if not candidates:
+              raise SystemExit('No available iPhone simulator found')
+          candidates.sort(reverse=True)
+          runtime, name, udid = candidates[0]
+          print(udid)
+          print(f'Selected {name} on {runtime}', file=__import__('sys').stderr)
+          PY
+          )
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+
+      - name: Run JVM reference common tests
+        run: |
+          set -euo pipefail
+          gradle :shared:jvmTest --stacktrace
+
+      - name: Run Kotlin Native iOS simulator common tests
+        run: |
+          set -euo pipefail
+          gradle :shared:iosSimulatorArm64Test --stacktrace
+
+      - name: Build fixture equivalence matrix from JUnit evidence
+        run: |
+          set -euo pipefail
+          mkdir -p ci-artifacts
+          python3 - <<'PY'
+          import json
+          import pathlib
+          import xml.etree.ElementTree as ET
+
+          roots = {
+              'jvm': pathlib.Path('shared/build/test-results/jvmTest'),
+              'iosSimulatorArm64': pathlib.Path('shared/build/test-results/iosSimulatorArm64Test'),
+          }
+
+          fixture_map = [
+              ('iphone13-mini-0x1000-dock-mic', 'I3DeterministicEngineTest', 'frozenI0Iphone13MiniExact0x1000RemainsEquivalent'),
+              ('iphone14-0x500000-battery', 'I3DeterministicEngineTest', 'frozenI0Iphone14BatteryAndWirelessDecimalRemainEquivalent'),
+              ('iphone14-wireless-coil-decimal-regression', 'I3DeterministicEngineTest', 'frozenI0Iphone14BatteryAndWirelessDecimalRemainEquivalent'),
+              ('iphone16-pro-decimal-3145728', 'I3DeterministicEngineTest', 'frozenI0Iphone16DecimalAndPrs0RemainEquivalent'),
+              ('iphone-x-missing-prs0', 'I3DeterministicEngineTest', 'frozenI0Iphone16DecimalAndPrs0RemainEquivalent'),
+              ('unknown-smc-safe-fallback', 'I3DeterministicEngineTest', 'frozenI0UnknownSmcUsesSafeFallback'),
+              ('rulepack-full-parser', 'I4RulePackCoreTest', 'fullParserPreservesRulePackMeaning'),
+              ('rulepack-valid-validator', 'I4RulePackCoreTest', 'validPackPassesValidator'),
+          ]
+
+          def load_cases(root):
+              files = list(root.rglob('*.xml'))
+              if not files:
+                  raise SystemExit(f'No JUnit XML files found under {root}')
+              cases = {}
+              for file in files:
+                  tree = ET.parse(file)
+                  for case in tree.findall('.//testcase'):
+                      raw_name = case.attrib.get('name', '')
+                      normalized_name = raw_name.split('[', 1)[0]
+                      key = (case.attrib.get('classname', ''), normalized_name)
+                      status = 'PASS'
+                      if case.find('failure') is not None:
+                          status = 'FAIL'
+                      elif case.find('error') is not None:
+                          status = 'ERROR'
+                      elif case.find('skipped') is not None:
+                          status = 'SKIPPED'
+                      cases[key] = status
+              return cases
+
+          results = {target: load_cases(root) for target, root in roots.items()}
+          matrix = []
+          for fixture_id, class_fragment, test_name in fixture_map:
+              row = {'fixture': fixture_id, 'test': test_name}
+              for target, cases in results.items():
+                  matches = [status for (classname, name), status in cases.items()
+                             if class_fragment in classname and name == test_name]
+                  if len(matches) != 1:
+                      raise SystemExit(
+                          f'{fixture_id}: expected exactly one {target} result for {class_fragment}.{test_name}, got {matches}'
+                      )
+                  row[target] = matches[0]
+                  if matches[0] != 'PASS':
+                      raise SystemExit(f'{fixture_id}: {target} status is {matches[0]}')
+              row['equivalent'] = row['jvm'] == row['iosSimulatorArm64'] == 'PASS'
+              matrix.append(row)
+
+          out = {
+              'schemaVersion': 1,
+              'evidenceMeaning': 'Same commonTest assertions executed and passed on JVM and Kotlin/Native iOS simulator targets.',
+              'fixtures': matrix,
+          }
+          path = pathlib.Path('ci-artifacts/i7-native-equivalence-matrix.json')
+          path.write_text(json.dumps(out, indent=2, ensure_ascii=False) + '\n')
+          print(path.read_text())
+          PY
+
+      - name: Link Shared simulator framework
+        run: |
+          set -euo pipefail
+          gradle :shared:linkDebugFrameworkIosSimulatorArm64 --stacktrace
+
+      - name: Run Xcode canonical Rule Pack bridge tests
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/PanicLabIOS-Equivalence.xcresult"
+          xcodebuild \
+            -project iosApp/PanicLabIOS.xcodeproj \
+            -scheme PanicLabIOS \
+            -configuration Debug \
+            -destination 'id=${{ steps.simulator.outputs.udid }}' \
+            -resultBundlePath "$RUNNER_TEMP/PanicLabIOS-Equivalence.xcresult" \
+            -only-testing:PanicLabIOSTests \
+            ARCHS=arm64 \
+            ONLY_ACTIVE_ARCH=YES \
+            CODE_SIGNING_ALLOWED=NO \
+            test
+
+      - name: Archive equivalence evidence
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p ci-artifacts
+          if [ -d "$RUNNER_TEMP/PanicLabIOS-Equivalence.xcresult" ]; then
+            ditto -c -k --sequesterRsrc --keepParent \
+              "$RUNNER_TEMP/PanicLabIOS-Equivalence.xcresult" \
+              "$GITHUB_WORKSPACE/ci-artifacts/PanicLabIOS-Equivalence.xcresult.zip"
+          fi
+          if [ -d shared/build/test-results/jvmTest ]; then
+            cp -R shared/build/test-results/jvmTest ci-artifacts/jvmTest-results
+          fi
+          if [ -d shared/build/test-results/iosSimulatorArm64Test ]; then
+            cp -R shared/build/test-results/iosSimulatorArm64Test ci-artifacts/iosSimulatorArm64Test-results
+          fi
+
+      - name: Upload equivalence evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: paniclab-i7-native-equivalence
+          path: ci-artifacts
+          retention-days: 7
+          if-no-files-found: error
