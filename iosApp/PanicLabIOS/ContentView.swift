@@ -61,7 +61,7 @@ struct ContentView: View {
 
             TextEditor(text: $viewModel.logText)
                 .font(.system(.footnote, design: .monospaced))
-                .frame(minHeight: 220)
+                .frame(height: 220)
                 .padding(8)
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
