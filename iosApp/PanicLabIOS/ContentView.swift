@@ -111,7 +111,7 @@ struct ContentView: View {
             .disabled(isLoading)
             .accessibilityIdentifier("paniclab.analyzeButton")
 
-            Text("Formatos: .ips, .txt, .log, .json · UTF-8/UTF-16 · máximo 5 MiB")
+            Text("Formatos: .ips, .txt, .log, .json · UTF-8 / UTF-16 con BOM · máximo 5 MiB")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
