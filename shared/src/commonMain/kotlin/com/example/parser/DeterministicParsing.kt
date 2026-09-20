@@ -251,7 +251,7 @@ object DeviceResolver {
         "iPhone13,1" to DeviceModel("iPhone13,1", "iPhone 12 mini", "IPHONE_12_MINI", "12_MINI", "THERMAL_CLASSIC_X_TO_12", 2020),
         "iPhone13,2" to DeviceModel("iPhone13,2", "iPhone 12", "IPHONE_12", "12", "THERMAL_CLASSIC_X_TO_12", 2020),
         "iPhone13,3" to DeviceModel("iPhone13,3", "iPhone 12 Pro", "IPHONE_12_PRO", "12_PRO", "THERMAL_CLASSIC_X_TO_12", 2020),
-        "iPhone13,4" to DeviceModel("iPhone13,4", "iPhone 12 Pro Max", "IPHONE_12_PRO_MAX", "12_PRO", "THERMAL_CLASSIC_X_TO_12", 2020),
+        "iPhone13,4" to DeviceModel("iPhone13,4", "iPhone 12 Pro Max", "IPHONE_12_PRO_MAX", "12_PRO_MAX", "THERMAL_CLASSIC_X_TO_12", 2020),
         "iPhone14,2" to DeviceModel("iPhone14,2", "iPhone 13 Pro", "IPHONE_13_PRO", "13_PRO", "SMC_13", 2021),
         "iPhone14,3" to DeviceModel("iPhone14,3", "iPhone 13 Pro Max", "IPHONE_13_PRO_MAX", "13_PRO_MAX", "SMC_13", 2021),
         "iPhone14,4" to DeviceModel("iPhone14,4", "iPhone 13 mini", "IPHONE_13_MINI", "13_MINI", "SMC_13_MINI", 2021),
