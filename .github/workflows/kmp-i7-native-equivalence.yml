@@ -112,7 +112,9 @@ jobs:
               for file in files:
                   tree = ET.parse(file)
                   for case in tree.findall('.//testcase'):
-                      key = (case.attrib.get('classname', ''), case.attrib.get('name', ''))
+                      raw_name = case.attrib.get('name', '')
+                      normalized_name = raw_name.split('[', 1)[0]
+                      key = (case.attrib.get('classname', ''), normalized_name)
                       status = 'PASS'
                       if case.find('failure') is not None:
                           status = 'FAIL'
