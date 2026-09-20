@@ -2,7 +2,7 @@
 
 **Reference PLAN:** `docs/features/paniclab-kmp-migration/PLAN.md`
 **PLAN version:** `4d5c70f12c68c480a930be7ede1b5451b41d1415` / approved 2026-09-18
-**Implementation authorization:** I0, I1, I2, I3, I4, I5 and I6 explicitly authorized, completed and merged; I7 explicitly authorized on 2026-09-19 and IN PROGRESS; TASK-KMP-070 and TASK-KMP-071 are completed and merged; TASK-KMP-072 remains a separate pending increment; I8 is not authorized.
+**Implementation authorization:** I0, I1, I2, I3, I4, I5, I6 and I7 explicitly authorized, completed and merged; TASK-KMP-070, TASK-KMP-071 and TASK-KMP-072 are completed and merged; I8 is not authorized.
 
 > These tasks translate the approved PLAN into reviewable execution increments. No task may move to `IN PROGRESS` until Luis explicitly authorizes that implementation increment. Approval of this task list, merge of documentation PRs, repository visibility changes and application implementation remain separate actions.
 
@@ -17,7 +17,7 @@
 | I4 | Explicitly authorized by Luis on 2026-09-18 | DONE | PR #8 merged as `b50e23cf879e191b531cf0c3ca7080b6300f5e41` |
 | I5 | Explicitly authorized by Luis before implementation | DONE | PR #10 merged as `40cdc6006a0884465aa0cd92b89a3a1ae74638b2` |
 | I6 | Explicitly authorized by Luis on 2026-09-19 | DONE | PR #13 merged as `425c59017f0368833416f8b83925b4b099558073`; PR #14 merged as `cd63f4f9a790ead3199bc1d1e063c5e905c5e82f`; PR #16 merged as `a97e4afdf25f8f5feb9b1900b6d9116a7d391e9f` |
-| I7 | Explicitly authorized by Luis on 2026-09-19 | IN PROGRESS | TASK-KMP-070 via PR #18 merged as `d64e106509f282b66e2cce0241d6c241ff9aaf14`; TASK-KMP-071 via PR #20 merged as `cb580ba0e5032fd96069b76e1706d979ed217335`; TASK-KMP-072 remains TODO |
+| I7 | Explicitly authorized by Luis on 2026-09-19 | DONE | TASK-KMP-070 via PR #18 merged as `d64e106509f282b66e2cce0241d6c241ff9aaf14`; TASK-KMP-071 via PR #20 merged as `cb580ba0e5032fd96069b76e1706d979ed217335`; TASK-KMP-072 via PR #22 merged as `4b14b534364fe3b5703989eb5289a4dbf1653e19` |
 
 ## Status vocabulary
 
@@ -393,7 +393,7 @@ A task is DONE only when its required implementation and validation have both be
 
 ### TASK-KMP-072 · Prove Kotlin/Native and iOS equivalence
 
-- **Status:** TODO
+- **Status:** DONE
 - **Target:** IOS / COMMON
 - **RF/CA:** RF-01, RF-08 · CA-01, CA-08, CA-09, CA-12
 - **Objective:** Prove the shared deterministic engine behaves equivalently when executed through the iOS/Kotlin-Native path.
@@ -404,8 +404,8 @@ A task is DONE only when its required implementation and validation have both be
 - **Coverage expectation:** scenario evidence for required iOS slice; native coverage reported separately if tooling provides it.
 - **Regression scope:** shared deterministic behavior + iOS host integration.
 - **Evidence required:** per-fixture equivalence matrix + Xcode/Kotlin-Native test logs.
-- **Actual result:** Not run
-- **Evidence reference:** PENDING
+- **Actual result:** The approved COMMON deterministic scenarios execute successfully on both JVM and `iosSimulatorArm64` Kotlin/Native, with an automatically generated eight-scenario equivalence matrix reporting PASS/PASS and `equivalent: true` for every required fixture. The Swift/Xcode host separately executed the canonical bundled Rule Pack through `NativeDiagnosticFacade`; three XCTest cases passed for iPhone14 `0x500000` battery, decimal `4194304` wireless charging coil, and safe unknown-SMC non-conclusive fallback. No engine semantics, Rule Pack contents, Android behavior, Room/schema, persistence/history, camera/OCR, AI, PDF/export or SwiftUI product behavior changed in this task.
+- **Evidence reference:** `I7_NATIVE_EQUIVALENCE.md`; PR #22; final head `ae67060540b7ff5032752cc6ade244fdbb22021c`; exact-head I0 run `35482186108` SUCCESS; native equivalence run `35482186113` SUCCESS; native iOS slice run `35482186094` SUCCESS; equivalence artifact from run `35481696591`, artifact `10595449813`, digest `sha256:21970459db3b0b233143426a04c5594870c5442f62d5d34a9f348e5a144747ee`; merge `4b14b534364fe3b5703989eb5289a4dbf1653e19`.
 
 # I8 — Platform capability increments
 
@@ -429,49 +429,50 @@ A task is DONE only when its required implementation and validation have both be
 
 | QA dimension | Target | Planned threshold / scenarios | Actual result | Status |
 | --- | --- | --- | --- | --- |
-| Requirements / CA traceability | MULTI | 100% of CA-01..CA-15 mapped | I0-I6 evidence mapped; TASK-KMP-070 adds executable iOS deployment/CI evidence and TASK-KMP-071 adds a real native SwiftUI/XCTest/XCUITest slice; TASK-KMP-072 and I8 remain pending | IN PROGRESS |
+| Requirements / CA traceability | MULTI | 100% of CA-01..CA-15 mapped | I0-I7 evidence is mapped through TASK-KMP-072; I8 capability work remains pending and is not authorized | IN PROGRESS |
 | Changed deterministic line coverage | COMMON/JVM-host | >= 90% | I5 deterministic scope remains 99.2513% (928/935); final pre-merge shared run `35418051651` passed | PASS THROUGH I5 |
 | Changed deterministic branch coverage | COMMON/JVM-host | >= 85% | I5 deterministic scope remains 87.6582% (554/632); threshold unchanged and green | PASS THROUGH I5 |
-| Critical deterministic scenario coverage | COMMON | 95–100% meaningful scenarios where practical for normalization, precedence, fallback, rule scope/ranking, validation/redaction | I0-I5 protect normalization, exact/bitmask precedence, unknown fallback, scope/ranking, rule-pack validation/diff and Android repository→shared→Room scenarios; TASK-KMP-071 adds two native smoke fixtures but does not substitute for TASK-KMP-072's broader matrix | IN PROGRESS |
-| Deterministic equivalence | COMMON/ANDROID/IOS | Approved fixture semantics match baseline | Shared semantics and Android cutover are proven through I5; TASK-KMP-071 proves the native bridge executes canonical known and unknown paths, while broader Kotlin/Native/iOS equivalence remains pending TASK-KMP-072 | IN PROGRESS |
-| Architecture/static | COMMON | No forbidden Android/JVM/platform leakage | COMMON guard and repository scan pass on the TASK-KMP-071 exact final head; `NativeDiagnosticFacade` remains Swift-friendly COMMON code without Apple UI/platform or Room persistence leakage | PASS THROUGH 071 |
-| Android regression | ANDROID | Existing diagnostic, rule-pack, OCR handoff, Room/history and touched UI scenarios pass | I5 Android matrix/physical smoke remain green; I6 Room safety remains unchanged; TASK-KMP-071 final exact-head I0 baseline run `35453724371` passed | PASS THROUGH 071 |
+| Critical deterministic scenario coverage | COMMON | 95–100% meaningful scenarios where practical for normalization, precedence, fallback, rule scope/ranking, validation/redaction | I0-I5 protect normalization, exact/bitmask precedence, unknown fallback, scope/ranking, rule-pack validation/diff and Android repository→shared→Room scenarios; TASK-KMP-072 executes the approved representative COMMON subset on JVM and Kotlin/Native with eight PASS/PASS equivalent scenarios | PASS THROUGH 072 |
+| Deterministic equivalence | COMMON/ANDROID/IOS | Approved fixture semantics match baseline | Shared semantics and Android cutover are proven through I5; TASK-KMP-072 proves the approved representative COMMON subset on JVM and Kotlin/Native plus canonical iOS host Rule Pack semantics | PASS THROUGH 072 |
+| Architecture/static | COMMON | No forbidden Android/JVM/platform leakage | COMMON guard and repository scan remain green through the exact TASK-KMP-072 head; no platform/Room leakage or deterministic semantic change was introduced | PASS THROUGH 072 |
+| Android regression | ANDROID | Existing diagnostic, rule-pack, OCR handoff, Room/history and touched UI scenarios pass | I5 Android matrix/physical smoke remain green; I6 Room safety remains unchanged; TASK-KMP-072 exact-head I0 baseline run `35482186108` passed without Android product changes | PASS THROUGH 072 |
 | Android physical smoke | ANDROID | At least one physical-device smoke before final core cutover | Real-device CI APK smoke reported `Smoke I5 PASS` on 2026-09-19, including diagnosis, History/reopen, Evidence/Log and lifecycle checks | PASS |
 | Persistence upgrade safety | ANDROID | 100% of verified supported schema paths preserve representative history | Source lineage v1/v2/v3 recovered; reconstructed v1/v2 fixtures fail closed without mutation when migrations are absent; current v3 preserves representative history across strict reopen. Historical v1→v2 and v2→v3 migrations remain unsupported/not proven. TASK-KMP-062 chose ADOPT LATER, so no persistence migration is authorized in I6/I7 | PASS THROUGH I6 |
-| Kotlin/Native execution | IOS/COMMON | Required common fixtures execute on Native path | Real macOS/Xcode TASK-KMP-071 executed the shared engine through Swift/XCTest for a canonical known diagnosis and unknown fallback; full representative per-fixture equivalence remains pending TASK-KMP-072 | IN PROGRESS |
-| Native iOS build/test | IOS | Real Xcode build + target-relevant tests pass | TASK-KMP-071 final head built simulator and generic device targets, booted an iPhone simulator, and passed XCTest + XCUITest in native run `35453724329` / job `105925223001` | PASS THROUGH 071 |
-| iOS native UX/accessibility | IOS | text/paste diagnostic slice has native states and basic accessibility semantics | Native SwiftUI text/paste surface is present; XCUITest verified accessible log input, analyze action and visible error-state surface on the real simulator | PASS THROUGH 071 |
-| CI truthfulness | MULTI | runner/visibility claims match actual evidence; USD0 private iOS not claimed without proof | Repository visibility is public; TASK-KMP-070/071 executed on standard GitHub-hosted `macos-latest`, with real Xcode builds/tests and no Apple signing credentials required for the validated CI slice | PASS THROUGH 071 |
-| Security/privacy | MULTI | no secrets/raw customer logs in fixtures/artifacts; redaction scenarios pass | Existing sanitized/source-derived fixtures remain unchanged; TASK-KMP-071 added no Apple signing secrets and uses source-controlled synthetic/canonical regression fixtures only | PASS THROUGH 071 |
+| Kotlin/Native execution | IOS/COMMON | Required common fixtures execute on Native path | TASK-KMP-072 ran the approved COMMON scenarios as real `iosSimulatorArm64Test` binaries and generated an eight-scenario JVM/Native equivalence matrix with all scenarios equivalent | PASS THROUGH 072 |
+| Native iOS build/test | IOS | Real Xcode build + target-relevant tests pass | TASK-KMP-072 exact-head native slice run `35482186094` passed; the equivalence workflow also ran three canonical Rule Pack XTests with 0 failures | PASS THROUGH 072 |
+| iOS native UX/accessibility | IOS | text/paste diagnostic slice has native states and basic accessibility semantics | Native SwiftUI text/paste surface is present; XCUITest verified accessible log input, analyze action and visible error-state surface in TASK-KMP-071; TASK-KMP-072 did not alter UI behavior | PASS THROUGH 072 |
+| CI truthfulness | MULTI | runner/visibility claims match actual evidence; USD0 private iOS not claimed without proof | Repository visibility is public; TASK-KMP-070/071/072 executed on standard GitHub-hosted macOS runners with real Xcode/Kotlin-Native evidence and no Apple signing credentials required for the validated CI slice | PASS THROUGH 072 |
+| Security/privacy | MULTI | no secrets/raw customer logs in fixtures/artifacts; redaction scenarios pass | Existing sanitized/source-derived fixtures remain unchanged; TASK-KMP-072 added no signing secrets or customer logs and used controlled regression fixtures/canonical bundled rules only | PASS THROUGH 072 |
 | Performance/resource regression | ANDROID | no gross representative analysis latency/memory regression at cutover | Physical smoke showed no gross lifecycle/product regression, but no dedicated latency/memory benchmark was captured | IN PROGRESS |
 
 ## Acceptance evidence ledger
 
 | CA | Target | Task(s) | Status | Executed evidence | Actual result |
 | --- | --- | --- | --- | --- | --- |
-| CA-01 | COMMON | 001, 020, 021, 030, 031, 050, 072 | IN PROGRESS | I0 fixture baseline + I2 portable models/utilities + I3 shared parser/engine + I5 Android shared-engine cutover + TASK-KMP-071 native bridge smoke | COMMON and Android portions pass; native bridge execution exists, but full representative iOS equivalence remains pending 072 |
+| CA-01 | COMMON | 001, 020, 021, 030, 031, 050, 072 | DONE | I0 fixture baseline + I2 portable models/utilities + I3 shared parser/engine + I5 Android shared-engine cutover + TASK-KMP-072 JVM/Kotlin-Native matrix | Required COMMON semantics pass across the approved JVM/Native representative set |
 | CA-02 | COMMON | 001, 021, 030, 031 | DONE | I0 decimal/hex fixtures + I2 HexUtils + I3 parser/engine exact/decimal cases | Required COMMON decimal/hex deterministic semantics pass through I3 |
-| CA-03 | COMMON | 001, 030, 031, 072 | IN PROGRESS | I0 deterministic fixtures + I3 shared parsing/engine scenarios + TASK-KMP-071 native known/unknown bridge execution | Shared JVM/Android-host semantics pass; broader Native/iOS equivalence remains pending 072 |
+| CA-03 | COMMON | 001, 030, 031, 072 | DONE | I0 deterministic fixtures + I3 shared parsing/engine scenarios + TASK-KMP-072 Native equivalence matrix | Shared JVM/Android-host semantics and the approved Native/iOS representative equivalence scenarios pass |
 | CA-04 | COMMON | 002, 040 | DONE | I0 rule-pack fixtures + I4 shared parser/validator/diff tests and Kover evidence | Required COMMON rule-pack parse/validate/diff semantics pass through I4 |
 | CA-05 | ANDROID | 050, 051, 052 | DONE | I5 repository→shared→Room integration, duplicate removal, final Android regression and physical smoke | Android cutover completed with single shared deterministic implementation and physical acceptance PASS |
 | CA-06 | ANDROID | 010, 011, 050, 051, 052 | DONE | I1 scaffold + I5 Android cutover/regression/duplicate removal | Android remains functional after shared-engine cutover; I5 physical smoke PASS |
 | CA-07 | ANDROID | 060, 061, 062 | DONE | I6 schema lineage (`I6_SCHEMA_LINEAGE.md`) + strict upgrade safety harness (`I6_UPGRADE_HARNESS.md`, run `35423527938`) + Room KMP decision (`I6_ROOM_KMP_DECISION.md`, run `35427718202`) | Source lineage and current-v3/fail-closed preservation are evidenced; historical migration support is not invented; persistence strategy is ADOPT LATER |
-| CA-08 | IOS | 071, 072 | IN PROGRESS | TASK-KMP-071 native SwiftUI/XCTest/XCUITest run `35453724329` | Native product slice and basic host semantics pass; broad per-fixture equivalence remains pending 072 |
-| CA-09 | IOS | 010, 011, 070, 071, 072 | IN PROGRESS | I1-I5 macOS framework links + TASK-KMP-070 preflight + TASK-KMP-071 real simulator/device builds and native tests | iOS deployment, native slice build/test and basic execution pass; equivalence closure remains pending 072 |
+| CA-08 | IOS | 071, 072 | DONE | TASK-KMP-071 native SwiftUI/XCTest/XCUITest + TASK-KMP-072 exact-head native equivalence/iOS runs `35482186113` and `35482186094` | Native product slice, canonical host semantics and approved representative Native equivalence pass |
+| CA-09 | IOS | 010, 011, 070, 071, 072 | DONE | I1-I5 framework links + TASK-KMP-070 preflight + TASK-KMP-071 simulator/device builds + TASK-KMP-072 Kotlin/Native/Xcode equivalence | iOS deployment, native build/test and required equivalence closure pass through I7 |
 | CA-10 | ANDROID/IOS | 032, 050, 051, 080 | IN PROGRESS | I3 COMMON OCR cleanup + I5 Android shared-engine handoff/regression | Android portion passes; iOS capability backlog remains pending |
 | CA-11 | COMMON | 001, 002, 003, 012, 021, 030, 031, 032, 040 | DONE | I0 fixtures/guard + I1 QA gates + I2 portable core + I3 parser/engine/OCR + I4 rule-pack Kover 99.2513/87.6582 | Required COMMON changed deterministic coverage gates remain green through I5 |
-| CA-12 | ANDROID/IOS | 051, 071, 072, 080 | IN PROGRESS | I5 Android physical lifecycle/navigation smoke + TASK-KMP-071 native SwiftUI accessibility/error-state smoke | Android physical behavior and first native iOS UX slice pass; equivalence closure and later capabilities remain pending |
+| CA-12 | ANDROID/IOS | 051, 071, 072, 080 | IN PROGRESS | I5 Android physical lifecycle/navigation smoke + TASK-KMP-071 native SwiftUI accessibility/error-state smoke + TASK-KMP-072 equivalence closure | Android physical behavior, first native iOS UX slice and I7 equivalence pass; later I8 platform capabilities remain pending |
 | CA-13 | COMMON | 003, 011, 012, 020, 021, 030, 040, 041, 052, 062 | DONE | Architecture guard + isolated shared + I2/I3/I4 boundary work + I5 duplicate removal + I6 Room KMP ADR | Single shared deterministic implementation is proven; persistence remains outside COMMON through I7 by explicit ADOPT LATER decision |
 | CA-14 | CI | 010, 012, 070 | DONE | I1 truthful common QA + TASK-KMP-070 public-repo standard macOS runner, real Xcode/SDK capture, dual-framework link and minos 15.0 verification | Required CI truthfulness/deployment precondition is executable and green; no paid/private-macOS claim is being made |
 | CA-15 | ANDROID | 041, 060, 061, 062 | DONE | I4 boundary cleanup + I6 source lineage + strict fail-closed/current-v3 preservation harness + Room KMP ADR | Schema evidence and safety harness are complete; historical migration support is not claimed; persistence migration is deferred by explicit ADOPT LATER decision |
 
 ## Outstanding checks before next implementation authorization
 
-- I0, I1, I2, I3, I4, I5 and I6 are merged with their evidence recorded above.
-- I7 was explicitly authorized by Luis on 2026-09-19 and is IN PROGRESS.
+- I0, I1, I2, I3, I4, I5, I6 and I7 are merged with their evidence recorded above.
+- I7 was explicitly authorized by Luis on 2026-09-19 and is DONE/CLOSED after TASK-KMP-070, TASK-KMP-071 and TASK-KMP-072 merged successfully.
 - TASK-KMP-070 is DONE via `I7_IOS_PREFLIGHT.md`, final I7 run `35443960120`, baseline run `35443960074`, PR #18 and merge `d64e106509f282b66e2cce0241d6c241ff9aaf14`; selected deployment baseline: **iOS 15.0**.
 - TASK-KMP-071 is DONE via `I7_NATIVE_SLICE.md`, final head `9bede0c0f0cbb51f43292547a1ac29e5d5af5a00`, four green exact-head gates including native run `35453724329`, `.xcresult` artifact `10587497480`, PR #20 and merge `cb580ba0e5032fd96069b76e1706d979ed217335`.
-- TASK-KMP-072 remains TODO. TASK-KMP-071's known/unknown XCTest smokes prove the bridge works but do **not** constitute the broader representative Kotlin/Native/iOS equivalence matrix required by 072.
+- TASK-KMP-072 is DONE via `I7_NATIVE_EQUIVALENCE.md`, final head `ae67060540b7ff5032752cc6ade244fdbb22021c`, exact-head runs `35482186108`, `35482186113` and `35482186094`, PR #22 and merge `4b14b534364fe3b5703989eb5289a4dbf1653e19`.
+- I8 is not authorized. No camera/OCR acquisition, persistence/history, file import/share, PDF/export, settings or AI guidance implementation should start until its capability increments are separately scoped and approved.
 - Room KMP implementation is not authorized by I6/I7. Any future persistence/history implementation under I8 requires its own explicit approved scope and must satisfy the ADR re-entry gates.
 - No historical `Migration(1,2)` or `Migration(2,3)` has been invented; historical non-destructive upgrade paths remain unsupported/not proven.
 - Production `fallbackToDestructiveMigration()` remains unchanged; no Room version/entity/DAO/schema change was made in I6/I7.
