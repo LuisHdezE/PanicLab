@@ -2,7 +2,7 @@
 
 ## Status
 
-**IMPLEMENTED / STACK-SAFETY FIX IN AUTOMATED REVALIDATION / PHYSICAL IPHONE SMOKE ROUND 2 FAILED**
+**IMPLEMENTED / ROUND 3 PHYSICAL SMOKE PARTIAL PASS / REPRESENTATIVE FULL-LOG OCR PENDING**
 
 Implementation branch: `kmp/i8-082-ios-camera-ocr`.
 
@@ -206,7 +206,36 @@ Remediation after Round 2:
 - preserve existing decoding and diagnostic semantics;
 - add a COMMON regression test with a >400 KiB concatenated Apple-style `panicString` payload.
 
-A fresh exact-head physical IPA is required after the full automated matrix is green.
+## Physical iPhone smoke — Round 3
+
+Round 3 used the unsigned physical-smoke IPA built from exact head `e4b0b37659f7fa88a20e99594538216f78928720` after the stack-safe parser remediation and a green automated matrix.
+
+User-observed physical-device results:
+
+1. app installation and launch succeeded;
+2. the same real `CrashLog.txt` class that previously caused termination loaded successfully;
+3. the log editor remained constrained to its fixed-height viewport and the long content scrolled internally instead of growing the card;
+4. tapping `Analizar` completed successfully and produced a visible diagnostic result without terminating the process;
+5. camera-related controls and torch were reported to work without difficulty on the physical iPhone;
+6. Vision OCR produced text successfully and the resulting text could flow into the diagnostic screen;
+7. a short/incomplete camera OCR sample produced a safe non-conclusive result instead of a crash.
+
+This is sufficient to confirm that the Round 1/2 process-termination blocker is resolved on the physical device and that native camera/torch/OCR acquisition is operational.
+
+A representative full-log OCR utility check remains pending because a handheld view could not expose enough Panic Full content to support a meaningful deterministic diagnosis. The intended follow-up is to test against a workstation display such as 3uTools where substantially more of the real Panic Full can be presented to the camera. This pending utility check must not be misrepresented as an OCR engine failure: the observed sample was visibly incomplete and the deterministic engine correctly returned a non-conclusive result.
+
+No private Panic Full, customer image or device crash report is committed as evidence.
+
+## UX correction after Round 3 observation
+
+Physical-device review identified an iOS action-layout issue unrelated to camera/OCR semantics: `Escanear`, `Importar` and `Pegar` were rendered in one uneven row while `Limpiar` sat alone below it.
+
+The diagnostic actions are therefore arranged as a symmetric 2x2 grid:
+
+- `Escanear` | `Importar`;
+- `Pegar` | `Limpiar`;
+
+All four secondary actions use equal flexible width and a common minimum control height. `Analizar` remains the separate full-width primary CTA. No diagnostic, OCR or persistence behavior is changed by this layout correction.
 
 ## Required exact-head acceptance before merge
 
@@ -226,7 +255,7 @@ Any code change after a green run invalidates that run for final approval.
 
 ## Physical iPhone smoke gate
 
-Even if all automated gates are green, TASK-KMP-082 must remain **PHYSICAL SMOKE PENDING** until the dedicated iPhone executes the approved checklist without blocking failures:
+Even if all automated gates are green, TASK-KMP-082 remains open until the remaining physical-device acceptance points are reconciled. The approved checklist covers:
 
 1. first camera permission prompt;
 2. live rear-camera preview;
@@ -238,6 +267,8 @@ Even if all automated gates are green, TASK-KMP-082 must remain **PHYSICAL SMOKE
 8. background/resume;
 9. torch if available;
 10. no unexpected photo persistence.
+
+Round 3 has physically demonstrated the former crash path is stable plus working camera/torch/OCR acquisition. The representative full-log OCR utility check against a workstation display remains explicitly pending, along with any checklist item not directly evidenced during the current physical session.
 
 The physical smoke also verifies that imported long Panic Full content keeps the action controls usable and that `Analizar` does not terminate the app.
 
