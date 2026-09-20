@@ -60,9 +60,13 @@ final class DiagnosticViewModel: ObservableObject {
         state = .idle
     }
 
-    func handleImportResult(_ result: Result<URL, Error>) {
+    func handleImportResult(_ result: Result<[URL], Error>) {
         switch result {
-        case .success(let url):
+        case .success(let urls):
+            guard let url = urls.first else {
+                state = .idle
+                return
+            }
             importDocument(at: url)
         case .failure(let error):
             let nsError = error as NSError
