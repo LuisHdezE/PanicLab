@@ -2,7 +2,7 @@
 
 ## Scope
 
-TASK-KMP-071 introduces PanicLab's first native iOS product surface. The slice is intentionally narrow:
+TASK-KMP-071 introduced PanicLab's first native iOS product surface. The slice is intentionally narrow:
 
 - native SwiftUI app target under `iosApp/`;
 - text entry and clipboard paste only;
@@ -51,17 +51,47 @@ The Xcode project supports iOS 15.0 and links the target-specific static `Shared
 
 ## QA contract
 
-The dedicated `KMP I7 Native iOS Slice` workflow must prove on the exact PR HEAD:
+The dedicated `KMP I7 Native iOS Slice` workflow proves on the exact PR HEAD:
 
 - `iosArm64` and `iosSimulatorArm64` Shared frameworks link;
 - SwiftUI app builds for iOS Simulator;
 - SwiftUI app builds for generic iOS device with signing disabled;
-- XCTest executes a frozen known diagnostic through Swift -> Shared -> canonical Rule Pack;
+- XCTest executes a known canonical product Rule Pack diagnosis through Swift -> Shared -> canonical Rule Pack;
 - XCTest executes the unknown-code non-conclusive path;
 - XCUITest verifies accessible log input, analyze action and error-state surface.
 
 The existing I0/I5/I6 baseline workflow remains an independent regression gate.
 
-## Status
+## Executable evidence
 
-Implementation started after explicit user authorization on 2026-09-19. Initial implementation commit: `4dd950972d0ee44a9a6d75a4b2126bfd0a582e03`. Final executable evidence is pending the PR workflow and must be recorded before TASK-KMP-071 can be marked DONE.
+Final TASK-KMP-071 PR head: `9bede0c0f0cbb51f43292547a1ac29e5d5af5a00`.
+
+All independent gates were green on that exact head:
+
+- `KMP I0 Baseline Verification` run `35453724371` — SUCCESS;
+- `KMP I1 Scaffold Verification` run `35453724330` — SUCCESS;
+- `KMP I7 iOS Preflight` run `35453724342` — SUCCESS;
+- `KMP I7 Native iOS Slice` run `35453724329`, job `105925223001` — SUCCESS.
+
+The native lane linked Shared frameworks, built the SwiftUI app for simulator, built the generic iOS device target with signing disabled, booted an iPhone simulator, and passed native unit plus accessibility UI smoke tests.
+
+The final `.xcresult` was uploaded as artifact `paniclab-i7-ios-xcresult`, artifact id `10587497480`, digest `sha256:dc665f944e1d685f95dc1ccc23be7f763f714f66cd6015b56ae9f283b4a54c52`.
+
+## QA correction discovered during execution
+
+The first executable attempts exposed two test-harness assumptions rather than a product-engine regression:
+
+1. the original iPhone 13 mini `0x1000` XCTest expectation came from the synthetic frozen migration baseline, while the native slice intentionally executes the full canonical product Rule Pack, where an overlapping `SMC_13_MINI` rule has different product semantics;
+2. the first XCUITest queried the SwiftUI error-state accessibility identifier only as `XCUIElementTypeOther`, which was too type-specific for SwiftUI's accessibility tree.
+
+Final correction commit `9bede0c0f0cbb51f43292547a1ac29e5d5af5a00` changed only the two native test files. The known diagnosis fixture was aligned with the canonical iPhone 14 / `0x500000` product case already proven through the Android repository -> shared engine -> Room path in TASK-KMP-051, and the UI smoke now resolves the error-state identifier through `.any` while also asserting the visible error title.
+
+No engine, Rule Pack, Android product, Room/schema, SwiftUI product behavior, Gradle, workflow semantics or Blueprint content changed as part of that correction.
+
+## Merge evidence and status
+
+TASK-KMP-071 is **DONE**.
+
+PR #20 was explicitly approved and merged as `cb580ba0e5032fd96069b76e1706d979ed217335`. The GitHub merge commit is validly signed and has parents `8e5b6de79bd1c90987dd8b02aaaa28c5869a4240` and the approved TASK-KMP-071 head `9bede0c0f0cbb51f43292547a1ac29e5d5af5a00`.
+
+TASK-KMP-072 remains a separate increment and is not proven by the two TASK-KMP-071 fixture smokes. It must establish a broader per-fixture Kotlin/Native/iOS equivalence matrix on real macOS/Xcode evidence before I7 can close.
