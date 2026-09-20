@@ -152,6 +152,23 @@ final class DiagnosticBridgeTests: XCTestCase {
     }
 
     @MainActor
+    func testImportAcceptsUtf16LittleEndianWithBom() throws {
+        let expected = "panic(cpu 0): UTF16 fixture"
+        var data = Data([0xFF, 0xFE])
+        data.append(try XCTUnwrap(expected.data(using: .utf16LittleEndian)))
+        let url = try temporaryFile(extension: "log", data: data)
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        let viewModel = DiagnosticViewModel()
+        viewModel.importDocument(at: url)
+
+        XCTAssertEqual(viewModel.logText, expected)
+        guard case .idle = viewModel.state else {
+            return XCTFail("Valid BOM-marked UTF-16 must import successfully")
+        }
+    }
+
+    @MainActor
     func testImportRejectsUndecodableText() throws {
         let url = try temporaryFile(extension: "json", data: Data([0xFF, 0xFF, 0xFF]))
         defer { try? FileManager.default.removeItem(at: url) }
@@ -159,7 +176,7 @@ final class DiagnosticBridgeTests: XCTestCase {
         let viewModel = DiagnosticViewModel()
         viewModel.importDocument(at: url)
 
-        XCTAssertTrue(errorMessage(from: viewModel.state)?.contains("UTF-8 o UTF-16") == true)
+        XCTAssertTrue(errorMessage(from: viewModel.state)?.contains("UTF-8 o UTF-16 con BOM") == true)
         XCTAssertTrue(viewModel.logText.isEmpty)
     }
 
