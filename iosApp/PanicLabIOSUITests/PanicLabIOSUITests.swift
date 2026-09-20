@@ -38,8 +38,8 @@ final class PanicLabIOSUITests: XCTestCase {
         XCTAssertTrue(scannerButton.waitForExistence(timeout: 10))
         scannerButton.tap()
 
-        let fallback = app.descendants(matching: .any)["paniclab.scanner.fallback"]
-        XCTAssertTrue(fallback.waitForExistence(timeout: 5))
+        let fallbackTitle = app.staticTexts["Cámara simulada para pruebas"]
+        XCTAssertTrue(fallbackTitle.waitForExistence(timeout: 5))
 
         let inject = app.buttons["paniclab.scanner.testInject"]
         XCTAssertTrue(inject.waitForExistence(timeout: 5))
