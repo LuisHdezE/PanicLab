@@ -1,8 +1,10 @@
 import Shared
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ContentView: View {
     @StateObject private var viewModel = DiagnosticViewModel()
+    @State private var isFileImporterPresented = false
 
     var body: some View {
         NavigationView {
@@ -18,13 +20,31 @@ struct ContentView: View {
             .navigationTitle("PanicLab")
         }
         .navigationViewStyle(.stack)
+        .fileImporter(
+            isPresented: $isFileImporterPresented,
+            allowedContentTypes: importContentTypes,
+            allowsMultipleSelection: false
+        ) { result in
+            viewModel.handleImportResult(result)
+        }
+    }
+
+    private var importContentTypes: [UTType] {
+        var types: [UTType] = [.plainText, .json]
+        if let ips = UTType(filenameExtension: "ips") {
+            types.append(ips)
+        }
+        if let log = UTType(filenameExtension: "log") {
+            types.append(log)
+        }
+        return types
     }
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label("Diagnóstico Panic Full", systemImage: "waveform.path.ecg.rectangle")
                 .font(.title2.bold())
-            Text("Pega el contenido del log. El análisis determinista se ejecuta con el motor KMP compartido y el Rule Pack incluido en la app.")
+            Text("Pega, escribe o importa un log compatible. El análisis determinista se ejecuta con el motor KMP compartido y el Rule Pack incluido en la app.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -48,32 +68,52 @@ struct ContentView: View {
                 .accessibilityIdentifier("paniclab.logInput")
                 .accessibilityLabel("Contenido del Panic Full")
 
+            if let importedFileName = viewModel.importedFileName {
+                Label("\(importedFileName) listo para analizar", systemImage: "doc.badge.checkmark")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("paniclab.import.status")
+            }
+
             HStack(spacing: 10) {
+                Button {
+                    isFileImporterPresented = true
+                } label: {
+                    Label("Importar", systemImage: "doc.badge.plus")
+                }
+                .buttonStyle(.bordered)
+                .disabled(isLoading)
+                .accessibilityIdentifier("paniclab.importButton")
+
                 Button {
                     viewModel.pasteFromClipboard()
                 } label: {
                     Label("Pegar", systemImage: "doc.on.clipboard")
                 }
                 .buttonStyle(.bordered)
+                .disabled(isLoading)
                 .accessibilityIdentifier("paniclab.pasteButton")
 
                 Button("Limpiar") {
                     viewModel.clear()
                 }
                 .buttonStyle(.bordered)
-                .disabled(viewModel.logText.isEmpty)
-
-                Spacer()
-
-                Button {
-                    viewModel.analyze()
-                } label: {
-                    Label("Analizar", systemImage: "stethoscope")
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(isLoading)
-                .accessibilityIdentifier("paniclab.analyzeButton")
+                .disabled(viewModel.logText.isEmpty || isLoading)
             }
+
+            Button {
+                viewModel.analyze()
+            } label: {
+                Label("Analizar", systemImage: "stethoscope")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(isLoading)
+            .accessibilityIdentifier("paniclab.analyzeButton")
+
+            Text("Formatos: .ips, .txt, .log, .json · UTF-8 / UTF-16 con BOM · máximo 5 MiB")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
         .padding(16)
         .background(Color(.systemBackground))
