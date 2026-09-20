@@ -61,6 +61,45 @@ final class DiagnosticBridgeTests: XCTestCase {
         XCTAssertFalse(result.isConclusive)
     }
 
+    func testSharedFacadeExportsMalformedRulePackAsSwiftError() {
+        XCTAssertThrowsError(
+            try NativeDiagnosticFacade().analyze(
+                rawLog: "iPhone14,7\nSMC PANIC",
+                rulePackJson: "{not-json",
+                rulePackChecksum: String(repeating: "0", count: 64)
+            )
+        )
+    }
+
+    func testSharedFacadeHandlesLargePhysicalStylePanicLog() throws {
+        let (rulePack, checksum) = try canonicalRulePack()
+        let mailboxLine = "[RX] user01 0x0000000110b28abb 0x000000000008b000 0x0010230000000020\n"
+        let mailboxTail = String(repeating: mailboxLine, count: 6_000)
+        let rawLog = """
+        {"bug_type":"210","timestamp":"2026-08-26 10:30:36.00 -0300","os_version":"iPhone OS 26.5 (23F77)","roots_installed":0}
+        {
+          "product":"iPhone14,7",
+          "panicString":"SMC PANIC - ASSERT: target/d27/target.cpp:321: 0, SMC BSC failure, TAOJ ----\\nS.sensor array 0 - 5 is 0, 4194304, 0, 0, 0\\nF.sensor array 0 - 1 is 0"
+        }
+        \(mailboxTail)
+        """
+
+        XCTAssertGreaterThan(rawLog.utf8.count, 400_000)
+
+        let result = try NativeDiagnosticFacade().analyze(
+            rawLog: rawLog,
+            rulePackJson: rulePack,
+            rulePackChecksum: checksum
+        )
+
+        XCTAssertEqual(result.productCode, "iPhone14,7")
+        XCTAssertEqual(result.deviceName, "iPhone 14")
+        XCTAssertEqual(result.diagnosis, "Bobina de carga inalámbrica")
+        XCTAssertEqual(result.confidence, "HIGH")
+        XCTAssertTrue(result.panicFamiliesText.contains("SMC_BSC_FAILURE"))
+        XCTAssertTrue(result.isConclusive)
+    }
+
     @MainActor
     func testImportedFixtureMatchesPastePathDiagnosis() throws {
         let rawLog = "{\"bug_type\":\"210\",\"product\":\"iPhone14,7\",\"os_version\":\"17.3\"}\npanic(cpu 1): \"SMC PANIC - ASSERTION FAILED: S.sensor array is 0x0, 0x500000, 0x0\""
