@@ -171,6 +171,7 @@ struct OcrScannerView: View {
                 .font(.title3.bold())
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
+                .accessibilityIdentifier("paniclab.scanner.fallback")
             Text(message)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -200,7 +201,6 @@ struct OcrScannerView: View {
             #endif
         }
         .padding(28)
-        .accessibilityIdentifier("paniclab.scanner.fallback")
     }
 
     private var liveScanner: some View {
@@ -377,8 +377,8 @@ private struct CameraPreview: UIViewRepresentable {
         return view
     }
 
-    func updateUIView(_ uiView: PreviewView, context: Context) {
-        uiView.previewLayer.session = session
+    func updateUIView(_ uiViewController: PreviewView, context: Context) {
+        uiViewController.previewLayer.session = session
     }
 }
 
