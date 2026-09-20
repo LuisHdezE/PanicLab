@@ -1,9 +1,9 @@
 # I8 Capability Roadmap — PanicLab KMP
 
-**Baseline:** `main@7d3fa9490825147f9fc4ae9929ef4a7c6122b5c6`
+**Baseline:** `main@1fa8d73a7e4fdfe9c56ba8cc067ce8d596be801e`
 **Precondition:** I7 is DONE/CLOSED. TASK-KMP-070/071/072 are merged and documented.
-**State:** PLANNING ONLY
-**Authorization boundary:** Luis authorized preparation of the I8 roadmap. No capability implementation in this document is authorized merely by appearing here.
+**State:** ACTIVE — TASK-KMP-080 and TASK-KMP-081 DONE; remaining capability increments require separate authorization.
+**Authorization boundary:** Luis authorized the I8 roadmap and separately authorized TASK-KMP-081. No later capability is authorized merely by appearing here.
 
 ## 1. Purpose
 
@@ -32,18 +32,21 @@ The Android navigation/product currently exposes real surfaces for:
 
 The Android OCR acquisition path uses CameraX + ML Kit, while deterministic post-OCR cleanup has already moved to COMMON. Android persistence remains Room-based. Android settings remain platform-native. AI guidance remains outside the deterministic diagnosis core.
 
-### iOS surface already present
+### iOS surface now present
 
-The native iOS app currently contains the first approved SwiftUI diagnostic slice:
+The native iOS app contains the approved SwiftUI diagnostic slice plus the first I8 capability increment:
 
 - text/paste input;
+- native Files/document import for `.ips`, `.txt`, `.log` and `.json`;
+- safe 5 MiB maximum import boundary;
+- UTF-8 input plus BOM-gated UTF-16 LE/BE input;
 - loading/error/non-conclusive/result states;
 - canonical bundled Rule Pack loading;
 - `NativeDiagnosticFacade` integration;
 - real XCTest/XCUITest evidence;
 - iOS deployment baseline 15.0.
 
-The iOS app does **not** yet claim camera/OCR, persisted history, file import, PDF/export/share, settings parity, rule-pack management, AI guidance or trends parity.
+The iOS app does **not** yet claim camera/OCR acquisition, persisted history, PDF/export/share, settings parity, knowledge-base/rule-pack management parity, AI guidance or trends parity.
 
 ## 3. Cross-cutting rules for every I8 capability
 
@@ -58,11 +61,11 @@ The iOS app does **not** yet claim camera/OCR, persisted history, file import, P
 9. **Privacy/security by default.** No real customer panic logs, secrets, signing material or private workshop data may be added to fixtures/artifacts.
 10. **Blueprint remains out of scope.** `SoftwareDevelopmentBlueprint` is not modified by I8 unless separately authorized.
 
-## 4. Proposed execution order
+## 4. Execution order and current status
 
-| Order | Proposed task | Capability | Android baseline | iOS target state | Risk | Dependencies | Implementation authorization |
+| Order | Task | Capability | Android baseline | iOS target state | Risk | Dependencies | Implementation authorization |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | TASK-KMP-081 | File import / external document intake | Existing `ImportFileScreen` | TODO | Low–Medium | I7 | NOT AUTHORIZED |
+| 1 | TASK-KMP-081 | File import / external document intake | Existing `ImportFileScreen` | **DONE** | Low–Medium | I7 | **AUTHORIZED / MERGED** |
 | 2 | TASK-KMP-082 | Camera + OCR acquisition | CameraX + ML Kit + shared OCR cleanup | TODO | Medium | 081 optional, shared OCR cleanup already available | NOT AUTHORIZED |
 | 3 | TASK-KMP-083 | Persistence strategy re-entry decision | Room v3 retained | Decision only | High | I6 ADR + I7 | NOT AUTHORIZED |
 | 4 | TASK-KMP-084 | iOS persistence + history | Room-backed history/case detail | TODO | High | 083 | NOT AUTHORIZED |
@@ -77,31 +80,45 @@ The order above minimizes risk by taking stateless/native-input capabilities bef
 
 ## 5. TASK-KMP-081 — iOS file import / external document intake
 
+**Status:** DONE / MERGED via PR #25 as `1fa8d73a7e4fdfe9c56ba8cc067ce8d596be801e`.
+
 **Objective:** Let iOS accept a panic log from Files or another supported external document source and feed the exact existing diagnostic pipeline.
 
-### Scope
+### Implemented scope
 
-- native SwiftUI document-picker/open-document flow;
-- supported text-like panic log inputs only;
-- explicit handling of unavailable/inaccessible files;
-- encoding/empty/oversized/invalid-content behavior defined before implementation;
-- imported text passes through the same shared normalization/diagnosis path as paste input;
-- no history persistence requirement in this task;
-- no PDF generation and no rule-pack import in this task.
+- native SwiftUI `fileImporter` document flow;
+- supported inputs `.ips`, `.txt`, `.log`, `.json`;
+- 5 MiB maximum;
+- UTF-8 accepted directly;
+- UTF-16 LE/BE accepted only with explicit BOM and BOM consumed before decoding;
+- arbitrary non-UTF-8 bytes without a valid BOM fail closed instead of receiving heuristic UTF-16 interpretation;
+- explicit handling of unavailable/inaccessible, unsupported, empty and oversized files;
+- cancellation preserves existing input and returns safely to idle;
+- imported text passes through the same `DiagnosticViewModel -> NativeDiagnosticFacade -> shared deterministic engine` path as paste input;
+- successful import does not auto-persist or auto-analyze;
+- no history persistence, PDF generation or rule-pack import was introduced.
 
-### Expected native mechanisms
+### Executed acceptance evidence
 
-Use iOS-native document APIs compatible with the deployment floor. The concrete API choice is an implementation detail to be compatibility-checked in the increment.
+- exact implementation head: `dcae6855a9f290abc264a2978c9ff3bb3b7028ce`;
+- `KMP I0 Baseline Verification` run `35489568505` SUCCESS;
+- `KMP I7 Native Equivalence` run `35489568540` SUCCESS;
+- `KMP I7 Native iOS Slice` run `35489568509` SUCCESS;
+- simulator build SUCCESS;
+- generic-device build without signing SUCCESS;
+- native unit + accessibility UI smoke tests SUCCESS;
+- import-versus-paste deterministic diagnosis equivalence XCTest SUCCESS;
+- cancellation, unsupported extension, empty input, oversize, unreadable input, positive BOM-marked UTF-16 and fail-closed non-BOM binary cases covered by XCTest;
+- iOS `.xcresult` artifact `10599226050`, digest `sha256:17653c50580ee0855638b1711298f6ac7b692cac8e663b5672fa22d17e376f76`;
+- native-equivalence artifact `10598792265`, digest `sha256:37a159af8dcc938def6c4581f08d2c8ee7116c5614102e00376cde436960801f`;
+- implementation evidence document: `I8_081_FILE_IMPORT.md`;
+- PR #25 merged after explicit approval as `1fa8d73a7e4fdfe9c56ba8cc067ce8d596be801e`.
 
-### Acceptance evidence
-
-- real simulator XCTest/UI integration for successful import;
-- cancellation path;
-- unreadable/unsupported/empty input path;
-- imported fixture produces the same domain diagnosis as paste input;
-- Android I0/I5 regression gates remain green.
+No Android behavior, Room/schema, deterministic engine semantics, canonical Rule Pack contents, camera/OCR, persistence/history, PDF/export, AI guidance or Blueprint content changed in TASK-KMP-081.
 
 ## 6. TASK-KMP-082 — iOS camera + OCR acquisition
+
+**Status:** TODO / NOT AUTHORIZED.
 
 **Objective:** Add native image-to-text acquisition while preserving shared post-OCR cleanup and deterministic diagnosis.
 
@@ -127,7 +144,9 @@ Use iOS-native document APIs compatible with the deployment floor. The concrete 
 
 ## 7. TASK-KMP-083 — persistence strategy re-entry decision
 
-**Objective:** Re-enter the I6 `ADOPT LATER` decision only because native iOS history now creates a concrete persistence need.
+**Status:** TODO / NOT AUTHORIZED.
+
+**Objective:** Re-enter the I6 `ADOPT LATER` decision only because native iOS history creates a concrete persistence need.
 
 This task is a decision checkpoint, not a persistence implementation.
 
@@ -159,6 +178,8 @@ No database code may be changed by this decision-only task.
 
 ## 8. TASK-KMP-084 — iOS persistence + history
 
+**Status:** TODO / NOT AUTHORIZED.
+
 **Objective:** Persist diagnostic sessions on iOS and expose native history/case-detail flows without weakening Android data safety.
 
 ### Scope
@@ -184,6 +205,8 @@ No database code may be changed by this decision-only task.
 
 ## 9. TASK-KMP-085 — iOS settings
 
+**Status:** TODO / NOT AUTHORIZED.
+
 **Objective:** Add only settings that have real product meaning on iOS, using a native settings store unless a shared semantic contract is justified.
 
 ### Scope candidates
@@ -201,6 +224,8 @@ No database code may be changed by this decision-only task.
 - no deterministic diagnosis behavior changes from presentation-only settings.
 
 ## 10. TASK-KMP-086 — PDF/report export + native share
+
+**Status:** TODO / NOT AUTHORIZED.
 
 **Objective:** Export a diagnostic report in a technician-usable form and share/save it through iOS-native mechanisms.
 
@@ -223,6 +248,8 @@ No database code may be changed by this decision-only task.
 
 ## 11. TASK-KMP-087 — iOS knowledge base read-only UX
 
+**Status:** TODO / NOT AUTHORIZED.
+
 **Objective:** Expose the canonical Rule Pack knowledge base natively without yet adding install/update management.
 
 ### Scope
@@ -241,6 +268,8 @@ No database code may be changed by this decision-only task.
 - Android knowledge-base behavior is unchanged.
 
 ## 12. TASK-KMP-088 — iOS rule-pack import/management
+
+**Status:** TODO / NOT AUTHORIZED.
 
 **Objective:** Add native management only after read-only knowledge-base behavior and file intake are stable.
 
@@ -262,6 +291,8 @@ No database code may be changed by this decision-only task.
 - canonical bundled fallback remains available.
 
 ## 13. TASK-KMP-089 — iOS AI repair guidance
+
+**Status:** TODO / NOT AUTHORIZED.
 
 **Objective:** Add optional AI-assisted repair guidance without allowing AI output to redefine deterministic diagnosis.
 
@@ -287,6 +318,8 @@ AI remains an **advisory capability**. The deterministic diagnosis, evidence, co
 - Android AI behavior remains unchanged unless separately scoped.
 
 ## 14. TASK-KMP-090 — iOS trends dashboard
+
+**Status:** TODO / NOT AUTHORIZED.
 
 **Objective:** Add native trend analysis only after iOS persistence/history provides a real local dataset.
 
@@ -316,7 +349,7 @@ The following findings are intentionally **not** mixed into the I8 platform-pari
 
 They require their own behavior-change scope, fixtures and approval before engine/parser semantics change.
 
-## 16. Proposed approval flow
+## 16. Approval flow
 
 For every capability:
 
@@ -326,15 +359,17 @@ For every capability:
 4. implement on a dedicated branch/PR;
 5. run target-specific QA plus Android/common regressions;
 6. obtain explicit merge approval;
-7. reconcile `TASKS.md` in documentation;
+7. reconcile documentation;
 8. move to the next capability only after the previous boundary is closed or an intentionally dependency-free task is separately approved.
 
-## 17. Immediate next decision after roadmap merge
+TASK-KMP-081 followed this flow and is now closed. This does not authorize the next task automatically.
 
-Once this roadmap itself is reviewed and merged, the first proposed implementation increment is:
+## 17. Immediate next decision
 
-**TASK-KMP-081 — iOS file import / external document intake.**
+The next proposed implementation increment is:
 
-It is first because it reuses the already-proven text diagnostic pipeline, adds useful native product capability with limited state/data risk, and does not require reopening the persistence architecture decision.
+**TASK-KMP-082 — iOS camera + OCR acquisition.**
 
-**TASK-KMP-081 is not authorized by this roadmap.** It requires a separate explicit authorization from Luis.
+It can reuse the COMMON post-OCR cleanup already proven while keeping camera and Apple OCR acquisition native. It must preserve Android CameraX/ML Kit behavior and deterministic semantics.
+
+**TASK-KMP-082 is NOT AUTHORIZED.** It requires separate explicit authorization from Luis before implementation begins.
