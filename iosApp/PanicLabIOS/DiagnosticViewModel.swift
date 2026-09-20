@@ -121,9 +121,9 @@ final class DiagnosticViewModel: ObservableObject {
             if let utf8 = String(data: data, encoding: .utf8) {
                 decoded = utf8
             } else if data.starts(with: [0xFF, 0xFE]) {
-                decoded = String(data: data, encoding: .utf16LittleEndian)
+                decoded = String(data: Data(data.dropFirst(2)), encoding: .utf16LittleEndian)
             } else if data.starts(with: [0xFE, 0xFF]) {
-                decoded = String(data: data, encoding: .utf16BigEndian)
+                decoded = String(data: Data(data.dropFirst(2)), encoding: .utf16BigEndian)
             } else {
                 decoded = nil
             }
