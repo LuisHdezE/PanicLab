@@ -377,8 +377,8 @@ private struct CameraPreview: UIViewRepresentable {
         return view
     }
 
-    func updateUIView(_ uiViewController: PreviewView, context: Context) {
-        uiViewController.previewLayer.session = session
+    func updateUIView(_ uiView: PreviewView, context: Context) {
+        uiView.previewLayer.session = session
     }
 }
 
