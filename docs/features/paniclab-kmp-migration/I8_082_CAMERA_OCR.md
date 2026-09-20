@@ -2,7 +2,7 @@
 
 ## Status
 
-**IMPLEMENTED / FIXES IN AUTOMATED REVALIDATION / PHYSICAL IPHONE SMOKE ROUND 1 FAILED**
+**IMPLEMENTED / STACK-SAFETY FIX IN AUTOMATED REVALIDATION / PHYSICAL IPHONE SMOKE ROUND 2 FAILED**
 
 Implementation branch: `kmp/i8-082-ios-camera-ocr`.
 
@@ -122,6 +122,13 @@ It:
 - covers valid panic text;
 - covers blank/no-text behavior.
 
+`MetadataExtractorStackSafetyTest`:
+
+- exercises two concatenated Apple-style JSON objects;
+- places a `panicString` larger than 400 KiB in the fallback metadata path;
+- proves extraction remains iterative/stack-safe;
+- verifies the representative `iPhone14,7` / SMC BSC data survives extraction.
+
 ### XCTest
 
 Added coverage for:
@@ -134,7 +141,7 @@ Added coverage for:
 - real `VNRecognizeTextRequest` against a high-contrast rendered Panic Full image;
 - Vision output passed into COMMON cleanup;
 - malformed Rule Pack errors exported to Swift instead of escaping the Kotlin boundary;
-- a large physical-style SMC BSC / TAOJ Panic Full input through the native diagnostic facade.
+- a large physical-style SMC BSC / TAOJ Panic Full input through the same native diagnostic facade.
 
 ### XCUITest
 
@@ -167,7 +174,39 @@ Remediation applied after Round 1:
 - add XCTest proving malformed Rule Pack failures are catchable from Swift;
 - add a large synthetic physical-style `iPhone14,7` SMC BSC / TAOJ stress case through the same native diagnostic facade.
 
-Round 2 requires a fresh exact-head IPA after all automated gates return green.
+## Physical iPhone smoke — Round 2 and crash root cause
+
+Round 2 used a fresh exact-head IPA after the previous automated matrix returned green.
+
+Observed result:
+
+- the app still terminated when the imported real Panic Full was analyzed.
+
+The device-generated PanicLab crash report was inspected outside the repository. No private crash report or Panic Full content is committed.
+
+Crash evidence:
+
+- exception: `EXC_BAD_ACCESS` / `SIGBUS`;
+- fault address was inside a thread stack guard region;
+- faulting stack was in Kotlin/Native regex matching;
+- the first PanicLab parser frame was `MetadataExtractor.extractPanicString()`;
+- call path continued through `MetadataExtractor.extractWithRegex()` -> `MetadataExtractor.extract()` -> `NativeDiagnosticFacade.analyze()`.
+
+Root cause:
+
+- fallback `panicString` extraction used recursive Kotlin regexes with unbounded matching over a large Apple Panic Full;
+- on the physical iPhone this exhausted the worker-thread stack before a Swift/Kotlin exception boundary could run;
+- therefore the prior exception-wrapper hardening could not intercept this crash.
+
+Remediation after Round 2:
+
+- replace the recursive JSON `panicString` regex with a linear escaped-string scanner;
+- replace the DOT_MATCHES_ALL panic block regex with bounded `indexOf` terminator searches;
+- use `lineSequence().take(6)` for the fallback signature collection instead of materializing all lines;
+- preserve existing decoding and diagnostic semantics;
+- add a COMMON regression test with a >400 KiB concatenated Apple-style `panicString` payload.
+
+A fresh exact-head physical IPA is required after the full automated matrix is green.
 
 ## Required exact-head acceptance before merge
 
@@ -176,7 +215,7 @@ The implementation is not DONE until the final PR head has all applicable gates 
 1. `KMP I0 Baseline Verification`;
 2. `KMP I7 Native Equivalence`;
 3. `KMP I7 Native iOS Slice`;
-4. shared JVM/Kotlin-Native OCR tests;
+4. shared JVM/Kotlin-Native OCR and stack-safety tests;
 5. simulator build;
 6. generic-device build without signing;
 7. XCTest/XCUITest;
@@ -213,12 +252,14 @@ TASK-KMP-082 does not modify:
 - Android DataStore;
 - persistence/history;
 - canonical Rule Pack contents;
-- deterministic parser/engine semantics;
+- deterministic diagnostic outcomes or rule semantics;
 - PDF/export;
 - AI guidance;
 - rule-pack management;
 - trends;
 - cloud OCR;
 - `SoftwareDevelopmentBlueprint`.
+
+The shared parser implementation is changed only to make existing `panicString` extraction stack-safe while preserving its intended outputs.
 
 TASK-KMP-083 and later I8 capabilities remain separately gated and are not authorized by this implementation.
