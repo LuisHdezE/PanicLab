@@ -11,7 +11,6 @@ import com.example.appleknowledge.model.AppleCapabilityAvailability
 import com.example.appleknowledge.model.AppleKnowledgeCategory
 import com.example.appleknowledge.model.AppleKnowledgeSourceStatus
 import com.example.appleknowledge.query.AppleKnowledgeSourceReferenceResolution
-import com.example.appleknowledge.runtime.AppleOfficialKnowledgeResourceBundle
 import com.example.appleknowledge.runtime.AppleOfficialKnowledgeResourceNames
 import com.example.appleknowledge.runtime.AppleOfficialKnowledgeRuntimeFactory
 import kotlin.test.Test
@@ -78,6 +77,10 @@ class AppleOfficialKnowledgeAcceptanceTest {
     @Test
     fun modelToolAndHistoricalGuardrailsRemainFailClosed() {
         val catalog = AppleOfficialKnowledgeRuntimeFactory.embedded().catalog
+
+        assertEquals(19, catalog.capabilities.size)
+        assertEquals(48, catalog.exactModels.size)
+        assertEquals(241, catalog.exactModels.flatMap(catalog::getCardsForExactModel).map { it.id }.distinct().size)
 
         val iPhone12 = assertNotNull(catalog.getModelCapability("iPhone 12"))
         val iPhone13 = assertNotNull(catalog.getModelCapability("iPhone 13"))
@@ -155,11 +158,4 @@ class AppleOfficialKnowledgeAcceptanceTest {
         val stream = assertNotNull(javaClass.classLoader.getResourceAsStream(name), "Missing resource $name")
         return stream.bufferedReader().use { it.readText() }
     }
-
-    @Suppress("unused")
-    private fun governedBundle() = AppleOfficialKnowledgeResourceBundle(
-        capabilitiesJson = readResource(AppleOfficialKnowledgeResourceNames.capabilities),
-        sourceJsonParts = AppleOfficialKnowledgeResourceNames.sources.map(::readResource),
-        cardJsonParts = AppleOfficialKnowledgeResourceNames.cards.map(::readResource)
-    )
 }
