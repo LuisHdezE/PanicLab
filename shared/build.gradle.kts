@@ -1,4 +1,5 @@
 import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
+import org.gradle.api.tasks.Exec
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -8,76 +9,27 @@ plugins {
 }
 
 val appleKnowledgeGeneratedDir = layout.buildDirectory.dir("generated/appleknowledge/commonMain/kotlin")
+val appleKnowledgeGeneratedFile = appleKnowledgeGeneratedDir.map {
+  it.file("com/example/appleknowledge/runtime/AppleOfficialKnowledgeEmbeddedResources.kt")
+}
 val appleKnowledgeResourceDir = layout.projectDirectory.dir("src/commonMain/resources/appleknowledge")
+val appleKnowledgeGeneratorScript = rootProject.layout.projectDirectory.file(
+  "scripts/generate-apple-official-knowledge-embedded.py"
+)
 
-val generateAppleOfficialKnowledgeEmbeddedResources = tasks.register("generateAppleOfficialKnowledgeEmbeddedResources") {
+val generateAppleOfficialKnowledgeEmbeddedResources = tasks.register<Exec>(
+  "generateAppleOfficialKnowledgeEmbeddedResources"
+) {
   inputs.dir(appleKnowledgeResourceDir)
-  outputs.dir(appleKnowledgeGeneratedDir)
+  inputs.file(appleKnowledgeGeneratorScript)
+  outputs.file(appleKnowledgeGeneratedFile)
 
-  doLast {
-    val sourceDir = appleKnowledgeResourceDir.asFile
-    val outputFile = appleKnowledgeGeneratedDir.get()
-      .file("com/example/appleknowledge/runtime/AppleOfficialKnowledgeEmbeddedResources.kt")
-      .asFile
-
-    val capabilityName = "apple_official_knowledge_capabilities_v1.json"
-    val sourceNames = listOf(
-      "apple_official_knowledge_sources_v1_part1.json",
-      "apple_official_knowledge_sources_v1_part2.json",
-      "apple_official_knowledge_sources_v1_part3.json"
-    )
-    val cardNames = listOf(
-      "apple_official_knowledge_cards_v1_part1.json",
-      "apple_official_knowledge_cards_v1_part2a.json",
-      "apple_official_knowledge_cards_v1_part2b.json",
-      "apple_official_knowledge_cards_v1_part2c.json",
-      "apple_official_knowledge_cards_v1_part2d.json",
-      "apple_official_knowledge_cards_v1_part3a.json",
-      "apple_official_knowledge_cards_v1_part3b.json",
-      "apple_official_knowledge_cards_v1_part3c.json",
-      "apple_official_knowledge_cards_v1_part3d.json",
-      "apple_official_knowledge_cards_v1_part4a.json",
-      "apple_official_knowledge_cards_v1_part4b.json",
-      "apple_official_knowledge_cards_v1_part4c.json",
-      "apple_official_knowledge_cards_v1_part4d.json",
-      "apple_official_knowledge_cards_v1_part5a.json",
-      "apple_official_knowledge_cards_v1_part5b.json",
-      "apple_official_knowledge_cards_v1_part5c.json",
-      "apple_official_knowledge_cards_v1_part5d.json"
-    )
-
-    fun rawLiteral(fileName: String): String {
-      val text = sourceDir.resolve(fileName).readText()
-      require(!text.contains("\"\"\"")) { "$fileName contains an unsupported triple quote" }
-      require(!text.contains('$')) { "$fileName contains an unsupported dollar sign" }
-      return "\"\"\"$text\"\"\""
-    }
-
-    outputFile.parentFile.mkdirs()
-    outputFile.writeText(
-      buildString {
-        appendLine("package com.example.appleknowledge.runtime")
-        appendLine()
-        appendLine("internal object AppleOfficialKnowledgeEmbeddedResources {")
-        appendLine("    fun bundle(): AppleOfficialKnowledgeResourceBundle = AppleOfficialKnowledgeResourceBundle(")
-        appendLine("        capabilitiesJson = ${rawLiteral(capabilityName)},")
-        appendLine("        sourceJsonParts = listOf(")
-        sourceNames.forEachIndexed { index, name ->
-          append("            ${rawLiteral(name)}")
-          appendLine(if (index == sourceNames.lastIndex) "" else ",")
-        }
-        appendLine("        ),")
-        appendLine("        cardJsonParts = listOf(")
-        cardNames.forEachIndexed { index, name ->
-          append("            ${rawLiteral(name)}")
-          appendLine(if (index == cardNames.lastIndex) "" else ",")
-        }
-        appendLine("        )")
-        appendLine("    )")
-        appendLine("}")
-      }
-    )
-  }
+  commandLine(
+    "python3",
+    appleKnowledgeGeneratorScript.asFile.absolutePath,
+    appleKnowledgeResourceDir.asFile.absolutePath,
+    appleKnowledgeGeneratedFile.get().asFile.absolutePath
+  )
 }
 
 kotlin {
