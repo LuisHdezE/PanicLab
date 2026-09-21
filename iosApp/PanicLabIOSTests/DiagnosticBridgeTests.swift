@@ -65,6 +65,26 @@ final class DiagnosticBridgeTests: XCTestCase {
         XCTAssertFalse(result.isConclusive)
     }
 
+    func testAppleOfficialKnowledgeEmbeddedCatalogIsAvailableFromSwift() throws {
+        let facade = NativeEmbeddedAppleOfficialKnowledgeFacade()
+
+        XCTAssertEqual(facade.exactModels().count, 48)
+
+        let summary = try XCTUnwrap(facade.modelSummary(exactModel: "iPhone 12"))
+        XCTAssertEqual(summary.family, "iPhone 12")
+        XCTAssertEqual(summary.publicRepairManual, "SUPPORTED")
+        XCTAssertEqual(summary.recoveryDiagnosticsMode, "NOT_SUPPORTED")
+
+        XCTAssertEqual(facade.cards(exactModel: "iPhone 12", categoryName: nil).count, 13)
+        XCTAssertEqual(facade.cards(exactModel: "iPhone 12 mini", categoryName: nil).count, 9)
+        XCTAssertEqual(facade.cards(exactModel: "iPhone 12 Pro", categoryName: nil).count, 10)
+        XCTAssertEqual(facade.cards(exactModel: "iPhone 12 Pro Max", categoryName: nil).count, 9)
+
+        let card = try XCTUnwrap(facade.cardDetail(cardId: "AOKF-12-001"))
+        XCTAssertTrue(card.sourceReferences.contains { $0.resolution == "UNMAPPED" })
+        XCTAssertTrue(card.sourceReferences.contains { $0.resolution == "EXACT_SINGLE" })
+    }
+
     @MainActor
     func testImportedFixtureMatchesPastePathDiagnosis() throws {
         let rawLog = "{\"bug_type\":\"210\",\"product\":\"iPhone14,7\",\"os_version\":\"17.3\"}\npanic(cpu 1): \"SMC PANIC - ASSERTION FAILED: S.sensor array is 0x0, 0x500000, 0x0\""
