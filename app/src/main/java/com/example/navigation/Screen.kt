@@ -20,6 +20,7 @@ sealed class Screen(val route: String) {
         fun createRoute(sessionId: String) = "case_detail/$sessionId"
     }
     object KnowledgeBase : Screen("knowledge_base")
+    object AppleOfficialKnowledge : Screen("apple_official_knowledge")
     object RuleDetail : Screen("rule_detail/{ruleId}") {
         fun createRoute(ruleId: String) = "rule_detail/$ruleId"
     }
