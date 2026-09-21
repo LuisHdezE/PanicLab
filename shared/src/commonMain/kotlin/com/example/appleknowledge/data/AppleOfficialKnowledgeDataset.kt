@@ -156,7 +156,7 @@ object AppleOfficialKnowledgeCapabilitiesValidator {
     private val sourceIdRegex = Regex("^AOK-\\d{3}$")
     private val isoDateRegex = Regex("^\\d{4}-\\d{2}-\\d{2}$")
     private val appleOfficialUrlRegex = Regex(
-        "^https://(?:[A-Za-z0-9-]+\\.)*apple\\.com(?:/|$)",
+        "^https://(?:[A-Za-z0-9-]+\\.)*apple\\.com(?:/.*)?$",
         RegexOption.IGNORE_CASE
     )
 
