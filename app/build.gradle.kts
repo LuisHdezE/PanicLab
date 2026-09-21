@@ -57,6 +57,10 @@ android {
     buildConfig = true
   }
 
+  sourceSets {
+    getByName("main").assets.srcDir("../shared/src/commonMain/resources")
+  }
+
   testOptions { unitTests { isIncludeAndroidResources = true } }
   dependenciesInfo {
     includeInApk = false
