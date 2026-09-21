@@ -1,6 +1,8 @@
 package com.example.navigation
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -14,6 +16,10 @@ import com.example.ui.analysis.AnalysisViewModel
 import com.example.ui.analysis.LogViewerScreen
 import com.example.ui.analysis.ResultScreen
 import com.example.ui.analysis.TechnicalEvidenceScreen
+import com.example.ui.appleknowledge.AppleOfficialHomeEntry
+import com.example.ui.appleknowledge.AppleOfficialKnowledgeScreen
+import com.example.ui.appleknowledge.AppleOfficialKnowledgeViewModel
+import com.example.ui.appleknowledge.AppleOfficialKnowledgeViewModelFactory
 import com.example.ui.export.ExportReportScreen
 import com.example.ui.history.CaseDetailScreen
 import com.example.ui.history.HistoryScreen
@@ -61,20 +67,24 @@ fun PanicLabNavGraph(
         }
 
         composable(Screen.Home.route) {
-            HomeScreen(
-                recentReports = recentReports,
-                kbVersion = kbVersion,
-                onNavigateToImportFile = { navController.navigate(Screen.ImportFile.route) },
-                onNavigateToPasteLog = { navController.navigate(Screen.PasteLog.route) },
-                onNavigateToCameraScanner = { navController.navigate(Screen.CameraScanner.route) },
-                onNavigateToHistory = { navController.navigate(Screen.History.route) },
-                onNavigateToKnowledgeBase = { navController.navigate(Screen.KnowledgeBase.route) },
-                onNavigateToTrends = { navController.navigate(Screen.TrendsDashboard.route) },
-                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
-                onNavigateToReport = { sessionId ->
-                    navController.navigate(Screen.Result.createRoute(sessionId))
-                }
-            )
+            AppleOfficialHomeEntry(
+                onOpenAppleOfficial = { navController.navigate(Screen.AppleOfficialKnowledge.route) }
+            ) {
+                HomeScreen(
+                    recentReports = recentReports,
+                    kbVersion = kbVersion,
+                    onNavigateToImportFile = { navController.navigate(Screen.ImportFile.route) },
+                    onNavigateToPasteLog = { navController.navigate(Screen.PasteLog.route) },
+                    onNavigateToCameraScanner = { navController.navigate(Screen.CameraScanner.route) },
+                    onNavigateToHistory = { navController.navigate(Screen.History.route) },
+                    onNavigateToKnowledgeBase = { navController.navigate(Screen.KnowledgeBase.route) },
+                    onNavigateToTrends = { navController.navigate(Screen.TrendsDashboard.route) },
+                    onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                    onNavigateToReport = { sessionId ->
+                        navController.navigate(Screen.Result.createRoute(sessionId))
+                    }
+                )
+            }
         }
 
         composable(Screen.ImportFile.route) {
@@ -321,6 +331,16 @@ fun PanicLabNavGraph(
                 onNavigateToImport = {
                     navController.navigate(Screen.ImportFile.route)
                 }
+            )
+        }
+
+        composable(Screen.AppleOfficialKnowledge.route) {
+            val context = LocalContext.current
+            val factory = remember(context) { AppleOfficialKnowledgeViewModelFactory(context) }
+            val appleKnowledgeViewModel: AppleOfficialKnowledgeViewModel = viewModel(factory = factory)
+            AppleOfficialKnowledgeScreen(
+                viewModel = appleKnowledgeViewModel,
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 

@@ -1,10 +1,35 @@
 import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
+import org.gradle.api.tasks.Exec
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
   alias(libs.plugins.kotlin.multiplatform)
   alias(libs.plugins.android.kotlin.multiplatform.library)
   alias(libs.plugins.kover)
+}
+
+val appleKnowledgeGeneratedDir = layout.buildDirectory.dir("generated/appleknowledge/commonMain/kotlin")
+val appleKnowledgeGeneratedFile = appleKnowledgeGeneratedDir.map {
+  it.file("com/example/appleknowledge/runtime/AppleOfficialKnowledgeEmbeddedResources.kt")
+}
+val appleKnowledgeResourceDir = layout.projectDirectory.dir("src/commonMain/resources/appleknowledge")
+val appleKnowledgeGeneratorScript = rootProject.layout.projectDirectory.file(
+  "scripts/generate-apple-official-knowledge-embedded.py"
+)
+
+val generateAppleOfficialKnowledgeEmbeddedResources = tasks.register<Exec>(
+  "generateAppleOfficialKnowledgeEmbeddedResources"
+) {
+  inputs.dir(appleKnowledgeResourceDir)
+  inputs.file(appleKnowledgeGeneratorScript)
+  outputs.file(appleKnowledgeGeneratedFile)
+
+  commandLine(
+    "python3",
+    appleKnowledgeGeneratorScript.asFile.absolutePath,
+    appleKnowledgeResourceDir.asFile.absolutePath,
+    appleKnowledgeGeneratedFile.get().asFile.absolutePath
+  )
 }
 
 kotlin {
@@ -39,13 +64,22 @@ kotlin {
   }
 
   sourceSets {
-    commonMain.dependencies {
-      implementation(libs.kotlinx.serialization.json)
+    commonMain {
+      kotlin.srcDir(appleKnowledgeGeneratedDir)
+      dependencies {
+        implementation(libs.kotlinx.serialization.json)
+      }
     }
     commonTest.dependencies {
       implementation(kotlin("test"))
     }
   }
+}
+
+tasks.matching {
+  it.name.startsWith("compile") || it.name.startsWith("link") || it.name.endsWith("Test")
+}.configureEach {
+  dependsOn(generateAppleOfficialKnowledgeEmbeddedResources)
 }
 
 kover {
