@@ -53,8 +53,8 @@ object AppleOfficialKnowledgeCardJsonParser {
         val records = root.requiredArray("rows").mapIndexed { index, element ->
             val row = element as? JsonArray
                 ?: throw IllegalArgumentException("rows[$index] must be an array")
-            if (row.size > COLUMN_COUNT) {
-                throw IllegalArgumentException("rows[$index] has ${row.size} columns; expected at most $COLUMN_COUNT")
+            if (row.size != COLUMN_COUNT) {
+                throw IllegalArgumentException("rows[$index] has ${row.size} columns; expected exactly $COLUMN_COUNT")
             }
 
             val categoryRaw = row.requiredStringAt(2, "rows[$index].category")
@@ -150,13 +150,14 @@ object AppleOfficialKnowledgeCardValidator {
         "CURRENT + HISTORICAL",
         "CURRENT + ENDED_CONTEXT"
     )
+    private val requiredLogicalParts = setOf(1, 2, 3, 4, 5)
 
     fun validate(parts: List<AppleOfficialKnowledgeCardSeedPart>): AppleKnowledgeDatasetValidationResult {
         val errors = mutableListOf<AppleKnowledgeDatasetIssue>()
         val warnings = mutableListOf<AppleKnowledgeDatasetIssue>()
 
         if (parts.isEmpty()) {
-            errors += error("cards", "card seed parts must not be empty")
+            errors += error("cards", "card seed fragments must not be empty")
             return result(errors, warnings)
         }
 
@@ -165,12 +166,19 @@ object AppleOfficialKnowledgeCardValidator {
                 errors += error("parts[$index].datasetVersion", "frozen v1 card dataset must use 1.0.0")
             }
             if (part.expectedPartCount != 5) {
-                errors += error("parts[$index].expectedPartCount", "card dataset must declare five parts")
+                errors += error("parts[$index].expectedPartCount", "card dataset must declare five logical parts")
+            }
+            if (part.part !in requiredLogicalParts) {
+                errors += error("parts[$index].part", "logical card part must be between 1 and 5")
+            }
+            if (part.records.isEmpty()) {
+                errors += error("parts[$index].records", "card seed fragment must not be empty")
             }
         }
 
-        if (parts.map { it.part }.sorted() != listOf(1, 2, 3, 4, 5)) {
-            errors += error("parts", "card dataset parts must be exactly 1 through 5")
+        val logicalParts = parts.map { it.part }.toSet()
+        if (logicalParts != requiredLogicalParts) {
+            errors += error("parts", "logical card parts must cover exactly 1 through 5")
         }
 
         val records = parts.flatMap { it.records }
