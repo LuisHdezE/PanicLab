@@ -47,20 +47,25 @@ class AppleOfficialKnowledgeRuntimeIntegrationTest {
         )
         val embeddedFacade = NativeEmbeddedAppleOfficialKnowledgeFacade()
 
-        listOf(resourceFacade, embeddedFacade).forEach { facade ->
-            assertEquals(48, facade.exactModels().size)
-            val summary = assertNotNull(facade.modelSummary("iPhone 12"))
-            assertEquals("iPhone 12", summary.family)
-            assertEquals("SUPPORTED", summary.publicRepairManual)
-            assertEquals("NOT_SUPPORTED", summary.recoveryDiagnosticsMode)
+        assertEquals(48, resourceFacade.exactModels().size)
+        assertEquals(48, embeddedFacade.exactModels().size)
 
-            val cards = facade.cards("iPhone 12")
-            assertEquals(13, cards.size)
-            val card = assertNotNull(facade.cardDetail("AOKF-12-001"))
-            assertEquals("NONE", runtimeRulePackEffect(card.id))
-            assertTrue(card.sourceReferences.any { it.resolution == "UNMAPPED" })
-            assertTrue(card.sourceReferences.any { it.resolution == "EXACT_SINGLE" })
-        }
+        val resourceSummary = assertNotNull(resourceFacade.modelSummary("iPhone 12"))
+        val embeddedSummary = assertNotNull(embeddedFacade.modelSummary("iPhone 12"))
+        assertEquals(resourceSummary.family, embeddedSummary.family)
+        assertEquals("iPhone 12", embeddedSummary.family)
+        assertEquals("SUPPORTED", embeddedSummary.publicRepairManual)
+        assertEquals("NOT_SUPPORTED", embeddedSummary.recoveryDiagnosticsMode)
+
+        assertEquals(13, resourceFacade.cards("iPhone 12").size)
+        assertEquals(13, embeddedFacade.cards("iPhone 12").size)
+
+        val resourceCard = assertNotNull(resourceFacade.cardDetail("AOKF-12-001"))
+        val embeddedCard = assertNotNull(embeddedFacade.cardDetail("AOKF-12-001"))
+        assertEquals(resourceCard.sourceReferences.map { it.resolution }, embeddedCard.sourceReferences.map { it.resolution })
+        assertEquals("NONE", runtimeRulePackEffect(embeddedCard.id))
+        assertTrue(embeddedCard.sourceReferences.any { it.resolution == "UNMAPPED" })
+        assertTrue(embeddedCard.sourceReferences.any { it.resolution == "EXACT_SINGLE" })
     }
 
     private fun assertCatalog(runtime: AppleOfficialKnowledgeRuntime) {
