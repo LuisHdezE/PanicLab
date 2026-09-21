@@ -10,6 +10,7 @@ import com.example.appleknowledge.model.AppleCapabilityAvailability
 import com.example.appleknowledge.model.AppleModelCapability
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -90,17 +91,12 @@ class AppleOfficialKnowledgeDatasetContractsTest {
     }
 
     @Test
-    fun validatorRejectsMalformedHistoricalSourceIds() {
-        val seed = validSeed(
-            capability = validCapability().copy(
+    fun domainRejectsMalformedHistoricalSourceIdsBeforeDatasetValidation() {
+        assertFailsWith<IllegalArgumentException> {
+            validCapability().copy(
                 historicalProgramSourceIds = listOf("PROGRAM-27")
             )
-        )
-
-        val result = AppleOfficialKnowledgeCapabilitiesValidator.validate(seed)
-
-        assertFalse(result.isValid)
-        assertTrue(result.errors.any { it.path.endsWith("historicalProgramSourceIds") })
+        }
     }
 
     private fun validSeed(
