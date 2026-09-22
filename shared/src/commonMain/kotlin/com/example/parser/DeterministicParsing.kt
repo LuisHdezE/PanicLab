@@ -90,11 +90,7 @@ object MetadataExtractor {
     }
 
     private fun extractPanicString(text: String): String? {
-        val jsonPanic = Regex(
-            "\"panicString\"\\s*:\\s*\"((?:\\\\.|[^\"\\\\])*)\"",
-            setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
-        ).find(text)?.groupValues?.getOrNull(1)
-
+        val jsonPanic = extractJsonStringValue(text, "panicString")
         if (!jsonPanic.isNullOrEmpty()) {
             return jsonPanic
                 .replace("\\n", "\n")
@@ -104,13 +100,10 @@ object MetadataExtractor {
                 .replace("\\\\", "\\")
         }
 
-        val block = Regex(
-            "(panic\\(.*?\\):.*?)(?:\\n\\n|Debugger message|Backtrace:|$)",
-            setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
-        ).find(text)?.groupValues?.getOrNull(1)
-        if (!block.isNullOrBlank()) return block.trim()
+        val block = extractPanicBlock(text)
+        if (!block.isNullOrBlank()) return block
 
-        val panicLines = text.lines().filter { line ->
+        val panicLines = text.lineSequence().filter { line ->
             line.contains("panic", ignoreCase = true) ||
                 line.contains("Missing sensor", ignoreCase = true) ||
                 line.contains("SMC BSC", ignoreCase = true) ||
@@ -118,8 +111,66 @@ object MetadataExtractor {
                 line.contains("watchdog timeout", ignoreCase = true) ||
                 line.contains("AOP PANIC", ignoreCase = true) ||
                 line.contains("ANS2", ignoreCase = true)
+        }.take(6).toList()
+        return panicLines.takeIf { it.isNotEmpty() }?.joinToString("\n")
+    }
+
+    private fun extractJsonStringValue(text: String, key: String): String? {
+        val quotedKey = "\"$key\""
+        val keyIndex = text.indexOf(quotedKey, ignoreCase = true)
+        if (keyIndex < 0) return null
+
+        var cursor = keyIndex + quotedKey.length
+        while (cursor < text.length && text[cursor].isWhitespace()) cursor += 1
+        if (cursor >= text.length || text[cursor] != ':') return null
+
+        cursor += 1
+        while (cursor < text.length && text[cursor].isWhitespace()) cursor += 1
+        if (cursor >= text.length || text[cursor] != '"') return null
+
+        cursor += 1
+        val valueStart = cursor
+        var escaped = false
+        while (cursor < text.length) {
+            val current = text[cursor]
+            if (escaped) {
+                escaped = false
+                cursor += 1
+                continue
+            }
+            if (current == '\\') {
+                escaped = true
+                cursor += 1
+                continue
+            }
+            if (current == '"') {
+                return text.substring(valueStart, cursor)
+            }
+            cursor += 1
         }
-        return panicLines.takeIf { it.isNotEmpty() }?.take(6)?.joinToString("\n")
+        return null
+    }
+
+    private fun extractPanicBlock(text: String): String? {
+        val panicStart = text.indexOf("panic(", ignoreCase = true)
+        if (panicStart < 0) return null
+
+        val headerEnd = text.indexOf("):", startIndex = panicStart)
+        if (headerEnd < 0) return null
+
+        val contentStart = headerEnd + 2
+        var blockEnd = text.length
+
+        val doubleNewline = text.indexOf("\n\n", startIndex = contentStart)
+        if (doubleNewline >= 0) blockEnd = minOf(blockEnd, doubleNewline)
+
+        val debuggerMessage = text.indexOf("Debugger message", startIndex = contentStart, ignoreCase = true)
+        if (debuggerMessage >= 0) blockEnd = minOf(blockEnd, debuggerMessage)
+
+        val backtrace = text.indexOf("Backtrace:", startIndex = contentStart, ignoreCase = true)
+        if (backtrace >= 0) blockEnd = minOf(blockEnd, backtrace)
+
+        return text.substring(panicStart, blockEnd).trim()
     }
 
     private fun findRegexMatch(text: String, pattern: String): String? = try {

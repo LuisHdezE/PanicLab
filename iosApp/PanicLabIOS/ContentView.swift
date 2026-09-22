@@ -5,6 +5,7 @@ import UniformTypeIdentifiers
 struct ContentView: View {
     @StateObject private var viewModel = DiagnosticViewModel()
     @State private var isFileImporterPresented = false
+    @State private var isScannerPresented = false
 
     var body: some View {
         NavigationView {
@@ -27,6 +28,9 @@ struct ContentView: View {
         ) { result in
             viewModel.handleImportResult(result)
         }
+        .fullScreenCover(isPresented: $isScannerPresented) {
+            OcrScannerView(diagnosticViewModel: viewModel)
+        }
     }
 
     private var importContentTypes: [UTType] {
@@ -44,7 +48,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 8) {
             Label("Diagnóstico Panic Full", systemImage: "waveform.path.ecg.rectangle")
                 .font(.title2.bold())
-            Text("Pega, escribe o importa un log compatible. El análisis determinista se ejecuta con el motor KMP compartido y el Rule Pack incluido en la app.")
+            Text("Pega, escribe, importa o escanea un log compatible. El análisis determinista se ejecuta con el motor KMP compartido y el Rule Pack incluido en la app.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -57,7 +61,7 @@ struct ContentView: View {
 
             TextEditor(text: $viewModel.logText)
                 .font(.system(.footnote, design: .monospaced))
-                .frame(minHeight: 220)
+                .frame(height: 220)
                 .padding(8)
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -75,11 +79,28 @@ struct ContentView: View {
                     .accessibilityIdentifier("paniclab.import.status")
             }
 
-            HStack(spacing: 10) {
+            LazyVGrid(
+                columns: [
+                    GridItem(.flexible(), spacing: 10),
+                    GridItem(.flexible(), spacing: 10)
+                ],
+                spacing: 10
+            ) {
+                Button {
+                    isScannerPresented = true
+                } label: {
+                    Label("Escanear", systemImage: "camera.viewfinder")
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.bordered)
+                .disabled(isLoading)
+                .accessibilityIdentifier("paniclab.scannerButton")
+
                 Button {
                     isFileImporterPresented = true
                 } label: {
                     Label("Importar", systemImage: "doc.badge.plus")
+                        .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.bordered)
                 .disabled(isLoading)
@@ -89,16 +110,21 @@ struct ContentView: View {
                     viewModel.pasteFromClipboard()
                 } label: {
                     Label("Pegar", systemImage: "doc.on.clipboard")
+                        .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.bordered)
                 .disabled(isLoading)
                 .accessibilityIdentifier("paniclab.pasteButton")
 
-                Button("Limpiar") {
+                Button {
                     viewModel.clear()
+                } label: {
+                    Label("Limpiar", systemImage: "trash")
+                        .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.bordered)
                 .disabled(viewModel.logText.isEmpty || isLoading)
+                .accessibilityIdentifier("paniclab.clearButton")
             }
 
             Button {
@@ -111,7 +137,7 @@ struct ContentView: View {
             .disabled(isLoading)
             .accessibilityIdentifier("paniclab.analyzeButton")
 
-            Text("Formatos: .ips, .txt, .log, .json · UTF-8 / UTF-16 con BOM · máximo 5 MiB")
+            Text("Archivos: .ips, .txt, .log, .json · UTF-8 / UTF-16 con BOM · máximo 5 MiB. OCR de cámara/imagen se procesa en el dispositivo.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

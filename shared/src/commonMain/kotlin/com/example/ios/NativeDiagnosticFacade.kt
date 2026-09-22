@@ -4,6 +4,7 @@ import com.example.diagnostic.CandidateRanker
 import com.example.diagnostic.DiagnosticRulesEngine
 import com.example.diagnostic.SensorExtractor
 import com.example.domain.model.ConfidenceLevel
+import com.example.ocr.OcrLogExtractor
 import com.example.parser.DeviceResolver
 import com.example.parser.EvidenceExtractor
 import com.example.parser.LogNormalizer
@@ -15,15 +16,35 @@ import com.example.rulepack.RulePackJsonParser
 import com.example.rulepack.RulePackValidator
 
 /**
- * Small Swift-friendly composition facade for the first native iOS diagnostic slice.
+ * Small Swift-friendly composition facade for the native iOS diagnostic slice.
  *
  * The deterministic engine remains in COMMON. iOS supplies the canonical bundled
  * rule-pack JSON plus its SHA-256 digest from CryptoKit, keeping cryptographic and
- * UI concerns native while avoiding Room/persistence in I7.
+ * UI concerns native while avoiding Room/persistence in the iOS slice.
  */
 class NativeDiagnosticFacade {
     @Throws(IllegalArgumentException::class)
     fun analyze(
+        rawLog: String,
+        rulePackJson: String,
+        rulePackChecksum: String
+    ): NativeDiagnosticResult = try {
+        analyzeInternal(
+            rawLog = rawLog,
+            rulePackJson = rulePackJson,
+            rulePackChecksum = rulePackChecksum
+        )
+    } catch (error: IllegalArgumentException) {
+        throw error
+    } catch (error: Exception) {
+        throw IllegalArgumentException(
+            error.message?.takeIf { it.isNotBlank() }
+                ?: "El motor de diagnóstico no pudo procesar el Panic Full.",
+            error
+        )
+    }
+
+    private fun analyzeInternal(
         rawLog: String,
         rulePackJson: String,
         rulePackChecksum: String
@@ -121,6 +142,41 @@ data class NativeDiagnosticResult(
     val evidenceCount: Int,
     val knowledgeBaseVersion: String,
     val isConclusive: Boolean
+)
+
+/**
+ * Swift-friendly projection of the existing COMMON OCR cleanup result.
+ *
+ * This facade deliberately delegates every cleanup/classification decision to
+ * [OcrLogExtractor]. It adds no platform-specific parsing semantics.
+ */
+class NativeOcrFacade {
+    fun process(rawText: String): NativeOcrScanResult {
+        val result = OcrLogExtractor.processScannedText(rawText)
+        return NativeOcrScanResult(
+            rawText = result.rawText,
+            cleanedText = result.cleanedText,
+            detectedDeviceModel = result.detectedDeviceModel,
+            detectedBuild = result.detectedBuild,
+            panicCodesText = result.detectedPanicCodes.joinToString("\n"),
+            keywordsText = result.detectedKeywords.joinToString("\n"),
+            lineCount = result.lineCount,
+            hasValidPanicSignatures = result.hasValidPanicSignatures,
+            confidenceHint = result.confidenceHint
+        )
+    }
+}
+
+data class NativeOcrScanResult(
+    val rawText: String,
+    val cleanedText: String,
+    val detectedDeviceModel: String?,
+    val detectedBuild: String?,
+    val panicCodesText: String,
+    val keywordsText: String,
+    val lineCount: Int,
+    val hasValidPanicSignatures: Boolean,
+    val confidenceHint: String
 )
 
 private class SequentialIdGenerator(
