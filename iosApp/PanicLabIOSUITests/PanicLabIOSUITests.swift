@@ -78,4 +78,22 @@ final class PanicLabIOSUITests: XCTestCase {
         XCTAssertTrue(input.waitForExistence(timeout: 5))
         XCTAssertEqual(input.value as? String, "existing-log")
     }
+
+    func testAppleOfficialKnowledgeIsSeparatedFromDiagnosticTab() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let diagnosticInput = app.textViews["paniclab.logInput"]
+        XCTAssertTrue(diagnosticInput.waitForExistence(timeout: 10))
+
+        let appleTab = app.tabBars.buttons["Apple Oficial"]
+        XCTAssertTrue(appleTab.waitForExistence(timeout: 5))
+        appleTab.tap()
+
+        let appleScreen = app.descendants(matching: .any)["paniclab.appleOfficial.screen"]
+        XCTAssertTrue(appleScreen.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Contexto oficial Apple"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["iPhone 17e"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["paniclab.analyzeButton"].exists)
+    }
 }
