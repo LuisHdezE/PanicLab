@@ -237,6 +237,21 @@ The diagnostic actions are therefore arranged as a symmetric 2x2 grid:
 
 All four secondary actions use equal flexible width and a common minimum control height. `Analizar` remains the separate full-width primary CTA. No diagnostic, OCR or persistence behavior is changed by this layout correction.
 
+## Reconciliation with Apple Official Knowledge v1
+
+After AOK-I1 through AOK-I5 were merged, `main` advanced to `541913c19eff95876bf55981be63c70da87c5459` while PR #28 remained based on the original TASK-KMP-082 baseline.
+
+The branch was reconciled without rebasing or rewriting its 16 existing commits. Merge commit `46ff6fd2c267edc4b04e034891e4c9a3017dcf2d` has two parents: the previous TASK-KMP-082 head `dce39556ce4d24446919fc14c88a4a16786f26fa` and AOK-complete `main@541913c19eff95876bf55981be63c70da87c5459`.
+
+Only two files overlapped semantically between AOK and TASK-KMP-082:
+
+- `iosApp/PanicLabIOSTests/DiagnosticBridgeTests.swift`;
+- `iosApp/PanicLabIOSUITests/PanicLabIOSUITests.swift`.
+
+Both conflicts were resolved additively. The native AOK catalog/segregation tests and all OCR/camera/large-log tests coexist. No AOK dataset, AOK product semantics, OCR product behavior or deterministic diagnostic contract was intentionally changed during reconciliation.
+
+After reconciliation the branch is 0 commits behind `main`, and its diff against `main` remains restricted to the 13 TASK-KMP-082 files. All earlier automated green runs are historical evidence only; the reconciled exact head must pass the complete automated matrix again before any merge decision.
+
 ## Required exact-head acceptance before merge
 
 The implementation is not DONE until the final PR head has all applicable gates green:
