@@ -1,0 +1,108 @@
+name: AOK I5 Acceptance
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/aok-i5-acceptance.yml'
+      - 'shared/src/commonMain/kotlin/com/example/appleknowledge/**'
+      - 'shared/src/commonMain/resources/appleknowledge/**'
+      - 'shared/src/commonTest/kotlin/com/example/appleknowledge/**'
+      - 'shared/src/jvmTest/kotlin/com/example/appleknowledge/**'
+      - 'app/src/main/java/com/example/data/appleknowledge/**'
+      - 'app/src/main/java/com/example/ui/appleknowledge/**'
+      - 'app/src/test/java/com/example/appleknowledge/**'
+      - 'iosApp/PanicLabIOS/ContentView.swift'
+      - 'iosApp/PanicLabIOSTests/DiagnosticBridgeTests.swift'
+      - 'iosApp/PanicLabIOSUITests/PanicLabIOSUITests.swift'
+      - 'scripts/generate-apple-official-knowledge-embedded.py'
+      - 'scripts/verify-aok-firewall.sh'
+      - 'shared/build.gradle.kts'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/aok-i5-acceptance.yml'
+      - 'shared/src/commonMain/kotlin/com/example/appleknowledge/**'
+      - 'shared/src/commonMain/resources/appleknowledge/**'
+      - 'shared/src/commonTest/kotlin/com/example/appleknowledge/**'
+      - 'shared/src/jvmTest/kotlin/com/example/appleknowledge/**'
+      - 'app/src/main/java/com/example/data/appleknowledge/**'
+      - 'app/src/main/java/com/example/ui/appleknowledge/**'
+      - 'app/src/test/java/com/example/appleknowledge/**'
+      - 'iosApp/PanicLabIOS/ContentView.swift'
+      - 'iosApp/PanicLabIOSTests/DiagnosticBridgeTests.swift'
+      - 'iosApp/PanicLabIOSUITests/PanicLabIOSUITests.swift'
+      - 'scripts/generate-apple-official-knowledge-embedded.py'
+      - 'scripts/verify-aok-firewall.sh'
+      - 'shared/build.gradle.kts'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aok-i5-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  acceptance:
+    name: Dataset, firewall and Android composition
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle 9.3.1
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.3.1'
+
+      - name: Configure Android SDK path
+        shell: bash
+        run: printf 'sdk.dir=%s\n' "$ANDROID_HOME" > local.properties
+
+      - name: Validate governed Apple JSON syntax
+        shell: bash
+        run: |
+          find shared/src/commonMain/resources/appleknowledge -name '*.json' -print0 \
+            | while IFS= read -r -d '' file; do
+                python3 -m json.tool "$file" >/dev/null
+              done
+
+      - name: Verify AOK structural firewall
+        shell: bash
+        run: bash scripts/verify-aok-firewall.sh
+
+      - name: Run shared Apple Official Knowledge acceptance suite
+        shell: bash
+        run: gradle :shared:jvmTest --stacktrace
+
+      - name: Run Android AOK composition acceptance
+        shell: bash
+        run: |
+          gradle :app:testDebugUnitTest \
+            --tests 'com.example.appleknowledge.AndroidAppleOfficialKnowledgeRuntimeTest' \
+            --stacktrace
+
+      - name: Upload acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: aok-i5-acceptance-evidence
+          path: |
+            shared/build/reports/tests/jvmTest/**
+            shared/build/test-results/jvmTest/**
+            app/build/reports/tests/testDebugUnitTest/**
+            app/build/test-results/testDebugUnitTest/**
+          if-no-files-found: warn
+          retention-days: 7
