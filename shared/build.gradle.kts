@@ -102,7 +102,9 @@ kover {
           "com.example.ocr.OcrLogExtractor*",
           "com.example.rulepack.RulePackJsonParser*",
           "com.example.rulepack.RulePackValidator*",
-          "com.example.rulepack.RulePackDiffCalculator*"
+          "com.example.rulepack.RulePackDiffCalculator*",
+          "com.example.artifact.AndroidEvidenceExtractor*",
+          "com.example.androiddiagnostic.*"
         )
       }
     }
