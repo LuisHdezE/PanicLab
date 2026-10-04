@@ -56,4 +56,26 @@ class PanicLogTextDecoderTest {
 
         assertEquals(text, PanicLogTextDecoder.decode(text.toByteArray(Charsets.UTF_8)))
     }
+
+    @Test
+    fun largePanicLogIsBoundedWithoutLosingHeaderOrTail() {
+        val header =
+            """{"product":"iPhone14,7","panicString":"SMC PANIC - SMC BSC failure - S.sensor array 0 - 5 is 0, 4194304, 0, 0, 0"}"""
+        val tail = "Debugger message: panic"
+        val oversized = header + "\n" + "x".repeat(400_000) + "\n" + tail
+
+        val analysisText = PanicLogAnalysisWindow.forAnalysis(oversized)
+
+        assertTrue(analysisText.length < oversized.length)
+        assertTrue(analysisText.contains("iPhone14,7"))
+        assertTrue(analysisText.contains("4194304"))
+        assertTrue(analysisText.contains(tail))
+    }
+
+    @Test
+    fun smallPanicLogIsNotChangedByAnalysisWindow() {
+        val text = """{"product":"iPhone14,7","panicString":"SMC PANIC"}"""
+
+        assertEquals(text, PanicLogAnalysisWindow.forAnalysis(text))
+    }
 }
