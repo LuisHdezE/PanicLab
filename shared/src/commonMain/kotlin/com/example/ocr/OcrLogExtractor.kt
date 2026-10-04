@@ -14,7 +14,12 @@ data class OcrScanResult(
 
 object OcrLogExtractor {
     private val hexCodeRegex = Regex("0x[0-9A-Fa-f]{3,8}", RegexOption.IGNORE_CASE)
-    private val decimalSensorRegex = Regex("\\b(4194304|524288|262144|131072|65536|32768|16384|8192|4096|2048|1024)\\b")
+    private val decimalSensorRegex = Regex("\\b(4194304|3145728|2097152|1048576|524288|262144|131072|65536|32768|16384|8192|4096|2048|1024)\\b")
+    private val sensorArrayPayloadRegex = Regex(
+        "(?:S\\.?\\s*sensor\\s*array|sensor\\s*array\\s*0\\s*-\\s*5).*?(?:is|=|:)\\s*([^\\n\\r\"]+)",
+        RegexOption.IGNORE_CASE
+    )
+    private val decimalValueRegex = Regex("\\b\\d{4,8}\\b")
     private val iphoneModelRegex = Regex("\\biPhone\\s*([0-9]{1,2}(?:,[0-9])?|\\d+\\s*(?:Pro(?:\\s*Max)?|Plus|Mini)?)\\b", RegexOption.IGNORE_CASE)
     private val buildRegex = Regex("\\b([12][0-9][A-Z][0-9]{2,4}[a-z]?)\\b")
     private val sensorArrayRegex = Regex("(?:S\\.?\\s*sensor\\s*array|sensor\\s*array\\s*0\\s*-\\s*5)", RegexOption.IGNORE_CASE)
@@ -67,6 +72,16 @@ object OcrLogExtractor {
             decimalSensorRegex.findAll(cleaned).forEach { match ->
                 match.value.toLongOrNull()?.let { value ->
                     detectedPanicCodes += "0x${value.toString(16).uppercase()}"
+                }
+            }
+            sensorArrayPayloadRegex.findAll(cleaned).forEach { sensorMatch ->
+                val payload = sensorMatch.groupValues.getOrNull(1).orEmpty()
+                decimalValueRegex.findAll(payload).forEach { decimalMatch ->
+                    decimalMatch.value.toLongOrNull()
+                        ?.takeIf { it > 0 }
+                        ?.let { value ->
+                            detectedPanicCodes += "0x${value.toString(16).uppercase()}"
+                        }
                 }
             }
 
