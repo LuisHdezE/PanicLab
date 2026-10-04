@@ -7,7 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
@@ -66,13 +65,6 @@ class MainActivity : ComponentActivity() {
         handleIncomingIntent(intent, analysisViewModel)
 
         setContent {
-            val darkModePreference by settingsViewModel.darkMode.collectAsState()
-            val isDarkTheme = when (darkModePreference) {
-                "DARK" -> true
-                "LIGHT" -> false
-                else -> isSystemInDarkTheme()
-            }
-
             val recentReports by diagnosticRepository.getSessionHistory().collectAsState(initial = emptyList())
             val kbVersion by kbViewModel.currentVersion.collectAsState()
 
@@ -80,7 +72,7 @@ class MainActivity : ComponentActivity() {
                 kbRepository.initializeDefaultRulePackIfNeeded()
             }
 
-            PanicLabTheme(darkTheme = isDarkTheme) {
+            PanicLabTheme(darkTheme = true) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     var trialState by remember { mutableStateOf(trialAccessManager.currentState()) }
 
