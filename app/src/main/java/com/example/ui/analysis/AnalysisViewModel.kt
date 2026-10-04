@@ -8,13 +8,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.domain.model.DiagnosticReport
 import com.example.domain.repository.DiagnosticRepository
 import com.example.domain.repository.SettingsRepository
+import com.example.util.PanicLogTextDecoder
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
 sealed class AnalysisUiState {
     object Idle : AnalysisUiState()
@@ -145,8 +144,8 @@ class AnalysisViewModel(
             _uiState.value = AnalysisUiState.Analyzing
             _selectedFilename.value = filename
             try {
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val content = inputStream?.bufferedReader()?.use(BufferedReader::readText) ?: ""
+                val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: ByteArray(0)
+                val content = PanicLogTextDecoder.decode(bytes)
                 _logInputText.value = content
                 analyzeText(content, filename)
             } catch (e: Exception) {
