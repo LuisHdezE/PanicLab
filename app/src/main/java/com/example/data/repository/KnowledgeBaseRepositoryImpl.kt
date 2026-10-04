@@ -13,6 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -24,6 +26,9 @@ class KnowledgeBaseRepositoryImpl(
     private val ruleDao = database.diagnosticRuleDao()
     private val deviceDao = database.deviceDao()
     private val rulePackDao = database.rulePackDao()
+    private val initializationMutex = Mutex()
+    @Volatile
+    private var initializationChecked = false
 
     override fun getAllRules(): Flow<List<DiagnosticRule>> {
         return ruleDao.getAllActiveRules().map { list ->
@@ -68,37 +73,48 @@ class KnowledgeBaseRepositoryImpl(
     }
 
     override suspend fun initializeDefaultRulePackIfNeeded(): Boolean = withContext(Dispatchers.IO) {
-        val activePack = rulePackDao.getActiveRulePack()
-        val existingRules = ruleDao.getAllRulesDirect()
-        if (activePack != null && existingRules.isNotEmpty()) {
-            return@withContext false
-        }
+        if (initializationChecked) return@withContext false
 
-        try {
-            val assetManager = context.assets
-            val inputStream = assetManager.open("paniclab_rules_v1.json")
-            val reader = BufferedReader(InputStreamReader(inputStream))
-            val jsonContent = reader.use { it.readText() }
+        initializationMutex.withLock {
+            if (initializationChecked) return@withLock false
 
-            val parseResult = RulePackJsonParser.parse(
-                jsonString = jsonContent,
-                origin = RulePackOrigin.BUNDLED,
-                sourceFilename = "paniclab_rules_v1.json"
-            )
-
-            database.withTransaction {
-                deviceDao.deleteAll()
-                ruleDao.deleteAll()
-                rulePackDao.deactivateAllPacks()
-
-                deviceDao.insertAll(parseResult.deviceModelEntities)
-                ruleDao.insertAll(parseResult.diagnosticRuleEntities)
-                rulePackDao.insertRulePack(parseResult.rulePackEntity.copy(isActive = true, isDefault = true))
+            val activePack = rulePackDao.getActiveRulePack()
+            val existingRules = ruleDao.getAllRulesDirect()
+            if (activePack != null && existingRules.isNotEmpty()) {
+                initializationChecked = true
+                return@withLock false
             }
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
+
+            try {
+                val assetManager = context.assets
+                val inputStream = assetManager.open("paniclab_rules_v1.json")
+                val reader = BufferedReader(InputStreamReader(inputStream))
+                val jsonContent = reader.use { it.readText() }
+
+                val parseResult = RulePackJsonParser.parse(
+                    jsonString = jsonContent,
+                    origin = RulePackOrigin.BUNDLED,
+                    sourceFilename = "paniclab_rules_v1.json"
+                )
+
+                database.withTransaction {
+                    deviceDao.deleteAll()
+                    ruleDao.deleteAll()
+                    rulePackDao.deactivateAllPacks()
+
+                    deviceDao.insertAll(parseResult.deviceModelEntities)
+                    ruleDao.insertAll(parseResult.diagnosticRuleEntities)
+                    rulePackDao.insertRulePack(
+                        parseResult.rulePackEntity.copy(isActive = true, isDefault = true)
+                    )
+                }
+
+                initializationChecked = true
+                true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
         }
     }
 
