@@ -34,11 +34,6 @@ import com.example.ui.analysis.AnalysisViewModel
 import com.example.ui.analysis.AnalyzingScreen
 import com.example.ui.components.HexagonMicroscopeEmblem
 import com.example.ui.theme.*
-import com.example.util.PanicLogAnalysisWindow
-import com.example.util.PanicLogTextDecoder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,38 +44,23 @@ fun ImportFileScreen(
     onAnalysisSuccess: (String) -> Unit
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
     val analysisStage by viewModel.analysisStage.collectAsState()
 
     var selectedFileName by remember { mutableStateOf<String?>(null) }
-    var fileContent by remember { mutableStateOf<String?>(null) }
     var fileSizeKb by remember { mutableStateOf<Long?>(null) }
 
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         if (uri != null) {
-            scope.launch {
-                try {
-                    val loaded = withContext(Dispatchers.IO) {
-                        val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: ByteArray(0)
-                        val decoded = PanicLogTextDecoder.decode(bytes)
-                        Triple(
-                            PanicLogAnalysisWindow.forAnalysis(decoded),
-                            (bytes.size / 1024).toLong(),
-                            decoded.length > PanicLogAnalysisWindow.MAX_ANALYSIS_CHARS
-                        )
-                    }
-                    var name = uri.lastPathSegment ?: "panic_log.ips"
-                    if (name.contains("/")) name = name.substringAfterLast("/")
-                    selectedFileName = name
-                    fileContent = loaded.first
-                    fileSizeKb = loaded.second
-                } catch (e: Exception) {
-                    Toast.makeText(context, "Error al leer archivo: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
+            var name = uri.lastPathSegment ?: "panic_log.ips"
+            if (name.contains("/")) name = name.substringAfterLast("/")
+            selectedFileName = name
+            fileSizeKb = null
+
+            // Use exactly the same import/analyze path as ACTION_VIEW / "Abrir con PanicLab".
+            viewModel.loadFromUri(context, uri, name)
         }
     }
 
@@ -152,12 +132,7 @@ fun ImportFileScreen(
                 ) {
                     Button(
                         onClick = {
-                            val content = fileContent
-                            if (!content.isNullOrBlank()) {
-                                viewModel.analyzeRawLog(content, selectedFileName)
-                            } else {
-                                filePickerLauncher.launch(arrayOf("*/*", "text/*", "application/json"))
-                            }
+                            filePickerLauncher.launch(arrayOf("*/*", "text/*", "application/json"))
                         },
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = ElectricBlue),
@@ -167,13 +142,13 @@ fun ImportFileScreen(
                             .testTag("start_file_analysis_button")
                     ) {
                         Icon(
-                            imageVector = if (fileContent != null) Icons.Default.Troubleshoot else Icons.Default.FileUpload,
+                            imageVector = Icons.Default.FileUpload,
                             contentDescription = null,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (fileContent != null) "Analizar ahora >" else "Seleccionar Archivo de Registro",
+                            text = "Seleccionar Archivo de Registro",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold
                         )
