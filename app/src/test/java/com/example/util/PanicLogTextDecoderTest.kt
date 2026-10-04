@@ -1,5 +1,10 @@
 package com.example.util
 
+import com.example.diagnostic.SensorExtractor
+import com.example.domain.model.PanicFamily
+import com.example.parser.LogNormalizer
+import com.example.parser.MetadataExtractor
+import com.example.parser.PanicClassifier
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -86,6 +91,27 @@ class PanicLogTextDecoderTest {
         assertTrue(analysisText.contains("iPhone14,7"))
         assertTrue(analysisText.contains("4194304"))
         assertTrue(analysisText.contains("Debugger message: panic"))
+    }
+
+    @Test
+    fun largeUtf16AppleStyleLogSurvivesDecodeWindowAndDeterministicParsing() {
+        val header =
+            """{"bug_type":"210","timestamp":"2026-08-26 10:30:36.00 -0300","os_version":"iPhone OS 26.5 (23F77)"}"""
+        val panicObjectPrefix =
+            """{"product":"iPhone14,7","panicString":"SMC PANIC - SMC BSC failure\\nS.sensor array 0 - 5 is 0, 4194304, 0, 0, 0","payload":""""
+        val text = header + "\n" + panicObjectPrefix + "x".repeat(450_000) + ""}"
+        val bytes = byteArrayOf(0xFF.toByte(), 0xFE.toByte()) + text.toByteArray(Charsets.UTF_16LE)
+
+        val decoded = PanicLogTextDecoder.decode(bytes)
+        val analysisText = PanicLogAnalysisWindow.forAnalysis(decoded)
+        val normalized = LogNormalizer.normalize(analysisText)
+        val metadata = MetadataExtractor.extract(normalized)
+        val families = PanicClassifier.classify(normalized, metadata.panicString)
+        val sensors = SensorExtractor.extract(normalized, metadata.panicString)
+
+        assertEquals("iPhone14,7", metadata.product)
+        assertTrue(PanicFamily.SMC_BSC_FAILURE in families)
+        assertTrue(sensors.sensorCodes.any { it.numericValue == 4_194_304L })
     }
 
     @Test
