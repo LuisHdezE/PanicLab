@@ -6,15 +6,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.domain.model.DiagnosticReport
+import com.example.domain.repository.DiagnosticAnalysisStage
 import com.example.domain.repository.DiagnosticRepository
 import com.example.domain.repository.SettingsRepository
+import com.example.util.PanicLogAnalysisWindow
+import com.example.util.PanicLogTextDecoder
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 
 sealed class AnalysisUiState {
     object Idle : AnalysisUiState()
@@ -38,6 +43,9 @@ class AnalysisViewModel(
 
     private val _uiState = MutableStateFlow<AnalysisUiState>(AnalysisUiState.Idle)
     val uiState: StateFlow<AnalysisUiState> = _uiState.asStateFlow()
+
+    private val _analysisStage = MutableStateFlow(DiagnosticAnalysisStage.PREPARING)
+    val analysisStage: StateFlow<DiagnosticAnalysisStage> = _analysisStage.asStateFlow()
 
     private val _logInputText = MutableStateFlow("")
     val logInputText: StateFlow<String> = _logInputText.asStateFlow()
@@ -143,10 +151,29 @@ class AnalysisViewModel(
     fun loadFromUri(context: Context, uri: Uri, filename: String?) {
         viewModelScope.launch {
             _uiState.value = AnalysisUiState.Analyzing
+            _analysisStage.value = DiagnosticAnalysisStage.PREPARING
             _selectedFilename.value = filename
             try {
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val content = inputStream?.bufferedReader()?.use(BufferedReader::readText) ?: ""
+                val readResult = withContext(Dispatchers.IO) {
+                    val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: ByteArray(0)
+                    if (PanicLogTextDecoder.isLegacyCharacterSpaced(bytes)) {
+                        Pair<String?, Boolean>(null, true)
+                    } else {
+                        Pair(
+                            PanicLogAnalysisWindow.forAnalysis(PanicLogTextDecoder.decode(bytes)),
+                            false
+                        )
+                    }
+                }
+
+                if (readResult.second) {
+                    _uiState.value = AnalysisUiState.Error(
+                        "Archivo alterado o no compatible. Vuelve a exportar/copiar el panic log original y vuelve a intentarlo."
+                    )
+                    return@launch
+                }
+
+                val content = readResult.first.orEmpty()
                 _logInputText.value = content
                 analyzeText(content, filename)
             } catch (e: Exception) {
@@ -179,13 +206,20 @@ class AnalysisViewModel(
             _uiState.value = AnalysisUiState.Analyzing
             try {
                 val saveRawLogs = settingsRepository.saveRawLogsFlow.first()
-                val report = diagnosticRepository.analyzeLog(
-                    rawLogContent = text,
-                    sourceFilename = _selectedFilename.value,
-                    saveRawLog = saveRawLogs
-                )
+                val report = withTimeout(ANALYSIS_TIMEOUT_MS) {
+                    diagnosticRepository.analyzeLog(
+                        rawLogContent = text,
+                        sourceFilename = _selectedFilename.value,
+                        saveRawLog = saveRawLogs,
+                        onStage = { _analysisStage.value = it }
+                    )
+                }
                 _uiState.value = AnalysisUiState.Success(report)
                 onSuccess(report.id)
+            } catch (_: TimeoutCancellationException) {
+                _uiState.value = AnalysisUiState.Error(
+                    "El análisis excedió el tiempo seguro. El log puede contener una sección no diagnóstica demasiado grande."
+                )
             } catch (e: Exception) {
                 e.printStackTrace()
                 _uiState.value = AnalysisUiState.Error("Fallo en el motor de diagnóstico: ${e.localizedMessage}")
@@ -196,12 +230,19 @@ class AnalysisViewModel(
     private suspend fun analyzeText(text: String, filename: String?) {
         try {
             val saveRawLogs = settingsRepository.saveRawLogsFlow.first()
-            val report = diagnosticRepository.analyzeLog(
-                rawLogContent = text,
-                sourceFilename = filename,
-                saveRawLog = saveRawLogs
-            )
+            val report = withTimeout(ANALYSIS_TIMEOUT_MS) {
+                diagnosticRepository.analyzeLog(
+                    rawLogContent = text,
+                    sourceFilename = filename,
+                    saveRawLog = saveRawLogs,
+                    onStage = { _analysisStage.value = it }
+                )
+            }
             _uiState.value = AnalysisUiState.Success(report)
+        } catch (_: TimeoutCancellationException) {
+            _uiState.value = AnalysisUiState.Error(
+                "El análisis excedió el tiempo seguro. El log puede contener una sección no diagnóstica demasiado grande."
+            )
         } catch (e: Exception) {
             e.printStackTrace()
             _uiState.value = AnalysisUiState.Error("Fallo en el motor de diagnóstico: ${e.localizedMessage}")
@@ -235,6 +276,10 @@ class AnalysisViewModel(
     fun resetState() {
         _uiState.value = AnalysisUiState.Idle
         _repairSuggestionState.value = com.example.domain.model.RepairSuggestionUiState.Idle
+    }
+
+    private companion object {
+        const val ANALYSIS_TIMEOUT_MS = 30_000L
     }
 }
 

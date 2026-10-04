@@ -34,7 +34,6 @@ import com.example.ui.analysis.AnalysisViewModel
 import com.example.ui.analysis.AnalyzingScreen
 import com.example.ui.components.HexagonMicroscopeEmblem
 import com.example.ui.theme.*
-import java.io.BufferedReader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,39 +45,46 @@ fun ImportFileScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val analysisStage by viewModel.analysisStage.collectAsState()
 
     var selectedFileName by remember { mutableStateOf<String?>(null) }
-    var fileContent by remember { mutableStateOf<String?>(null) }
     var fileSizeKb by remember { mutableStateOf<Long?>(null) }
 
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         if (uri != null) {
-            try {
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val text = inputStream?.bufferedReader()?.use(BufferedReader::readText) ?: ""
-                var name = uri.lastPathSegment ?: "panic_log.ips"
-                if (name.contains("/")) name = name.substringAfterLast("/")
-                selectedFileName = name
-                fileContent = text
-                fileSizeKb = (text.toByteArray().size / 1024).toLong()
-            } catch (e: Exception) {
-                Toast.makeText(context, "Error al leer archivo: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+            var name = uri.lastPathSegment ?: "panic_log.ips"
+            if (name.contains("/")) name = name.substringAfterLast("/")
+            selectedFileName = name
+            fileSizeKb = null
+
+            // Use exactly the same import/analyze path as ACTION_VIEW / "Abrir con PanicLab".
+            viewModel.loadFromUri(context, uri, name)
         }
     }
 
     LaunchedEffect(uiState) {
-        if (uiState is AnalysisUiState.Success) {
-            val report = (uiState as AnalysisUiState.Success).report
-            onAnalysisSuccess(report.id)
-            viewModel.resetState()
+        when (val state = uiState) {
+            is AnalysisUiState.Success -> {
+                onAnalysisSuccess(state.report.id)
+                viewModel.resetState()
+            }
+
+            is AnalysisUiState.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                viewModel.resetState()
+            }
+
+            else -> Unit
         }
     }
 
     if (uiState is AnalysisUiState.Analyzing) {
-        AnalyzingScreen(currentStepText = "Escaneando archivo .ips y sensor array...")
+        AnalyzingScreen(
+            currentStepText = "Escaneando archivo .ips y sensor array...",
+            stage = analysisStage
+        )
         return
     }
 
@@ -126,12 +132,7 @@ fun ImportFileScreen(
                 ) {
                     Button(
                         onClick = {
-                            val content = fileContent
-                            if (!content.isNullOrBlank()) {
-                                viewModel.analyzeRawLog(content, selectedFileName)
-                            } else {
-                                filePickerLauncher.launch(arrayOf("*/*", "text/*", "application/json"))
-                            }
+                            filePickerLauncher.launch(arrayOf("*/*", "text/*", "application/json"))
                         },
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = ElectricBlue),
@@ -141,13 +142,13 @@ fun ImportFileScreen(
                             .testTag("start_file_analysis_button")
                     ) {
                         Icon(
-                            imageVector = if (fileContent != null) Icons.Default.Troubleshoot else Icons.Default.FileUpload,
+                            imageVector = Icons.Default.FileUpload,
                             contentDescription = null,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (fileContent != null) "Analizar ahora >" else "Seleccionar Archivo de Registro",
+                            text = "Seleccionar Archivo de Registro",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -258,13 +259,13 @@ fun ImportFileScreen(
 
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "¿Tienes el log en otra pantalla o en papel?",
+                                text = "¿Tienes una foto o captura del log?",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
                             Text(
-                                text = "Escanear con Cámara (OCR automático)",
+                                text = "Abrir cámara o seleccionar imagen (OCR)",
                                 fontSize = 11.sp,
                                 color = ElectricCyanLight
                             )

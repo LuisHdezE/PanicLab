@@ -29,12 +29,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.domain.repository.DiagnosticAnalysisStage
 import com.example.ui.components.HexagonMicroscopeEmblem
 import com.example.ui.theme.*
 
 @Composable
 fun AnalyzingScreen(
     currentStepText: String = "Escaneando sensor array y códigos SMC...",
+    stage: DiagnosticAnalysisStage? = null,
     modifier: Modifier = Modifier
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "analyzing_anim")
@@ -48,15 +50,24 @@ fun AnalyzingScreen(
         label = "rotation"
     )
 
-    val progressValue by infiniteTransition.animateFloat(
-        initialValue = 0.2f,
-        targetValue = 0.95f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2500, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "progress"
-    )
+    val progressValue = stage?.let {
+        (it.ordinal + 1).toFloat() / DiagnosticAnalysisStage.entries.size.toFloat()
+    } ?: 0.5f
+
+    val effectiveStepText = when (stage) {
+        DiagnosticAnalysisStage.PREPARING -> "Preparando log y base local"
+        DiagnosticAnalysisStage.METADATA -> "Extrayendo encabezado y metadatos"
+        DiagnosticAnalysisStage.DEVICE -> "Resolviendo modelo del dispositivo"
+        DiagnosticAnalysisStage.CLASSIFYING -> "Clasificando familia de pánico"
+        DiagnosticAnalysisStage.SENSORS -> "Extrayendo sensores y códigos"
+        DiagnosticAnalysisStage.EVIDENCE -> "Construyendo evidencias técnicas"
+        DiagnosticAnalysisStage.RULES -> "Evaluando base determinista"
+        DiagnosticAnalysisStage.RANKING -> "Priorizando diagnóstico"
+        DiagnosticAnalysisStage.REPORT -> "Generando informe técnico"
+        DiagnosticAnalysisStage.PERSISTING -> "Guardando resultado"
+        DiagnosticAnalysisStage.COMPLETE -> "Análisis completado"
+        null -> currentStepText
+    }
 
     Column(
         modifier = modifier
@@ -152,7 +163,7 @@ fun AnalyzingScreen(
                         isActive = false
                     )
                     AnalysisStepItem(
-                        text = currentStepText,
+                        text = effectiveStepText,
                         isCompleted = false,
                         isActive = true
                     )

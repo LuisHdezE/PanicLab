@@ -196,16 +196,19 @@ fun ResultScreen(
                     ) {
                         HexagonMicroscopeEmblem(size = 40.dp)
                         Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = deviceName,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Spacer(modifier = Modifier.height(3.dp))
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(6.dp)
                             ) {
-                                Text(
-                                    text = deviceName,
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(6.dp))
@@ -217,16 +220,20 @@ fun ResultScreen(
                                         fontSize = 10.sp,
                                         fontFamily = FontFamily.Monospace,
                                         fontWeight = FontWeight.Bold,
-                                        color = ElectricCyanLight
+                                        color = ElectricCyanLight,
+                                        maxLines = 1,
+                                        softWrap = false
                                     )
                                 }
+                                Text(
+                                    text = "Base v${report.knowledgeBaseVersion} • ${report.panicFamilies.joinToString(", ") { it.name }}",
+                                    fontSize = 11.sp,
+                                    color = Color(0xFF94A3B8),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1f)
+                                )
                             }
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = "Base v${report.knowledgeBaseVersion} • ${report.panicFamilies.joinToString(", ") { it.name }}",
-                                fontSize = 11.sp,
-                                color = Color(0xFF94A3B8)
-                            )
                         }
                         ConfidenceBadge(level = report.confidence)
                     }

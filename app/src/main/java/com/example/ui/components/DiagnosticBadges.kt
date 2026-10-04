@@ -79,7 +79,9 @@ fun VerificationBadge(
             color = fg,
             fontSize = 10.sp,
             fontWeight = FontWeight.Bold,
-            letterSpacing = 0.5.sp
+            letterSpacing = 0.5.sp,
+            maxLines = 1,
+            softWrap = false
         )
     }
 }
