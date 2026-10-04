@@ -13,6 +13,7 @@ import com.example.domain.model.*
 import com.example.domain.repository.DiagnosticRepository
 import com.example.domain.repository.KnowledgeBaseRepository
 import com.example.parser.*
+import com.example.util.PanicLogAnalysisWindow
 import com.example.util.RulePackJsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -40,8 +41,11 @@ class DiagnosticRepositoryImpl(
         // Ensure knowledge base is seeded
         kbRepository.initializeDefaultRulePackIfNeeded()
 
-        // 1. Normalize
-        val normalizedLog = LogNormalizer.normalize(rawLogContent)
+        // 1. Bound oversized reports before regex-heavy deterministic analysis.
+        // Apple panic logs keep the diagnostic header/panicString at the beginning;
+        // retaining a tail also preserves late footer signals without scanning megabytes.
+        val analysisInput = PanicLogAnalysisWindow.forAnalysis(rawLogContent)
+        val normalizedLog = LogNormalizer.normalize(analysisInput)
 
         // 2. Extract Metadata
         val metadata = MetadataExtractor.extract(normalizedLog)
@@ -291,7 +295,7 @@ class DiagnosticRepositoryImpl(
 
             val rawLog = sessionEntity.rawLog
             val (evaluatedPrimary, evaluatedAlts, appliedRules, updatedEvidences) = if (!rawLog.isNullOrBlank()) {
-                val normalizedLog = LogNormalizer.normalize(rawLog)
+                val normalizedLog = LogNormalizer.normalize(PanicLogAnalysisWindow.forAnalysis(rawLog))
                 val metadata = MetadataExtractor.extract(normalizedLog)
                 val reclassifiedFamilies = PanicClassifier.classify(normalizedLog, metadata.panicString)
                 val sensors = SensorExtractor.extract(normalizedLog, metadata.panicString)
