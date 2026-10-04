@@ -20,6 +20,8 @@ import com.example.data.repository.KnowledgeBaseRepositoryImpl
 import com.example.data.repository.SettingsRepositoryImpl
 import com.example.navigation.PanicLabNavGraph
 import com.example.navigation.Screen
+import com.example.release.TrialAccessManager
+import com.example.release.TrialExpiredScreen
 import com.example.ui.analysis.AnalysisViewModel
 import com.example.ui.analysis.AnalysisViewModelFactory
 import com.example.ui.history.HistoryViewModel
@@ -38,6 +40,7 @@ class MainActivity : ComponentActivity() {
 
         val database = AppDatabase.getDatabase(applicationContext)
         val dataStoreManager = DataStoreManager(applicationContext)
+        val trialAccessManager = TrialAccessManager(applicationContext)
 
         val kbRepository = KnowledgeBaseRepositoryImpl(applicationContext, database)
         val settingsRepository = SettingsRepositoryImpl(dataStoreManager)
@@ -79,21 +82,35 @@ class MainActivity : ComponentActivity() {
 
             PanicLabTheme(darkTheme = isDarkTheme) {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    val navController = rememberNavController()
+                    var trialState by remember { mutableStateOf(trialAccessManager.currentState()) }
 
-                    PanicLabNavGraph(
-                        navController = navController,
-                        diagnosticRepository = diagnosticRepository,
-                        kbRepository = kbRepository,
-                        settingsRepository = settingsRepository,
-                        analysisViewModel = analysisViewModel,
-                        historyViewModel = historyViewModel,
-                        kbViewModel = kbViewModel,
-                        settingsViewModel = settingsViewModel,
-                        trendDashboardViewModel = trendDashboardViewModel,
-                        recentReports = recentReports,
-                        kbVersion = kbVersion
-                    )
+                    if (trialState.canUseApp) {
+                        val navController = rememberNavController()
+
+                        PanicLabNavGraph(
+                            navController = navController,
+                            diagnosticRepository = diagnosticRepository,
+                            kbRepository = kbRepository,
+                            settingsRepository = settingsRepository,
+                            analysisViewModel = analysisViewModel,
+                            historyViewModel = historyViewModel,
+                            kbViewModel = kbViewModel,
+                            settingsViewModel = settingsViewModel,
+                            trendDashboardViewModel = trendDashboardViewModel,
+                            recentReports = recentReports,
+                            kbVersion = kbVersion
+                        )
+                    } else {
+                        TrialExpiredScreen(
+                            onActivate = { code ->
+                                val activated = trialAccessManager.activate(code)
+                                if (activated) {
+                                    trialState = trialAccessManager.currentState()
+                                }
+                                activated
+                            }
+                        )
+                    }
                 }
             }
         }
