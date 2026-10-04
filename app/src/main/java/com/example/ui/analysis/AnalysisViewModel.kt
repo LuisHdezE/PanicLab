@@ -154,10 +154,26 @@ class AnalysisViewModel(
             _analysisStage.value = DiagnosticAnalysisStage.PREPARING
             _selectedFilename.value = filename
             try {
-                val content = withContext(Dispatchers.IO) {
+                val readResult = withContext(Dispatchers.IO) {
                     val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: ByteArray(0)
-                    PanicLogAnalysisWindow.forAnalysis(PanicLogTextDecoder.decode(bytes))
+                    if (PanicLogTextDecoder.isLegacyCharacterSpaced(bytes)) {
+                        Pair<String?, Boolean>(null, true)
+                    } else {
+                        Pair(
+                            PanicLogAnalysisWindow.forAnalysis(PanicLogTextDecoder.decode(bytes)),
+                            false
+                        )
+                    }
                 }
+
+                if (readResult.second) {
+                    _uiState.value = AnalysisUiState.Error(
+                        "Archivo alterado o no compatible. Vuelve a exportar/copiar el panic log original y vuelve a intentarlo."
+                    )
+                    return@launch
+                }
+
+                val content = readResult.first.orEmpty()
                 _logInputText.value = content
                 analyzeText(content, filename)
             } catch (e: Exception) {
