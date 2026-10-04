@@ -68,6 +68,7 @@ class ADX005AndroidBugReportAnalyzerTest {
         appendLine("========================================================")
         appendLine("== dumpstate: 2026-09-27 11:01:00")
         appendLine("========================================================")
+        appendLine("Build fingerprint: 'google/shiba/shiba:16/BP2A.260927.001/123456:user/release-keys'")
         appendLine("[ro.product.manufacturer]: [Google]")
         appendLine("[ro.product.model]: [Pixel 8]")
         appendLine("[ro.build.version.release]: [16]")
