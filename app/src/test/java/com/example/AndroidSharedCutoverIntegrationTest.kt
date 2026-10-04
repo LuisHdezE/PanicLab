@@ -8,6 +8,7 @@ import com.example.data.repository.DiagnosticRepositoryImpl
 import com.example.data.repository.KnowledgeBaseRepositoryImpl
 import com.example.domain.model.ConfidenceLevel
 import com.example.domain.model.PanicFamily
+import com.example.ocr.OcrLogExtractor
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -142,6 +143,33 @@ class AndroidSharedCutoverIntegrationTest {
         assertEquals("iPhone12,8", report.productCode)
         assertNotNull(report.id)
         assertNotNull(repository.getSessionById(report.id))
+    }
+
+    @Test
+    fun ocrIPhone15ScreenshotPattern_resolvesFrontSensorThroughRealRulePack() = runBlocking {
+        val ocrText = """
+            product : iPhone15,4
+            panicString : panic(cpu 0 caller 0xfffffff03e4c1a88): SMC PANIC - ASSERT target/vd37/vtarget.cpp:316: 0, SMC BSC failure
+            S.sensor array 0 - 5 is 0, 1048576, 0, 0, 0
+        """.trimIndent()
+
+        val scan = OcrLogExtractor.processScannedText(ocrText)
+        assertTrue(scan.hasValidPanicSignatures)
+        assertEquals("iPhone15,4", scan.detectedDeviceModel)
+        assertTrue(scan.detectedPanicCodes.any { it.equals("0x100000", ignoreCase = true) })
+
+        val report = repository.analyzeLog(
+            rawLogContent = scan.cleanedText,
+            sourceFilename = "facebook-screenshot-ocr.ips",
+            saveRawLog = false
+        )
+
+        assertEquals("iPhone15,4", report.productCode)
+        assertEquals("iPhone 15", report.deviceModel?.marketingName)
+        assertTrue(report.panicFamilies.contains(PanicFamily.SMC_BSC_FAILURE))
+        assertEquals("smc15base_0x100000", report.primaryCandidate?.ruleId)
+        assertEquals("Sensor frontal", report.primaryCandidate?.label)
+        assertEquals(ConfidenceLevel.HIGH, report.confidence)
     }
 
     @Test
