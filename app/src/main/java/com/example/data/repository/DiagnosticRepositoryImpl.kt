@@ -10,6 +10,7 @@ import com.example.diagnostic.DiagnosticRulesEngine
 import com.example.diagnostic.ExtractedSensors
 import com.example.diagnostic.SensorExtractor
 import com.example.domain.model.*
+import com.example.domain.repository.DiagnosticAnalysisStage
 import com.example.domain.repository.DiagnosticRepository
 import com.example.domain.repository.KnowledgeBaseRepository
 import com.example.parser.*
