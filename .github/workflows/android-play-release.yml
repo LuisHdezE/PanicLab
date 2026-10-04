@@ -1,0 +1,70 @@
+name: Android Play Release Bundle
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-play-aab:
+    name: Build signed Play AAB
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle 9.3.1
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.3.1'
+
+      - name: Configure Android SDK path
+        shell: bash
+        run: printf 'sdk.dir=%s\n' "$ANDROID_HOME" > local.properties
+
+      - name: Restore Play upload keystore
+        shell: bash
+        env:
+          PLAY_UPLOAD_KEYSTORE_B64: ${{ secrets.PLAY_UPLOAD_KEYSTORE_B64 }}
+        run: |
+          test -n "$PLAY_UPLOAD_KEYSTORE_B64"
+          printf '%s' "$PLAY_UPLOAD_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/paniclab-upload-key.jks"
+          keytool -list \
+            -keystore "$RUNNER_TEMP/paniclab-upload-key.jks" \
+            -storepass "${{ secrets.PLAY_UPLOAD_STORE_PASSWORD }}" \
+            -alias upload >/dev/null
+
+      - name: Build signed release bundle
+        shell: bash
+        env:
+          KEYSTORE_PATH: ${{ runner.temp }}/paniclab-upload-key.jks
+          STORE_PASSWORD: ${{ secrets.PLAY_UPLOAD_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.PLAY_UPLOAD_KEY_PASSWORD }}
+        run: gradle :app:bundleRelease --stacktrace
+
+      - name: Verify release bundle
+        shell: bash
+        run: |
+          AAB="app/build/outputs/bundle/release/app-release.aab"
+          test -f "$AAB"
+          jarsigner -verify -strict "$AAB"
+          sha256sum "$AAB" | tee "$AAB.sha256"
+
+      - name: Upload signed Play bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: paniclab-play-release-aab
+          path: |
+            app/build/outputs/bundle/release/app-release.aab
+            app/build/outputs/bundle/release/app-release.aab.sha256
+          if-no-files-found: error
+          retention-days: 14
