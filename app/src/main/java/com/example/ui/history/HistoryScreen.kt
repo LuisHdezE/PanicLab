@@ -409,23 +409,22 @@ private fun HistorySessionItem(
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = deviceName,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Text(
-                        text = "• $dateStr",
-                        fontSize = 11.sp,
-                        color = Color(0xFF94A3B8)
-                    )
-                }
-                Spacer(modifier = Modifier.height(3.dp))
+                Text(
+                    text = deviceName,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = dateStr,
+                    fontSize = 11.sp,
+                    color = Color(0xFF94A3B8),
+                    maxLines = 1
+                )
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = report.primaryCandidate?.label ?: "Diagnóstico no concluyente",
                     fontSize = 13.sp,
