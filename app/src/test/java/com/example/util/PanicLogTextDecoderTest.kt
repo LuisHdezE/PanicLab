@@ -44,9 +44,9 @@ class PanicLogTextDecoderTest {
 
         val decoded = PanicLogTextDecoder.decode(spaced.toByteArray(Charsets.UTF_8))
 
-        assertTrue(decoded.contains(""""bug_type":"210""""))
-        assertTrue(decoded.contains(""""product":"iPhone12,8""""))
-        assertTrue(decoded.contains(""""panicString":"Missing sensor(s): mic1""""))
+        assertTrue(decoded.contains("\"bug_type\":\"210\""))
+        assertTrue(decoded.contains("\"product\":\"iPhone12,8\""))
+        assertTrue(decoded.contains("\"panicString\":\"Missing sensor(s): mic1\""))
     }
 
     @Test
