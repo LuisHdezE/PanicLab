@@ -34,7 +34,11 @@ import com.example.ui.analysis.AnalysisViewModel
 import com.example.ui.analysis.AnalyzingScreen
 import com.example.ui.components.HexagonMicroscopeEmblem
 import com.example.ui.theme.*
+import com.example.util.PanicLogAnalysisWindow
 import com.example.util.PanicLogTextDecoder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +49,7 @@ fun ImportFileScreen(
     onAnalysisSuccess: (String) -> Unit
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
 
     var selectedFileName by remember { mutableStateOf<String?>(null) }
@@ -55,16 +60,32 @@ fun ImportFileScreen(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         if (uri != null) {
-            try {
-                val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: ByteArray(0)
-                val text = PanicLogTextDecoder.decode(bytes)
-                var name = uri.lastPathSegment ?: "panic_log.ips"
-                if (name.contains("/")) name = name.substringAfterLast("/")
-                selectedFileName = name
-                fileContent = text
-                fileSizeKb = (bytes.size / 1024).toLong()
-            } catch (e: Exception) {
-                Toast.makeText(context, "Error al leer archivo: ${e.message}", Toast.LENGTH_SHORT).show()
+            scope.launch {
+                try {
+                    val loaded = withContext(Dispatchers.IO) {
+                        val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: ByteArray(0)
+                        val decoded = PanicLogTextDecoder.decode(bytes)
+                        Triple(
+                            PanicLogAnalysisWindow.forAnalysis(decoded),
+                            (bytes.size / 1024).toLong(),
+                            decoded.length > PanicLogAnalysisWindow.MAX_ANALYSIS_CHARS
+                        )
+                    }
+                    var name = uri.lastPathSegment ?: "panic_log.ips"
+                    if (name.contains("/")) name = name.substringAfterLast("/")
+                    selectedFileName = name
+                    fileContent = loaded.first
+                    fileSizeKb = loaded.second
+                    if (loaded.third) {
+                        Toast.makeText(
+                            context,
+                            "Log grande: se usará una ventana segura de análisis.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(context, "Error al leer archivo: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
