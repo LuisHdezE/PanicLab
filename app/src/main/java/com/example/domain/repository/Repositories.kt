@@ -22,11 +22,26 @@ interface KnowledgeBaseRepository {
     suspend fun restoreRulePackVersion(version: String): Result<String>
 }
 
+enum class DiagnosticAnalysisStage {
+    PREPARING,
+    METADATA,
+    DEVICE,
+    CLASSIFYING,
+    SENSORS,
+    EVIDENCE,
+    RULES,
+    RANKING,
+    REPORT,
+    PERSISTING,
+    COMPLETE
+}
+
 interface DiagnosticRepository {
     suspend fun analyzeLog(
         rawLogContent: String,
         sourceFilename: String?,
-        saveRawLog: Boolean
+        saveRawLog: Boolean,
+        onStage: ((DiagnosticAnalysisStage) -> Unit)? = null
     ): DiagnosticReport
 
     fun getSessionHistory(): Flow<List<DiagnosticReport>>
