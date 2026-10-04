@@ -101,6 +101,51 @@ class AndroidSharedCutoverIntegrationTest {
     }
 
     @Test
+    fun characterSpacedThermalWatchdogFixture_completesThroughRepositoryAndRoom() = runBlocking {
+        val verboseKernelTail = buildString {
+            append("\\nDebugger message: panic")
+            append("\\nMemory ID: 0x1")
+            repeat(180) { index ->
+                append("\\ncom.apple.driver.VerboseKernelDriver")
+                append(index)
+                append(" 1.0 0xfffffff0")
+                append(index.toString(16).padStart(8, '0'))
+            }
+            append("\\ncom.apple.driver.AppleSMC 3.1.9")
+            append("\\ncom.apple.driver.AppleBasebandI19 1.0.0d1")
+            append("\\ncom.apple.iokit.IOHDCPFamily 1.0.0")
+        }
+        val compactLog =
+            "{ \"bug_type\" : \"210\", \"os_version\" : \"iPhone OS 17.6.1\" }\\n" +
+                "{ \"product\" : \"iPhone12,8\", \"panicString\" : \"" +
+                "panic(cpu 0 caller 0xfffffff02197697c): userspace watchdog timeout: " +
+                "no successful checkins from thermalmonitord (2 induced crashes) " +
+                "\\nservice returned not alive with context: Missing sensor(s): mic1 " +
+                verboseKernelTail +
+                "\", \"bug_type\" : \"210\", \"repairStatus\" : \"1\" }"
+
+        val characterSpaced = compactLog
+            .replace(" ", "   ")
+            .toCharArray()
+            .joinToString(" ")
+        val decoded = com.example.util.PanicLogTextDecoder.decode(characterSpaced.toByteArray())
+        val bounded = com.example.util.PanicLogAnalysisWindow.forAnalysis(decoded)
+
+        val report = kotlinx.coroutines.withTimeout(10_000L) {
+            repository.analyzeLog(
+                rawLogContent = bounded,
+                sourceFilename = "character-spaced-watchdog.txt",
+                saveRawLog = false
+            )
+        }
+
+        assertEquals("iPhone12,8", report.productCode)
+        assertTrue(report.panicFamilies.contains(PanicFamily.THERMAL_MISSING_SENSOR))
+        assertTrue(report.evidences.any { it.type == "MISSING_SENSOR" && it.rawValue.equals("mic1", true) })
+        assertNotNull(repository.getSessionById(report.id))
+    }
+
+    @Test
     fun decimalSensorFixture_keepsProductRulePackSemanticsThroughSharedEngine() = runBlocking {
         val rawLog = """
             "product":"iPhone14,7"
