@@ -70,6 +70,7 @@ fun CameraLogScannerScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
+    val analysisStage by viewModel.analysisStage.collectAsState()
 
     var hasCameraPermission by remember {
         mutableStateOf(
@@ -123,7 +124,10 @@ fun CameraLogScannerScreen(
     }
 
     if (uiState is AnalysisUiState.Analyzing) {
-        AnalyzingScreen(currentStepText = "Analizando texto extraído por OCR con motor determinista...")
+        AnalyzingScreen(
+            currentStepText = "Analizando texto extraído por OCR con motor determinista...",
+            stage = analysisStage
+        )
         return
     }
 
@@ -292,6 +296,26 @@ fun CameraLogScannerScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        OutlinedButton(
+                            onClick = { galleryPickerLauncher.launch("image/*") },
+                            shape = RoundedCornerShape(14.dp),
+                            border = BorderStroke(1.dp, ElectricCyanLight.copy(alpha = 0.5f)),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(46.dp)
+                                .testTag("scanner_gallery_primary_btn")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.PhotoLibrary,
+                                contentDescription = null,
+                                tint = ElectricCyanLight,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Seleccionar foto o captura", fontWeight = FontWeight.Bold)
+                        }
+
                         // Capture and Review Button
                         Button(
                             onClick = {
@@ -471,11 +495,24 @@ fun CameraLogScannerScreen(
 
                     Button(
                         onClick = {
-                            if (editableLogText.isNotBlank()) {
-                                showReviewSheet = false
-                                viewModel.analyzeRawLog(editableLogText, "scan_ocr.ips")
-                            } else {
+                            if (editableLogText.isBlank()) {
                                 Toast.makeText(context, "El texto del log no puede estar vacío", Toast.LENGTH_SHORT).show()
+                            } else {
+                                val reviewed = OcrLogExtractor.processScannedText(editableLogText)
+                                val hasMinimumContext =
+                                    reviewed.detectedDeviceModel != null &&
+                                        reviewed.hasValidPanicSignatures
+
+                                if (!hasMinimumContext) {
+                                    Toast.makeText(
+                                        context,
+                                        "OCR insuficiente: captura el modelo del iPhone y las líneas del panicString/sensor array.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } else {
+                                    showReviewSheet = false
+                                    viewModel.analyzeRawLog(reviewed.cleanedText, "scan_ocr.ips")
+                                }
                             }
                         },
                         shape = RoundedCornerShape(14.dp),
