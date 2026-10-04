@@ -51,9 +51,12 @@ class TrialAccessManagerTest {
 
     @Test
     fun temporaryReleaseCodeActivatesTheApp() {
-        val manager = TrialAccessManager(context)
+        val manager = TrialAccessManager(
+            context,
+            activationCodeSha256 = "e49f2c0ee9a1370e1ebeb3d14564210df48514965ac88fcd155b5e6caf0f4071"
+        )
 
-        assertTrue(manager.activate("PANICLAB-RC1-2026"))
+        assertTrue(manager.activate("TEST-CODE"))
         assertTrue(manager.currentState(nowEpochMs = Long.MAX_VALUE / 4).canUseApp)
     }
 
