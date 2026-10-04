@@ -36,8 +36,10 @@ class DiagnosticRepositoryImpl(
     override suspend fun analyzeLog(
         rawLogContent: String,
         sourceFilename: String?,
-        saveRawLog: Boolean
+        saveRawLog: Boolean,
+        onStage: ((DiagnosticAnalysisStage) -> Unit)?
     ): DiagnosticReport = withContext(Dispatchers.IO) {
+        onStage?.invoke(DiagnosticAnalysisStage.PREPARING)
         // Ensure knowledge base is seeded
         kbRepository.initializeDefaultRulePackIfNeeded()
 
@@ -48,18 +50,23 @@ class DiagnosticRepositoryImpl(
         val normalizedLog = LogNormalizer.normalize(analysisInput)
 
         // 2. Extract Metadata
+        onStage?.invoke(DiagnosticAnalysisStage.METADATA)
         val metadata = MetadataExtractor.extract(normalizedLog)
 
         // 3. Resolve Device Model
+        onStage?.invoke(DiagnosticAnalysisStage.DEVICE)
         val deviceModel = DeviceResolver.resolve(metadata.product, deviceDao)
 
         // 4. Classify Panic Families
+        onStage?.invoke(DiagnosticAnalysisStage.CLASSIFYING)
         val panicFamilies = PanicClassifier.classify(normalizedLog, metadata.panicString)
 
         // 5. Extract Sensors & Codes
+        onStage?.invoke(DiagnosticAnalysisStage.SENSORS)
         val extractedSensors = SensorExtractor.extract(normalizedLog, metadata.panicString)
 
         // 6. Extract Evidences
+        onStage?.invoke(DiagnosticAnalysisStage.EVIDENCE)
         val evidences = EvidenceExtractor.extractEvidences(
             logText = normalizedLog,
             metadata = metadata,
@@ -68,6 +75,7 @@ class DiagnosticRepositoryImpl(
         )
 
         // 7. Load all rules and evaluate
+        onStage?.invoke(DiagnosticAnalysisStage.RULES)
         val allRules = kbRepository.getAllRulesDirect()
         val ruleMatchResult = DiagnosticRulesEngine.evaluate(
             deviceModel = deviceModel,
@@ -78,6 +86,7 @@ class DiagnosticRepositoryImpl(
         )
 
         // 8. Rank candidates
+        onStage?.invoke(DiagnosticAnalysisStage.RANKING)
         val (primaryCandidate, altCandidates) = CandidateRanker.toCandidates(
             primaryRule = ruleMatchResult.primaryRule,
             alternativeRules = ruleMatchResult.alternativeRules
@@ -86,6 +95,7 @@ class DiagnosticRepositoryImpl(
         val kbVersion = kbRepository.getCurrentRulePackVersion()
 
         // 9. Build Report
+        onStage?.invoke(DiagnosticAnalysisStage.REPORT)
         val report = DiagnosticReportBuilder.build(
             sourceFilename = sourceFilename,
             rawLog = normalizedLog,
@@ -100,7 +110,9 @@ class DiagnosticRepositoryImpl(
         )
 
         // 10. Persist Session, Evidences, Candidates to Room
+        onStage?.invoke(DiagnosticAnalysisStage.PERSISTING)
         saveSessionToDatabase(report, ruleMatchResult.appliedRuleIds, saveRawLog, normalizedLog)
+        onStage?.invoke(DiagnosticAnalysisStage.COMPLETE)
 
         report
     }
