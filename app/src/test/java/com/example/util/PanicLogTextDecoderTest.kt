@@ -73,6 +73,22 @@ class PanicLogTextDecoderTest {
     }
 
     @Test
+    fun largeUtf16PanicLogCanBeDecodedAndBoundedForAnalysis() {
+        val header =
+            """{"product":"iPhone14,7","panicString":"SMC PANIC - SMC BSC failure - S.sensor array 0 - 5 is 0, 4194304, 0, 0, 0"}"""
+        val text = header + "\n" + "kernel_task ".repeat(45_000) + "\nDebugger message: panic"
+        val bytes = byteArrayOf(0xFF.toByte(), 0xFE.toByte()) + text.toByteArray(Charsets.UTF_16LE)
+
+        val decoded = PanicLogTextDecoder.decode(bytes)
+        val analysisText = PanicLogAnalysisWindow.forAnalysis(decoded)
+
+        assertTrue(analysisText.length <= PanicLogAnalysisWindow.MAX_ANALYSIS_CHARS + 100)
+        assertTrue(analysisText.contains("iPhone14,7"))
+        assertTrue(analysisText.contains("4194304"))
+        assertTrue(analysisText.contains("Debugger message: panic"))
+    }
+
+    @Test
     fun smallPanicLogIsNotChangedByAnalysisWindow() {
         val text = """{"product":"iPhone14,7","panicString":"SMC PANIC"}"""
 
