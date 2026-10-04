@@ -44,6 +44,18 @@ class PanicLogTextDecoderTest {
     }
 
     @Test
+    fun detectsLegacyCharacterSpacedFileBeforeAnalysis() {
+        val spaced =
+            """{ " b u g _ t y p e " : " 2 1 0 " , " p r o d u c t " : " i P h o n e 1 2 , 8 " , " p a n i c S t r i n g " : " M i s s i n g   s e n s o r ( s ) :   m i c 1 " }"""
+
+        assertTrue(
+            PanicLogTextDecoder.isLegacyCharacterSpaced(
+                spaced.toByteArray(Charsets.UTF_8)
+            )
+        )
+    }
+
+    @Test
     fun normalizesLegacyCharacterSpacedPanicLog() {
         val spaced =
             """{ " b u g _ t y p e " : " 2 1 0 " , " p r o d u c t " : " i P h o n e 1 2 , 8 " , " p a n i c S t r i n g " : " M i s s i n g   s e n s o r ( s ) :   m i c 1 " }"""
@@ -60,7 +72,10 @@ class PanicLogTextDecoderTest {
         val text =
             """{"product":"iPhone12,8","panicString":"userspace watchdog timeout: Missing sensor(s): mic1"}"""
 
-        assertEquals(text, PanicLogTextDecoder.decode(text.toByteArray(Charsets.UTF_8)))
+        val bytes = text.toByteArray(Charsets.UTF_8)
+
+        assertFalse(PanicLogTextDecoder.isLegacyCharacterSpaced(bytes))
+        assertEquals(text, PanicLogTextDecoder.decode(bytes))
     }
 
     @Test
