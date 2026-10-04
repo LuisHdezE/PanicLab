@@ -65,6 +65,7 @@ jobs:
             --tests 'com.example.OcrLogExtractorTest' \
             --tests 'com.example.AndroidSharedCutoverIntegrationTest' \
             --tests 'com.example.RoomUpgradeSafetyTest' \
+            --tests 'com.example.util.PanicLogTextDecoderTest' \
             --stacktrace
 
       - name: Restore stable Android debug keystore
