@@ -5,10 +5,16 @@ import java.nio.charset.CodingErrorAction
 
 object PanicLogTextDecoder {
 
-    fun decode(bytes: ByteArray): String {
+    fun decode(bytes: ByteArray): String =
+        normalizeLegacyCharacterSpacing(decodeRaw(bytes))
+
+    fun isLegacyCharacterSpaced(bytes: ByteArray): Boolean =
+        looksCharacterSpaced(decodeRaw(bytes))
+
+    private fun decodeRaw(bytes: ByteArray): String {
         if (bytes.isEmpty()) return ""
 
-        val decoded = when {
+        return when {
             bytes.hasPrefix(0xEF, 0xBB, 0xBF) ->
                 decodeStrict(bytes.copyOfRange(3, bytes.size), Charsets.UTF_8)
 
@@ -21,8 +27,6 @@ object PanicLogTextDecoder {
             else ->
                 decodeStrict(bytes, Charsets.UTF_8)
         }
-
-        return normalizeLegacyCharacterSpacing(decoded)
     }
 
     private fun decodeStrict(bytes: ByteArray, charset: java.nio.charset.Charset): String =
@@ -33,18 +37,19 @@ object PanicLogTextDecoder {
             .toString()
 
     private fun normalizeLegacyCharacterSpacing(text: String): String {
-        val sample = text.take(8192)
-        val looksCharacterSpaced =
-            sample.contains("b u g _ t y p e", ignoreCase = true) ||
-                sample.contains("p a n i c S t r i n g", ignoreCase = true) ||
-                sample.contains("i P h o n e", ignoreCase = true)
-
-        if (!looksCharacterSpaced) return text
+        if (!looksCharacterSpaced(text)) return text
 
         return SPACE_RUN.replace(text) { match ->
             val originalSpaceCount = ((match.value.length - 1) / 2).coerceAtLeast(0)
             " ".repeat(originalSpaceCount)
         }
+    }
+
+    private fun looksCharacterSpaced(text: String): Boolean {
+        val sample = text.take(8192)
+        return sample.contains("b u g _ t y p e", ignoreCase = true) ||
+            sample.contains("p a n i c S t r i n g", ignoreCase = true) ||
+            sample.contains("i P h o n e", ignoreCase = true)
     }
 
     private fun ByteArray.hasPrefix(vararg values: Int): Boolean {
