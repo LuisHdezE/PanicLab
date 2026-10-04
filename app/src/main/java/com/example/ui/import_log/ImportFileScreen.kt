@@ -91,10 +91,18 @@ fun ImportFileScreen(
     }
 
     LaunchedEffect(uiState) {
-        if (uiState is AnalysisUiState.Success) {
-            val report = (uiState as AnalysisUiState.Success).report
-            onAnalysisSuccess(report.id)
-            viewModel.resetState()
+        when (val state = uiState) {
+            is AnalysisUiState.Success -> {
+                onAnalysisSuccess(state.report.id)
+                viewModel.resetState()
+            }
+
+            is AnalysisUiState.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                viewModel.resetState()
+            }
+
+            else -> Unit
         }
     }
 
