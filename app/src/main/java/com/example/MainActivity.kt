@@ -36,6 +36,9 @@ import com.example.ui.theme.PanicLabTheme
 
 class MainActivity : ComponentActivity() {
 
+    private var analysisViewModelRef: AnalysisViewModel? = null
+    private var externalFileAnalysisActive by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -52,6 +55,7 @@ class MainActivity : ComponentActivity() {
         val analysisViewModel by viewModels<AnalysisViewModel> {
             AnalysisViewModelFactory(diagnosticRepository, settingsRepository)
         }
+        analysisViewModelRef = analysisViewModel
         val historyViewModel by viewModels<HistoryViewModel> {
             HistoryViewModelFactory(diagnosticRepository)
         }
@@ -82,6 +86,48 @@ class MainActivity : ComponentActivity() {
 
                     if (trialState.canUseApp) {
                         val navController = rememberNavController()
+                        val analysisUiState by analysisViewModel.uiState.collectAsState()
+
+                        LaunchedEffect(externalFileAnalysisActive, analysisUiState) {
+                            if (!externalFileAnalysisActive) return@LaunchedEffect
+
+                            when (val state = analysisUiState) {
+                                is com.example.ui.analysis.AnalysisUiState.Analyzing -> {
+                                    if (navController.currentDestination?.route != Screen.ImportFile.route) {
+                                        navController.navigate(Screen.ImportFile.route) {
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                }
+
+                                is com.example.ui.analysis.AnalysisUiState.Success -> {
+                                    externalFileAnalysisActive = false
+                                    val currentRoute = navController.currentDestination?.route
+                                    val localAnalysisRoutes = setOf(
+                                        Screen.ImportFile.route,
+                                        Screen.PasteLog.route,
+                                        Screen.CameraScanner.route
+                                    )
+                                    if (currentRoute !in localAnalysisRoutes) {
+                                        navController.navigate(Screen.Result.createRoute(state.report.id)) {
+                                            launchSingleTop = true
+                                        }
+                                        analysisViewModel.resetState()
+                                    }
+                                }
+
+                                is com.example.ui.analysis.AnalysisUiState.Error -> {
+                                    externalFileAnalysisActive = false
+                                    if (navController.currentDestination?.route != Screen.ImportFile.route) {
+                                        navController.navigate(Screen.ImportFile.route) {
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                }
+
+                                else -> Unit
+                            }
+                        }
 
                         PanicLabNavGraph(
                             navController = navController,
@@ -122,6 +168,7 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        analysisViewModelRef?.let { handleIncomingIntent(intent, it) }
     }
 
     private fun hideNavigationBar() {
@@ -133,26 +180,35 @@ class MainActivity : ComponentActivity() {
 
     private fun handleIncomingIntent(intent: Intent?, analysisViewModel: AnalysisViewModel) {
         try {
-            if (intent == null || intent.action != Intent.ACTION_SEND) return
+            if (intent == null) return
 
-            if ("text/plain" == intent.type) {
-                val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
-                if (!sharedText.isNullOrBlank()) {
-                    analysisViewModel.updateLogInputText(sharedText)
+            val uri: Uri? = when (intent.action) {
+                Intent.ACTION_SEND -> {
+                    if ("text/plain" == intent.type) {
+                        val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
+                        if (!sharedText.isNullOrBlank()) {
+                            analysisViewModel.updateLogInputText(sharedText)
+                        }
+                    }
+
+                    @Suppress("DEPRECATION")
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+                    } else {
+                        intent.getParcelableExtra(Intent.EXTRA_STREAM)
+                    }
                 }
-            }
 
-            @Suppress("DEPRECATION")
-            val uri: Uri? = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
-            } else {
-                intent.getParcelableExtra(Intent.EXTRA_STREAM)
+                Intent.ACTION_VIEW -> intent.data
+                else -> null
             }
 
             if (uri != null) {
+                externalFileAnalysisActive = true
                 analysisViewModel.loadFromUri(applicationContext, uri, "Archivo Compartido")
             }
         } catch (e: Exception) {
+            externalFileAnalysisActive = false
             e.printStackTrace()
         }
     }
