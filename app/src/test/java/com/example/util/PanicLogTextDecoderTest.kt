@@ -6,6 +6,7 @@ import com.example.parser.LogNormalizer
 import com.example.parser.MetadataExtractor
 import com.example.parser.PanicClassifier
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -111,6 +112,37 @@ class PanicLogTextDecoderTest {
 
         assertEquals("iPhone14,7", metadata.product)
         assertTrue(PanicFamily.SMC_BSC_FAILURE in families)
+        assertTrue(sensors.sensorCodes.any { it.numericValue == 4_194_304L })
+    }
+
+    @Test
+    fun oversizedAppleProcessPayloadIsExcludedBeforeDeterministicAnalysis() {
+        val diagnosticPrefix = buildString {
+            append("{\"bug_type\":\"210\",\"os_version\":\"iPhone OS 26.5\"}\n")
+            append("{\n  \"product\" : \"iPhone14,7\",\n")
+            append("  \"panicString\" : \"SMC PANIC - SMC BSC failure\\\\n")
+            append("S.sensor array 0 - 5 is 0, 4194304, 0, 0, 0")
+            append("x".repeat(6_000))
+            append("\",\n  \"panicInitiator\" : \"SMC\",")
+        }
+        val oversizedNoise =
+            "\n  \"processByPid\" : { \"0\" : { \"procname\" : \"DCP AppleBaseband\" }, \"payload\" : \"" +
+                "z".repeat(220_000) + "\" } }"
+        val raw = diagnosticPrefix + oversizedNoise
+
+        val analysisText = PanicLogAnalysisWindow.forAnalysis(raw)
+        val normalized = LogNormalizer.normalize(analysisText)
+        val metadata = MetadataExtractor.extract(normalized)
+        val families = PanicClassifier.classify(normalized, metadata.panicString)
+        val sensors = SensorExtractor.extract(normalized, metadata.panicString)
+
+        assertTrue(analysisText.length < 20_000)
+        assertFalse(analysisText.contains("processByPid"))
+        assertFalse(analysisText.contains("AppleBaseband"))
+        assertEquals("iPhone14,7", metadata.product)
+        assertTrue(PanicFamily.SMC_BSC_FAILURE in families)
+        assertFalse(PanicFamily.DCP_DISPLAY in families)
+        assertFalse(PanicFamily.BASEBAND in families)
         assertTrue(sensors.sensorCodes.any { it.numericValue == 4_194_304L })
     }
 
