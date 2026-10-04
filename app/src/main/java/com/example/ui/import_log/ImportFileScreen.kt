@@ -259,13 +259,13 @@ fun ImportFileScreen(
 
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "¿Tienes el log en otra pantalla o en papel?",
+                                text = "¿Tienes una foto o captura del log?",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
                             Text(
-                                text = "Escanear con Cámara (OCR automático)",
+                                text = "Abrir cámara o seleccionar imagen (OCR)",
                                 fontSize = 11.sp,
                                 color = ElectricCyanLight
                             )
