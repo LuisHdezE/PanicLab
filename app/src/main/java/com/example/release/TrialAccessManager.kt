@@ -13,7 +13,10 @@ data class TrialAccessState(
         get() = isActivated || !isExpired
 }
 
-class TrialAccessManager(context: Context) {
+class TrialAccessManager(
+    context: Context,
+    private val activationCodeSha256: String = DEFAULT_ACTIVATION_CODE_SHA256
+) {
     private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
 
     fun currentState(nowEpochMs: Long = System.currentTimeMillis()): TrialAccessState {
@@ -41,7 +44,7 @@ class TrialAccessManager(context: Context) {
 
     fun activate(code: String): Boolean {
         val normalized = code.trim().uppercase()
-        if (sha256(normalized) != ACTIVATION_CODE_SHA256) {
+        if (sha256(normalized) != activationCodeSha256) {
             return false
         }
 
@@ -63,7 +66,7 @@ class TrialAccessManager(context: Context) {
         const val TRIAL_DURATION_MS = 30L * DAY_MS
 
         // Temporary Google Play validation code. Replace with production licensing after publication.
-        const val ACTIVATION_CODE_SHA256 =
+        const val DEFAULT_ACTIVATION_CODE_SHA256 =
             "75576b6da2ce16717559a3107a1d935eaf899efd425bb77831923b987007f344"
     }
 }
