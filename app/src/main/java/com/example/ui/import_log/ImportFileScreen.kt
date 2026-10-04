@@ -51,6 +51,7 @@ fun ImportFileScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
+    val analysisStage by viewModel.analysisStage.collectAsState()
 
     var selectedFileName by remember { mutableStateOf<String?>(null) }
     var fileContent by remember { mutableStateOf<String?>(null) }
@@ -76,13 +77,6 @@ fun ImportFileScreen(
                     selectedFileName = name
                     fileContent = loaded.first
                     fileSizeKb = loaded.second
-                    if (loaded.third) {
-                        Toast.makeText(
-                            context,
-                            "Log grande: se usará una ventana segura de análisis.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
                 } catch (e: Exception) {
                     Toast.makeText(context, "Error al leer archivo: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -107,7 +101,10 @@ fun ImportFileScreen(
     }
 
     if (uiState is AnalysisUiState.Analyzing) {
-        AnalyzingScreen(currentStepText = "Escaneando archivo .ips y sensor array...")
+        AnalyzingScreen(
+            currentStepText = "Escaneando archivo .ips y sensor array...",
+            stage = analysisStage
+        )
         return
     }
 
