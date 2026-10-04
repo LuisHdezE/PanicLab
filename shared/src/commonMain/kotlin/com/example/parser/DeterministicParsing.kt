@@ -90,18 +90,10 @@ object MetadataExtractor {
     }
 
     private fun extractPanicString(text: String): String? {
-        val jsonPanic = Regex(
-            "\"panicString\"\\s*:\\s*\"((?:\\\\.|[^\"\\\\])*)\"",
-            setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
-        ).find(text)?.groupValues?.getOrNull(1)
+        val jsonPanic = extractJsonStringValue(text, "panicString")
 
         if (!jsonPanic.isNullOrEmpty()) {
             return jsonPanic
-                .replace("\\n", "\n")
-                .replace("\\r", "\r")
-                .replace("\\t", "\t")
-                .replace("\\\"", "\"")
-                .replace("\\\\", "\\")
         }
 
         val block = Regex(
@@ -120,6 +112,54 @@ object MetadataExtractor {
                 line.contains("ANS2", ignoreCase = true)
         }
         return panicLines.takeIf { it.isNotEmpty() }?.take(6)?.joinToString("\n")
+    }
+
+    private fun extractJsonStringValue(text: String, key: String): String? {
+        val keyToken = "\"$key\""
+        val keyIndex = text.indexOf(keyToken, ignoreCase = true)
+        if (keyIndex < 0) return null
+
+        var index = keyIndex + keyToken.length
+        while (index < text.length && text[index].isWhitespace()) index++
+        if (index >= text.length || text[index] != ':') return null
+
+        index++
+        while (index < text.length && text[index].isWhitespace()) index++
+        if (index >= text.length || text[index] != '"') return null
+
+        index++
+        val result = StringBuilder()
+        var escaped = false
+
+        while (index < text.length) {
+            val ch = text[index++]
+
+            if (escaped) {
+                when (ch) {
+                    'n' -> result.append('\n')
+                    'r' -> result.append('\r')
+                    't' -> result.append('\t')
+                    '"' -> result.append('"')
+                    '\\' -> result.append('\\')
+                    'b' -> result.append('\b')
+                    'f' -> result.append('\u000C')
+                    else -> {
+                        result.append('\\')
+                        result.append(ch)
+                    }
+                }
+                escaped = false
+                continue
+            }
+
+            when (ch) {
+                '\\' -> escaped = true
+                '"' -> return result.toString()
+                else -> result.append(ch)
+            }
+        }
+
+        return null
     }
 
     private fun findRegexMatch(text: String, pattern: String): String? = try {
