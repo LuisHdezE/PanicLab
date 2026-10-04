@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.domain.model.DiagnosticReport
+import com.example.domain.repository.DiagnosticAnalysisStage
 import com.example.domain.repository.DiagnosticRepository
 import com.example.domain.repository.SettingsRepository
 import com.example.util.PanicLogAnalysisWindow
@@ -42,6 +43,9 @@ class AnalysisViewModel(
 
     private val _uiState = MutableStateFlow<AnalysisUiState>(AnalysisUiState.Idle)
     val uiState: StateFlow<AnalysisUiState> = _uiState.asStateFlow()
+
+    private val _analysisStage = MutableStateFlow(DiagnosticAnalysisStage.PREPARING)
+    val analysisStage: StateFlow<DiagnosticAnalysisStage> = _analysisStage.asStateFlow()
 
     private val _logInputText = MutableStateFlow("")
     val logInputText: StateFlow<String> = _logInputText.asStateFlow()
@@ -147,6 +151,7 @@ class AnalysisViewModel(
     fun loadFromUri(context: Context, uri: Uri, filename: String?) {
         viewModelScope.launch {
             _uiState.value = AnalysisUiState.Analyzing
+            _analysisStage.value = DiagnosticAnalysisStage.PREPARING
             _selectedFilename.value = filename
             try {
                 val content = withContext(Dispatchers.IO) {
@@ -189,7 +194,8 @@ class AnalysisViewModel(
                     diagnosticRepository.analyzeLog(
                         rawLogContent = text,
                         sourceFilename = _selectedFilename.value,
-                        saveRawLog = saveRawLogs
+                        saveRawLog = saveRawLogs,
+                        onStage = { _analysisStage.value = it }
                     )
                 }
                 _uiState.value = AnalysisUiState.Success(report)
@@ -212,7 +218,8 @@ class AnalysisViewModel(
                 diagnosticRepository.analyzeLog(
                     rawLogContent = text,
                     sourceFilename = filename,
-                    saveRawLog = saveRawLogs
+                    saveRawLog = saveRawLogs,
+                    onStage = { _analysisStage.value = it }
                 )
             }
             _uiState.value = AnalysisUiState.Success(report)
