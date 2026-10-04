@@ -27,7 +27,6 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onNavigateBack: () -> Unit
 ) {
-    val darkMode by viewModel.darkMode.collectAsState()
     val saveRawLogs by viewModel.saveRawLogs.collectAsState()
     val redactIdentifiers by viewModel.redactIdentifiers.collectAsState()
     val kbVersion by viewModel.kbVersion.collectAsState()
@@ -190,54 +189,6 @@ fun SettingsScreen(
                                 onCheckedChange = { viewModel.setRedactIdentifiers(it) },
                                 modifier = Modifier.testTag("redact_identifiers_switch")
                             )
-                        }
-                    }
-                }
-            }
-
-            // Theme Preferences
-            item {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(22.dp),
-                    color = TechDarkCard,
-                    border = BorderStroke(1.dp, TechDarkBorder)
-                ) {
-                    Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text(
-                            text = "Tema Visual",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            val themeOptions = listOf(
-                                Triple("DARK", "Oscuro (Lab)", "theme_dark_chip"),
-                                Triple("SYSTEM", "Sistema", "theme_system_chip"),
-                                Triple("LIGHT", "Claro", "theme_light_chip")
-                            )
-                            themeOptions.forEach { (mode, label, tag) ->
-                                val isSelected = darkMode == mode
-                                Surface(
-                                    onClick = { viewModel.setDarkMode(mode) },
-                                    shape = RoundedCornerShape(12.dp),
-                                    color = if (isSelected) ElectricBlueContainer else TechDarkSurface,
-                                    border = BorderStroke(1.dp, if (isSelected) ElectricBlue else TechDarkBorder),
-                                    modifier = Modifier.testTag(tag)
-                                ) {
-                                    Text(
-                                        text = label,
-                                        fontSize = 12.sp,
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                        color = if (isSelected) ElectricCyanLight else Color(0xFF94A3B8),
-                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
-                                    )
-                                }
-                            }
                         }
                     }
                 }
