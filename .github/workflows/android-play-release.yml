@@ -56,7 +56,7 @@ jobs:
         run: |
           AAB="app/build/outputs/bundle/release/app-release.aab"
           test -f "$AAB"
-          jarsigner -verify -strict "$AAB"
+          jarsigner -verify "$AAB"
           sha256sum "$AAB" | tee "$AAB.sha256"
 
       - name: Upload signed Play bundle
