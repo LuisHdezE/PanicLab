@@ -57,6 +57,25 @@ class OcrLogExtractorTest {
     }
 
     @Test
+    fun testProcessScannedText_detectsIPhone15FacebookScreenshotPattern() {
+        val ocrSample = """
+            product : iPhone15,4
+            panicString : panic(cpu 0 caller 0xfffffff03e4c1a88): SMC PANIC - ASSERT target/vd37/vtarget.cpp:316: 0, SMC BSC failure
+            S.sensor array 0 - 5 is 0, 1048576, 0, 0, 0
+        """.trimIndent()
+
+        val result = OcrLogExtractor.processScannedText(ocrSample)
+
+        assertTrue(result.hasValidPanicSignatures)
+        assertEquals("iPhone15,4", result.detectedDeviceModel)
+        assertTrue(
+            "Should normalize 1048576 decimal to 0x100000",
+            result.detectedPanicCodes.any { it.equals("0x100000", ignoreCase = true) }
+        )
+        assertTrue(result.detectedKeywords.any { it.contains("SMC BSC Failure") })
+    }
+
+    @Test
     fun testProcessScannedText_emptyTextReturnsGracefulResult() {
         val result = OcrLogExtractor.processScannedText("")
         assertFalse(result.hasValidPanicSignatures)
