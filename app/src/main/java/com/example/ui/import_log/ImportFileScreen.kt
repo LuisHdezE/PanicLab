@@ -34,7 +34,7 @@ import com.example.ui.analysis.AnalysisViewModel
 import com.example.ui.analysis.AnalyzingScreen
 import com.example.ui.components.HexagonMicroscopeEmblem
 import com.example.ui.theme.*
-import java.io.BufferedReader
+import com.example.util.PanicLogTextDecoder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,13 +56,13 @@ fun ImportFileScreen(
     ) { uri: Uri? ->
         if (uri != null) {
             try {
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val text = inputStream?.bufferedReader()?.use(BufferedReader::readText) ?: ""
+                val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: ByteArray(0)
+                val text = PanicLogTextDecoder.decode(bytes)
                 var name = uri.lastPathSegment ?: "panic_log.ips"
                 if (name.contains("/")) name = name.substringAfterLast("/")
                 selectedFileName = name
                 fileContent = text
-                fileSizeKb = (text.toByteArray().size / 1024).toLong()
+                fileSizeKb = (bytes.size / 1024).toLong()
             } catch (e: Exception) {
                 Toast.makeText(context, "Error al leer archivo: ${e.message}", Toast.LENGTH_SHORT).show()
             }
