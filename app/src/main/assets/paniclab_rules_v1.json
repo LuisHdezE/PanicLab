@@ -118,7 +118,9 @@
       "variant": "X",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2017,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone10,6",
@@ -127,7 +129,9 @@
       "variant": "X",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2017,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone11,2",
@@ -136,7 +140,9 @@
       "variant": "XS",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2018,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone11,4",
@@ -145,7 +151,9 @@
       "variant": "XS_MAX",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2018,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone11,6",
@@ -154,7 +162,9 @@
       "variant": "XS_MAX",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2018,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone11,8",
@@ -163,7 +173,9 @@
       "variant": "XR",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2018,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone12,1",
@@ -172,7 +184,9 @@
       "variant": "11",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2019,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone12,3",
@@ -181,7 +195,9 @@
       "variant": "11_PRO",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2019,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone12,5",
@@ -190,7 +206,9 @@
       "variant": "11_PRO_MAX",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2019,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone12,8",
@@ -199,7 +217,9 @@
       "variant": "SE2",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2020,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone13,1",
@@ -208,7 +228,9 @@
       "variant": "12_MINI",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2020,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone13,2",
@@ -217,7 +239,9 @@
       "variant": "12",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2020,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone13,3",
@@ -226,7 +250,9 @@
       "variant": "12_PRO",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2020,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone13,4",
@@ -235,7 +261,9 @@
       "variant": "12_PRO_MAX",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2020,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone14,2",
@@ -244,7 +272,9 @@
       "variant": "13_PRO",
       "diagnosticProfile": "SMC_13",
       "releaseYear": 2021,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone14,3",
@@ -253,7 +283,9 @@
       "variant": "13_PRO_MAX",
       "diagnosticProfile": "SMC_13",
       "releaseYear": 2021,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone14,4",
@@ -262,7 +294,9 @@
       "variant": "13_MINI",
       "diagnosticProfile": "SMC_13_MINI",
       "releaseYear": 2021,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone14,5",
@@ -271,7 +305,9 @@
       "variant": "13",
       "diagnosticProfile": "SMC_13",
       "releaseYear": 2021,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone14,6",
@@ -280,7 +316,9 @@
       "variant": "SE3",
       "diagnosticProfile": "THERMAL_CLASSIC_X_TO_12",
       "releaseYear": 2022,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone14,7",
@@ -289,7 +327,9 @@
       "variant": "14",
       "diagnosticProfile": "SMC_14_BASE",
       "releaseYear": 2022,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone14,8",
@@ -298,7 +338,9 @@
       "variant": "14_PLUS",
       "diagnosticProfile": "SMC_14_BASE",
       "releaseYear": 2022,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone15,2",
@@ -307,7 +349,9 @@
       "variant": "14_PRO",
       "diagnosticProfile": "SMC_14_PRO",
       "releaseYear": 2022,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone15,3",
@@ -316,7 +360,9 @@
       "variant": "14_PRO_MAX",
       "diagnosticProfile": "SMC_14_PRO",
       "releaseYear": 2022,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone15,4",
@@ -325,7 +371,9 @@
       "variant": "15",
       "diagnosticProfile": "SMC_15_BASE",
       "releaseYear": 2023,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone15,5",
@@ -334,7 +382,9 @@
       "variant": "15_PLUS",
       "diagnosticProfile": "SMC_15_BASE",
       "releaseYear": 2023,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone16,1",
@@ -343,7 +393,9 @@
       "variant": "15_PRO",
       "diagnosticProfile": "SMC_15_PRO",
       "releaseYear": 2023,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone16,2",
@@ -352,7 +404,9 @@
       "variant": "15_PRO_MAX",
       "diagnosticProfile": "SMC_15_PRO",
       "releaseYear": 2023,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone17,1",
@@ -361,7 +415,9 @@
       "variant": "16_PRO",
       "diagnosticProfile": "SMC_16_PRO",
       "releaseYear": 2024,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone17,2",
@@ -370,7 +426,9 @@
       "variant": "16_PRO_MAX",
       "diagnosticProfile": "SMC_16_PRO",
       "releaseYear": 2024,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone17,3",
@@ -379,7 +437,9 @@
       "variant": "16",
       "diagnosticProfile": "SMC_16_BASE",
       "releaseYear": 2024,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone17,4",
@@ -388,7 +448,9 @@
       "variant": "16_PLUS",
       "diagnosticProfile": "SMC_16_BASE",
       "releaseYear": 2024,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone17,5",
@@ -397,7 +459,9 @@
       "variant": "16E",
       "diagnosticProfile": "SMC_16E",
       "releaseYear": 2025,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone18,1",
@@ -406,7 +470,9 @@
       "variant": "17_PRO",
       "diagnosticProfile": "SMC_17",
       "releaseYear": 2025,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone18,2",
@@ -415,7 +481,9 @@
       "variant": "17_PRO_MAX",
       "diagnosticProfile": "SMC_17",
       "releaseYear": 2025,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone18,3",
@@ -424,7 +492,9 @@
       "variant": "17",
       "diagnosticProfile": "SMC_17",
       "releaseYear": 2025,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone18,4",
@@ -433,7 +503,9 @@
       "variant": "AIR",
       "diagnosticProfile": "SMC_17",
       "releaseYear": 2025,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     },
     {
       "productCode": "iPhone18,5",
@@ -442,7 +514,9 @@
       "variant": "17E",
       "diagnosticProfile": "SMC_17E",
       "releaseYear": 2026,
-      "sourceIds": ["appledb_devices"]
+      "sourceIds": [
+        "appledb_devices"
+      ]
     }
   ],
   "panicClassifiers": [
@@ -451,8 +525,12 @@
       "family": "THERMAL_MISSING_SENSOR",
       "priority": 100,
       "match": {
-        "allTerms": ["thermalmonitord"],
-        "regexAny": ["Missing sensor\\(s\\)\\s*:"]
+        "allTerms": [
+          "thermalmonitord"
+        ],
+        "regexAny": [
+          "Missing sensor\\(s\\)\\s*:"
+        ]
       },
       "notes": "Missing required thermal/sensor check-in."
     },
@@ -461,7 +539,10 @@
       "family": "SMC_BSC_FAILURE",
       "priority": 100,
       "match": {
-        "allTerms": ["SMC", "BSC failure"]
+        "allTerms": [
+          "SMC",
+          "BSC failure"
+        ]
       },
       "notes": "SMC failed to receive expected communication from a sensor."
     },
@@ -475,7 +556,9 @@
           "SMC PANIC - ASSERTION FAILED",
           "ASSERTION FAILED"
         ],
-        "allTerms": ["SMC"]
+        "allTerms": [
+          "SMC"
+        ]
       },
       "notes": "SMC assertion family; may coexist with SMC_BSC_FAILURE."
     },
@@ -484,7 +567,10 @@
       "family": "AOP_NMI_POWER",
       "priority": 95,
       "match": {
-        "allTerms": ["AOP", "NMI POWER"]
+        "allTerms": [
+          "AOP",
+          "NMI POWER"
+        ]
       },
       "notes": "Always-On Processor non-maskable interrupt, power-related."
     },
@@ -493,7 +579,11 @@
       "family": "AOP_BOSCH_CONTROL",
       "priority": 95,
       "match": {
-        "allTerms": ["Bosch", "control channel", "write failure"]
+        "allTerms": [
+          "Bosch",
+          "control channel",
+          "write failure"
+        ]
       },
       "notes": "AOP Bosch control-channel failure."
     },
@@ -502,7 +592,10 @@
       "family": "ANS2",
       "priority": 95,
       "match": {
-        "anyTerms": ["ANS2 Recoverable Panic", "ANS2"]
+        "anyTerms": [
+          "ANS2 Recoverable Panic",
+          "ANS2"
+        ]
       },
       "notes": "Apple NAND Storage v2 subsystem."
     },
@@ -511,7 +604,10 @@
       "family": "APPLE_SOC_HOT",
       "priority": 95,
       "match": {
-        "anyTerms": ["AppleSocHot", "Hot Hot Hot"]
+        "anyTerms": [
+          "AppleSocHot",
+          "Hot Hot Hot"
+        ]
       },
       "notes": "SoC/power-management board-level thermal/power path."
     },
@@ -520,7 +616,10 @@
       "family": "SEP_ROM_BOOT",
       "priority": 95,
       "match": {
-        "anyTerms": ["SEP ROM Boot Panic", "SEP ROM"]
+        "anyTerms": [
+          "SEP ROM Boot Panic",
+          "SEP ROM"
+        ]
       },
       "notes": "Secure Enclave ROM/CPU communication."
     },
@@ -529,7 +628,9 @@
       "family": "UNDEFINED_KERNEL_INSTRUCTION",
       "priority": 90,
       "match": {
-        "allTerms": ["Undefined Kernel Instruction"]
+        "allTerms": [
+          "Undefined Kernel Instruction"
+        ]
       },
       "notes": "Software first; persistent cases may implicate RAM/NAND/board."
     },
@@ -538,7 +639,10 @@
       "family": "I2C",
       "priority": 80,
       "match": {
-        "regexAny": ["\\bi2c\\d*\\b", "\\bi²c\\b"]
+        "regexAny": [
+          "\\bi2c\\d*\\b",
+          "\\bi²c\\b"
+        ]
       },
       "notes": "Bus/channel requires model-specific schematic context."
     },
@@ -547,7 +651,11 @@
       "family": "DCP_DISPLAY",
       "priority": 70,
       "match": {
-        "regexAny": ["\\bDCP\\b", "iomfb", "display coprocessor"]
+        "regexAny": [
+          "\\bDCP\\b",
+          "iomfb",
+          "display coprocessor"
+        ]
       },
       "notes": "Classification only in v1; no automatic part diagnosis."
     },
@@ -556,7 +664,11 @@
       "family": "BASEBAND",
       "priority": 70,
       "match": {
-        "regexAny": ["\\bbaseband\\b", "AppleBaseband", "\\bBB[A-Z_]*\\b"]
+        "regexAny": [
+          "\\bbaseband\\b",
+          "AppleBaseband",
+          "\\bBB[A-Z_]*\\b"
+        ]
       },
       "notes": "Classification only in v1; no automatic part diagnosis."
     },
@@ -565,8 +677,13 @@
       "family": "WATCHDOG_NO_CHECKIN",
       "priority": 50,
       "match": {
-        "anyTerms": ["watchdog timeout", "userspace watchdog timeout"],
-        "notRegex": ["Missing sensor\\(s\\)\\s*:"]
+        "anyTerms": [
+          "watchdog timeout",
+          "userspace watchdog timeout"
+        ],
+        "notRegex": [
+          "Missing sensor\\(s\\)\\s*:"
+        ]
       },
       "notes": "No missing-sensor token; often software/process check-in related."
     }
@@ -575,20 +692,34 @@
     {
       "diagnosticProfile": "SMC_13",
       "enabled": true,
-      "knownBits": ["0x800", "0x1000", "0x4000"],
+      "knownBits": [
+        "0x800",
+        "0x1000",
+        "0x4000"
+      ],
       "exactRulesAlwaysWin": true,
       "notes": "0x1800 exists as an explicit multi-part rule. Treat conflicting aliases 0x10000/0x40000 separately."
     },
     {
       "diagnosticProfile": "SMC_13_MINI",
       "enabled": true,
-      "knownBits": ["0x400", "0x800", "0x1000", "0x4000"],
+      "knownBits": [
+        "0x400",
+        "0x800",
+        "0x1000",
+        "0x4000"
+      ],
       "exactRulesAlwaysWin": true
     },
     {
       "diagnosticProfile": "SMC_14_PRO",
       "enabled": true,
-      "knownBits": ["0x20000", "0x40000", "0x80000", "0x100000"],
+      "knownBits": [
+        "0x20000",
+        "0x40000",
+        "0x80000",
+        "0x100000"
+      ],
       "exactRulesAlwaysWin": true,
       "notes": "0xC0000 is an explicit exact combination."
     },
@@ -650,12 +781,19 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["THERMAL_CLASSIC_X_TO_12"],
+        "diagnosticProfiles": [
+          "THERMAL_CLASSIC_X_TO_12"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["THERMAL_MISSING_SENSOR"],
-        "sensorTokensAny": ["PRS0", "Prs0"],
+        "panicFamiliesAny": [
+          "THERMAL_MISSING_SENSOR"
+        ],
+        "sensorTokensAny": [
+          "PRS0",
+          "Prs0"
+        ],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
         "rawTermsAny": []
@@ -694,7 +832,9 @@
           "Que el teléfono cargue no demuestra que el sensor del flex esté comunicando."
         ]
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -703,12 +843,19 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["THERMAL_CLASSIC_X_TO_12"],
+        "diagnosticProfiles": [
+          "THERMAL_CLASSIC_X_TO_12"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["THERMAL_MISSING_SENSOR"],
-        "sensorTokensAny": ["Mic1", "mic1"],
+        "panicFamiliesAny": [
+          "THERMAL_MISSING_SENSOR"
+        ],
+        "sensorTokensAny": [
+          "Mic1",
+          "mic1"
+        ],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
         "rawTermsAny": []
@@ -745,7 +892,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -754,12 +903,19 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["THERMAL_CLASSIC_X_TO_12"],
+        "diagnosticProfiles": [
+          "THERMAL_CLASSIC_X_TO_12"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["THERMAL_MISSING_SENSOR"],
-        "sensorTokensAny": ["Mic2", "mic2"],
+        "panicFamiliesAny": [
+          "THERMAL_MISSING_SENSOR"
+        ],
+        "sensorTokensAny": [
+          "Mic2",
+          "mic2"
+        ],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
         "rawTermsAny": []
@@ -798,7 +954,9 @@
           "No reemplazar un 'micrófono' aislado sin localizar primero el ensamblaje de ese modelo."
         ]
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -807,12 +965,19 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["THERMAL_CLASSIC_X_TO_12"],
+        "diagnosticProfiles": [
+          "THERMAL_CLASSIC_X_TO_12"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["THERMAL_MISSING_SENSOR"],
-        "sensorTokensAny": ["TG0V", "tg0v"],
+        "panicFamiliesAny": [
+          "THERMAL_MISSING_SENSOR"
+        ],
+        "sensorTokensAny": [
+          "TG0V",
+          "tg0v"
+        ],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
         "rawTermsAny": []
@@ -849,7 +1014,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -858,12 +1025,19 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["THERMAL_CLASSIC_X_TO_12"],
+        "diagnosticProfiles": [
+          "THERMAL_CLASSIC_X_TO_12"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["THERMAL_MISSING_SENSOR"],
-        "sensorTokensAny": ["TG0B", "tg0b"],
+        "panicFamiliesAny": [
+          "THERMAL_MISSING_SENSOR"
+        ],
+        "sensorTokensAny": [
+          "TG0B",
+          "tg0b"
+        ],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
         "rawTermsAny": []
@@ -900,7 +1074,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -910,11 +1086,21 @@
       "priority": 120,
       "deviceScope": {
         "diagnosticProfiles": [],
-        "productCodes": ["iPhone12,3", "iPhone12,5"]
+        "productCodes": [
+          "iPhone12,3",
+          "iPhone12,5"
+        ]
       },
       "match": {
-        "panicFamiliesAny": ["THERMAL_MISSING_SENSOR"],
-        "sensorTokensAny": ["TG0B", "TG0V", "tg0b", "tg0v"],
+        "panicFamiliesAny": [
+          "THERMAL_MISSING_SENSOR"
+        ],
+        "sensorTokensAny": [
+          "TG0B",
+          "TG0V",
+          "tg0b",
+          "tg0v"
+        ],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
         "rawTermsAny": []
@@ -955,7 +1141,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -968,7 +1156,9 @@
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["WATCHDOG_NO_CHECKIN"],
+        "panicFamiliesAny": [
+          "WATCHDOG_NO_CHECKIN"
+        ],
         "sensorTokensAny": [],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
@@ -998,7 +1188,9 @@
           "No aplicar reglas de sensores si no existe Missing sensor(s)."
         ]
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -1011,7 +1203,9 @@
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["I2C"],
+        "panicFamiliesAny": [
+          "I2C"
+        ],
         "sensorTokensAny": [],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
@@ -1042,7 +1236,9 @@
           "No asignar una pieza universal a i2c0/i2c1/i2c2/i2c3."
         ]
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -1055,7 +1251,9 @@
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["AOP_NMI_POWER"],
+        "panicFamiliesAny": [
+          "AOP_NMI_POWER"
+        ],
         "sensorTokensAny": [],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
@@ -1092,7 +1290,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -1105,7 +1305,9 @@
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["AOP_BOSCH_CONTROL"],
+        "panicFamiliesAny": [
+          "AOP_BOSCH_CONTROL"
+        ],
         "sensorTokensAny": [],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
@@ -1142,7 +1344,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -1155,7 +1359,9 @@
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["ANS2"],
+        "panicFamiliesAny": [
+          "ANS2"
+        ],
         "sensorTokensAny": [],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
@@ -1195,7 +1401,9 @@
           "La sustitución de NAND exige equipamiento y manejo de datos únicos."
         ]
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -1208,7 +1416,9 @@
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["APPLE_SOC_HOT"],
+        "panicFamiliesAny": [
+          "APPLE_SOC_HOT"
+        ],
         "sensorTokensAny": [],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
@@ -1243,7 +1453,9 @@
           "No asumir que el problema es simplemente una batería caliente."
         ]
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -1256,7 +1468,9 @@
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SEP_ROM_BOOT"],
+        "panicFamiliesAny": [
+          "SEP_ROM_BOOT"
+        ],
         "sensorTokensAny": [],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
@@ -1291,7 +1505,9 @@
           "Los datos asociados al SEP son únicos; una intervención incorrecta puede comprometer la recuperación."
         ]
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -1304,7 +1520,9 @@
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["UNDEFINED_KERNEL_INSTRUCTION"],
+        "panicFamiliesAny": [
+          "UNDEFINED_KERNEL_INSTRUCTION"
+        ],
         "sensorTokensAny": [],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
@@ -1332,7 +1550,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_kernel_panics"],
+      "sourceIds": [
+        "ifixit_kernel_panics"
+      ],
       "notes": null
     },
     {
@@ -1345,7 +1565,9 @@
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["DCP_DISPLAY"],
+        "panicFamiliesAny": [
+          "DCP_DISPLAY"
+        ],
         "sensorTokensAny": [],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
@@ -1388,7 +1610,9 @@
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["BASEBAND"],
+        "panicFamiliesAny": [
+          "BASEBAND"
+        ],
         "sensorTokensAny": [],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
@@ -1427,13 +1651,21 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_13", "SMC_13_MINI"],
+        "diagnosticProfiles": [
+          "SMC_13",
+          "SMC_13_MINI"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x800"],
+        "sensorCodesExactAny": [
+          "0x800"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -1482,13 +1714,21 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_13", "SMC_13_MINI"],
+        "diagnosticProfiles": [
+          "SMC_13",
+          "SMC_13_MINI"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x1000"],
+        "sensorCodesExactAny": [
+          "0x1000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -1538,13 +1778,21 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_13", "SMC_13_MINI"],
+        "diagnosticProfiles": [
+          "SMC_13",
+          "SMC_13_MINI"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x10000"],
+        "sensorCodesExactAny": [
+          "0x10000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -1589,13 +1837,21 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_13", "SMC_13_MINI"],
+        "diagnosticProfiles": [
+          "SMC_13",
+          "SMC_13_MINI"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x4000"],
+        "sensorCodesExactAny": [
+          "0x4000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -1644,13 +1900,21 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_13", "SMC_13_MINI"],
+        "diagnosticProfiles": [
+          "SMC_13",
+          "SMC_13_MINI"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x40000"],
+        "sensorCodesExactAny": [
+          "0x40000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -1696,12 +1960,19 @@
       "priority": 130,
       "deviceScope": {
         "diagnosticProfiles": [],
-        "productCodes": ["iPhone14,4"]
+        "productCodes": [
+          "iPhone14,4"
+        ]
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x400"],
+        "sensorCodesExactAny": [
+          "0x400"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -1748,13 +2019,21 @@
       "active": true,
       "priority": 150,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_13", "SMC_13_MINI"],
+        "diagnosticProfiles": [
+          "SMC_13",
+          "SMC_13_MINI"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x1800"],
+        "sensorCodesExactAny": [
+          "0x1800"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -1791,7 +2070,9 @@
           "Usar esta regla exacta antes de cualquier descomposición bitwise."
         ]
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -1800,13 +2081,20 @@
       "active": true,
       "priority": 120,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_14_BASE"],
+        "diagnosticProfiles": [
+          "SMC_14_BASE"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x100000"],
+        "sensorCodesExactAny": [
+          "0x100000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -1841,7 +2129,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -1850,13 +2140,20 @@
       "active": true,
       "priority": 120,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_14_BASE"],
+        "diagnosticProfiles": [
+          "SMC_14_BASE"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x200000"],
+        "sensorCodesExactAny": [
+          "0x200000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -1891,7 +2188,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -1900,13 +2199,20 @@
       "active": true,
       "priority": 120,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_14_BASE"],
+        "diagnosticProfiles": [
+          "SMC_14_BASE"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x400000"],
+        "sensorCodesExactAny": [
+          "0x400000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -1941,7 +2247,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -1950,13 +2258,20 @@
       "active": true,
       "priority": 160,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_14_BASE"],
+        "diagnosticProfiles": [
+          "SMC_14_BASE"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x500000"],
+        "sensorCodesExactAny": [
+          "0x500000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -1993,7 +2308,9 @@
           "No descomponer este valor si existe una regla exacta para el modelo."
         ]
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -2002,13 +2319,20 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_14_PRO"],
+        "diagnosticProfiles": [
+          "SMC_14_PRO"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x41"],
+        "sensorCodesExactAny": [
+          "0x41"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2042,7 +2366,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -2051,13 +2377,20 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_14_PRO"],
+        "diagnosticProfiles": [
+          "SMC_14_PRO"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x20000"],
+        "sensorCodesExactAny": [
+          "0x20000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2091,7 +2424,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -2100,13 +2435,20 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_14_PRO"],
+        "diagnosticProfiles": [
+          "SMC_14_PRO"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x40000"],
+        "sensorCodesExactAny": [
+          "0x40000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2140,7 +2482,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -2149,13 +2493,20 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_14_PRO"],
+        "diagnosticProfiles": [
+          "SMC_14_PRO"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x80000"],
+        "sensorCodesExactAny": [
+          "0x80000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2189,7 +2540,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -2198,13 +2551,20 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_14_PRO"],
+        "diagnosticProfiles": [
+          "SMC_14_PRO"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x100000"],
+        "sensorCodesExactAny": [
+          "0x100000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2238,7 +2598,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -2247,13 +2609,20 @@
       "active": true,
       "priority": 150,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_14_PRO"],
+        "diagnosticProfiles": [
+          "SMC_14_PRO"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0xC0000"],
+        "sensorCodesExactAny": [
+          "0xC0000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2290,7 +2659,9 @@
           "Regla exacta de combinación; debe evaluarse antes de descomposición genérica."
         ]
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -2299,13 +2670,20 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_15_BASE"],
+        "diagnosticProfiles": [
+          "SMC_15_BASE"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0xA1"],
+        "sensorCodesExactAny": [
+          "0xA1"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2339,7 +2717,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -2348,13 +2728,20 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_15_BASE"],
+        "diagnosticProfiles": [
+          "SMC_15_BASE"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x80000"],
+        "sensorCodesExactAny": [
+          "0x80000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2400,13 +2787,20 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_15_BASE"],
+        "diagnosticProfiles": [
+          "SMC_15_BASE"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x100000"],
+        "sensorCodesExactAny": [
+          "0x100000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2440,7 +2834,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -2449,13 +2845,20 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_15_BASE"],
+        "diagnosticProfiles": [
+          "SMC_15_BASE"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x200000"],
+        "sensorCodesExactAny": [
+          "0x200000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2489,7 +2892,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -2498,13 +2903,20 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_15_PRO"],
+        "diagnosticProfiles": [
+          "SMC_15_PRO"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0xA1"],
+        "sensorCodesExactAny": [
+          "0xA1"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2538,7 +2950,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -2547,13 +2961,20 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_15_PRO"],
+        "diagnosticProfiles": [
+          "SMC_15_PRO"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x300000"],
+        "sensorCodesExactAny": [
+          "0x300000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2587,7 +3008,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -2596,13 +3019,20 @@
       "active": true,
       "priority": 100,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_15_PRO"],
+        "diagnosticProfiles": [
+          "SMC_15_PRO"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x400000"],
+        "sensorCodesExactAny": [
+          "0x400000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2636,7 +3066,9 @@
         ],
         "cautions": []
       },
-      "sourceIds": ["ifixit_smc_assert"],
+      "sourceIds": [
+        "ifixit_smc_assert"
+      ],
       "notes": null
     },
     {
@@ -2645,32 +3077,44 @@
       "active": true,
       "priority": 140,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_16_PRO"],
+        "diagnosticProfiles": [
+          "SMC_16_PRO"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["3145728", "0x300000"],
+        "sensorCodesExactAny": [
+          "3145728",
+          "0x300000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
       "diagnosis": {
-        "label": "Puerto de carga",
+        "label": "Ruta inferior: puerto de carga / barómetro",
         "subsystem": "SMC_SENSOR",
         "suspectedComponents": [
           {
-            "name": "Charge Port Assembly",
-            "role": "PRIMARY"
+            "name": "Charge Port Assembly / USB-C flex",
+            "role": "CANDIDATE"
           },
           {
-            "name": "Charge-port FPC / board communication path",
+            "name": "Bottom microphone / barometer module",
+            "role": "CANDIDATE"
+          },
+          {
+            "name": "Associated connectors / board communication path",
             "role": "SECONDARY"
           }
         ],
-        "interpretation": "La tabla SMC actual documenta 3145728 como charge-port assembly en 16 Pro/Pro Max; 3145728 equivale a 0x300000."
+        "interpretation": "En iPhone 16 Pro/Pro Max, 3145728 (0x300000) orienta a la ruta inferior. Hay casos independientes resueltos con flex USB-C y con módulo de micrófono/barómetro. Verificar cada componente y sus conexiones por separado; no indicar sustitución automática de puerto. Evidencia comunitaria pendiente de revisión humana."
       },
-      "confidence": "HIGH",
+      "confidence": "MEDIUM",
       "verificationStatus": "WELL_DOCUMENTED",
       "primaryEligible": true,
       "exactCodeOnly": true,
@@ -2698,13 +3142,21 @@
       "active": true,
       "priority": 90,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_16_PRO"],
+        "diagnosticProfiles": [
+          "SMC_16_PRO"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["1048576", "0x100000"],
+        "sensorCodesExactAny": [
+          "1048576",
+          "0x100000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2737,7 +3189,9 @@
           "No está todavía en la tabla oficial comunitaria principal de iFixit para 16 Pro/Max."
         ]
       },
-      "sourceIds": ["ifixit_16_series_charge_community"],
+      "sourceIds": [
+        "ifixit_16_series_charge_community"
+      ],
       "notes": null
     },
     {
@@ -2746,13 +3200,21 @@
       "active": true,
       "priority": 40,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_16_PRO"],
+        "diagnosticProfiles": [
+          "SMC_16_PRO"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["2097152", "0x200000"],
+        "sensorCodesExactAny": [
+          "2097152",
+          "0x200000"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2785,7 +3247,9 @@
           "Esta regla no puede producir por sí sola un diagnóstico principal."
         ]
       },
-      "sourceIds": ["ifixit_16_series_charge_community"],
+      "sourceIds": [
+        "ifixit_16_series_charge_community"
+      ],
       "notes": null
     },
     {
@@ -2794,13 +3258,21 @@
       "active": true,
       "priority": 50,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_16_BASE"],
+        "diagnosticProfiles": [
+          "SMC_16_BASE"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x300000", "3145728"],
+        "sensorCodesExactAny": [
+          "0x300000",
+          "3145728"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2833,7 +3305,9 @@
           "No puede ser diagnóstico principal automático en este Rule Pack v1."
         ]
       },
-      "sourceIds": ["ifixit_16_series_charge_community"],
+      "sourceIds": [
+        "ifixit_16_series_charge_community"
+      ],
       "notes": null
     },
     {
@@ -2842,13 +3316,21 @@
       "active": true,
       "priority": 35,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_16_BASE"],
+        "diagnosticProfiles": [
+          "SMC_16_BASE"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x100000", "1048576"],
+        "sensorCodesExactAny": [
+          "0x100000",
+          "1048576"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2881,7 +3363,9 @@
           "No puede generar diagnóstico principal automático."
         ]
       },
-      "sourceIds": ["ifixit_16_series_charge_community"],
+      "sourceIds": [
+        "ifixit_16_series_charge_community"
+      ],
       "notes": null
     },
     {
@@ -2890,13 +3374,21 @@
       "active": true,
       "priority": 50,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_16E"],
+        "diagnosticProfiles": [
+          "SMC_16E"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x300000", "3145728"],
+        "sensorCodesExactAny": [
+          "0x300000",
+          "3145728"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2929,7 +3421,9 @@
           "No puede ser diagnóstico principal automático en este Rule Pack v1."
         ]
       },
-      "sourceIds": ["ifixit_16_series_charge_community"],
+      "sourceIds": [
+        "ifixit_16_series_charge_community"
+      ],
       "notes": null
     },
     {
@@ -2938,13 +3432,21 @@
       "active": true,
       "priority": 35,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_16E"],
+        "diagnosticProfiles": [
+          "SMC_16E"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x100000", "1048576"],
+        "sensorCodesExactAny": [
+          "0x100000",
+          "1048576"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -2977,7 +3479,9 @@
           "No puede generar diagnóstico principal automático."
         ]
       },
-      "sourceIds": ["ifixit_16_series_charge_community"],
+      "sourceIds": [
+        "ifixit_16_series_charge_community"
+      ],
       "notes": null
     },
     {
@@ -2986,13 +3490,21 @@
       "active": true,
       "priority": 50,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_17"],
+        "diagnosticProfiles": [
+          "SMC_17"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x300000", "3145728"],
+        "sensorCodesExactAny": [
+          "0x300000",
+          "3145728"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -3025,7 +3537,9 @@
           "No puede ser diagnóstico principal automático en este Rule Pack v1."
         ]
       },
-      "sourceIds": ["ifixit_16_series_charge_community"],
+      "sourceIds": [
+        "ifixit_16_series_charge_community"
+      ],
       "notes": null
     },
     {
@@ -3034,13 +3548,21 @@
       "active": true,
       "priority": 35,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_17"],
+        "diagnosticProfiles": [
+          "SMC_17"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x100000", "1048576"],
+        "sensorCodesExactAny": [
+          "0x100000",
+          "1048576"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -3073,7 +3595,9 @@
           "No puede generar diagnóstico principal automático."
         ]
       },
-      "sourceIds": ["ifixit_16_series_charge_community"],
+      "sourceIds": [
+        "ifixit_16_series_charge_community"
+      ],
       "notes": null
     },
     {
@@ -3082,13 +3606,21 @@
       "active": true,
       "priority": 50,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_17E"],
+        "diagnosticProfiles": [
+          "SMC_17E"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x300000", "3145728"],
+        "sensorCodesExactAny": [
+          "0x300000",
+          "3145728"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -3121,7 +3653,9 @@
           "No puede ser diagnóstico principal automático en este Rule Pack v1."
         ]
       },
-      "sourceIds": ["ifixit_16_series_charge_community"],
+      "sourceIds": [
+        "ifixit_16_series_charge_community"
+      ],
       "notes": null
     },
     {
@@ -3130,13 +3664,21 @@
       "active": true,
       "priority": 35,
       "deviceScope": {
-        "diagnosticProfiles": ["SMC_17E"],
+        "diagnosticProfiles": [
+          "SMC_17E"
+        ],
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
-        "sensorCodesExactAny": ["0x100000", "1048576"],
+        "sensorCodesExactAny": [
+          "0x100000",
+          "1048576"
+        ],
         "requiredTermsAll": [],
         "rawTermsAny": []
       },
@@ -3169,7 +3711,9 @@
           "No puede generar diagnóstico principal automático."
         ]
       },
-      "sourceIds": ["ifixit_16_series_charge_community"],
+      "sourceIds": [
+        "ifixit_16_series_charge_community"
+      ],
       "notes": null
     },
     {
@@ -3182,7 +3726,10 @@
         "productCodes": []
       },
       "match": {
-        "panicFamiliesAny": ["SMC_BSC_FAILURE", "SMC_ASSERTION"],
+        "panicFamiliesAny": [
+          "SMC_BSC_FAILURE",
+          "SMC_ASSERTION"
+        ],
         "sensorTokensAny": [],
         "sensorCodesExactAny": [],
         "requiredTermsAll": [],
