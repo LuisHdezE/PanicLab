@@ -2656,31 +2656,31 @@
         "rawTermsAny": []
       },
       "diagnosis": {
-        "label": "Puerto de carga",
+        "label": "Ruta inferior: USB-C / barómetro",
         "subsystem": "SMC_SENSOR",
         "suspectedComponents": [
           {
             "name": "Charge Port Assembly",
-            "role": "PRIMARY"
+            "role": "CANDIDATE"
           },
           {
-            "name": "Charge-port FPC / board communication path",
-            "role": "SECONDARY"
+            "name": "Bottom microphone / barometer module",
+            "role": "CANDIDATE"
           }
         ],
-        "interpretation": "La tabla SMC actual documenta 3145728 como charge-port assembly en 16 Pro/Pro Max; 3145728 equivale a 0x300000."
+        "interpretation": "0x300000 puede involucrar puerto USB-C o módulo inferior micrófono/barómetro: dos reparaciones independientes confirmaron rutas diferentes. Verificar conexiones y componentes antes de sustituir piezas."
       },
-      "confidence": "HIGH",
-      "verificationStatus": "WELL_DOCUMENTED",
+      "confidence": "MEDIUM",
+      "verificationStatus": "COMMUNITY_SUPPORTED",
       "primaryEligible": true,
       "exactCodeOnly": true,
       "allowBitmaskDecomposition": false,
       "repairFlow": {
         "firstChecks": [
-          "Inspeccionar USB-C/charge-port flex y FPC",
+          "Inspeccionar flex USB-C, módulo micrófono/barómetro y sus conectores",
           "Buscar líquido/corrosión"
         ],
-        "knownGoodTest": "Probar charge-port assembly conocido como bueno.",
+        "knownGoodTest": "Aislar y probar por separado flex USB-C y módulo micrófono/barómetro conocidos como buenos.",
         "boardLevelNextSteps": [
           "Modo diodo del conector y líneas de comunicación si persiste"
         ],
