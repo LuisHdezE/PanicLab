@@ -2664,23 +2664,23 @@
             "role": "CANDIDATE"
           },
           {
-            "name": "Charge-port FPC / board communication path",
-            "role": "SECONDARY"
+            "name": "Bottom microphone / barometer module",
+            "role": "CANDIDATE"
           }
         ],
         "interpretation": "0x300000 puede involucrar puerto USB-C o módulo inferior micrófono/barómetro: dos reparaciones independientes confirmaron rutas diferentes. Verificar conexiones y componentes antes de sustituir piezas."
       },
       "confidence": "MEDIUM",
       "verificationStatus": "COMMUNITY_SUPPORTED",
-      "primaryEligible": false,
+      "primaryEligible": true,
       "exactCodeOnly": true,
       "allowBitmaskDecomposition": false,
       "repairFlow": {
         "firstChecks": [
-          "Inspeccionar USB-C/charge-port flex y FPC",
+          "Inspeccionar flex USB-C, módulo micrófono/barómetro y sus conectores",
           "Buscar líquido/corrosión"
         ],
-        "knownGoodTest": "Probar charge-port assembly conocido como bueno.",
+        "knownGoodTest": "Aislar y probar por separado flex USB-C y módulo micrófono/barómetro conocidos como buenos.",
         "boardLevelNextSteps": [
           "Modo diodo del conector y líneas de comunicación si persiste"
         ],
