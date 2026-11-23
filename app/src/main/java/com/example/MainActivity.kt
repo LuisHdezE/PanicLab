@@ -22,8 +22,6 @@ import com.example.data.repository.KnowledgeBaseRepositoryImpl
 import com.example.data.repository.SettingsRepositoryImpl
 import com.example.navigation.PanicLabNavGraph
 import com.example.navigation.Screen
-import com.example.release.TrialAccessManager
-import com.example.release.TrialExpiredScreen
 import com.example.ui.analysis.AnalysisViewModel
 import com.example.ui.analysis.AnalysisViewModelFactory
 import com.example.ui.history.HistoryViewModel
@@ -46,7 +44,6 @@ class MainActivity : ComponentActivity() {
 
         val database = AppDatabase.getDatabase(applicationContext)
         val dataStoreManager = DataStoreManager(applicationContext)
-        val trialAccessManager = TrialAccessManager(applicationContext)
 
         val kbRepository = KnowledgeBaseRepositoryImpl(applicationContext, database)
         val settingsRepository = SettingsRepositoryImpl(dataStoreManager)
@@ -82,77 +79,63 @@ class MainActivity : ComponentActivity() {
 
             PanicLabTheme(darkTheme = true) {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    var trialState by remember { mutableStateOf(trialAccessManager.currentState()) }
+                    val navController = rememberNavController()
+                    val analysisUiState by analysisViewModel.uiState.collectAsState()
 
-                    if (trialState.canUseApp) {
-                        val navController = rememberNavController()
-                        val analysisUiState by analysisViewModel.uiState.collectAsState()
+                    LaunchedEffect(externalFileAnalysisActive, analysisUiState) {
+                        if (!externalFileAnalysisActive) return@LaunchedEffect
 
-                        LaunchedEffect(externalFileAnalysisActive, analysisUiState) {
-                            if (!externalFileAnalysisActive) return@LaunchedEffect
-
-                            when (val state = analysisUiState) {
-                                is com.example.ui.analysis.AnalysisUiState.Analyzing -> {
-                                    if (navController.currentDestination?.route != Screen.ImportFile.route) {
-                                        navController.navigate(Screen.ImportFile.route) {
-                                            launchSingleTop = true
-                                        }
+                        when (val state = analysisUiState) {
+                            is com.example.ui.analysis.AnalysisUiState.Analyzing -> {
+                                if (navController.currentDestination?.route != Screen.ImportFile.route) {
+                                    navController.navigate(Screen.ImportFile.route) {
+                                        launchSingleTop = true
                                     }
                                 }
-
-                                is com.example.ui.analysis.AnalysisUiState.Success -> {
-                                    externalFileAnalysisActive = false
-                                    val currentRoute = navController.currentDestination?.route
-                                    val localAnalysisRoutes = setOf(
-                                        Screen.ImportFile.route,
-                                        Screen.PasteLog.route,
-                                        Screen.CameraScanner.route
-                                    )
-                                    if (currentRoute !in localAnalysisRoutes) {
-                                        navController.navigate(Screen.Result.createRoute(state.report.id)) {
-                                            launchSingleTop = true
-                                        }
-                                        analysisViewModel.resetState()
-                                    }
-                                }
-
-                                is com.example.ui.analysis.AnalysisUiState.Error -> {
-                                    externalFileAnalysisActive = false
-                                    if (navController.currentDestination?.route != Screen.ImportFile.route) {
-                                        navController.navigate(Screen.ImportFile.route) {
-                                            launchSingleTop = true
-                                        }
-                                    }
-                                }
-
-                                else -> Unit
                             }
+
+                            is com.example.ui.analysis.AnalysisUiState.Success -> {
+                                externalFileAnalysisActive = false
+                                val currentRoute = navController.currentDestination?.route
+                                val localAnalysisRoutes = setOf(
+                                    Screen.ImportFile.route,
+                                    Screen.PasteLog.route,
+                                    Screen.CameraScanner.route
+                                )
+                                if (currentRoute !in localAnalysisRoutes) {
+                                    navController.navigate(Screen.Result.createRoute(state.report.id)) {
+                                        launchSingleTop = true
+                                    }
+                                    analysisViewModel.resetState()
+                                }
+                            }
+
+                            is com.example.ui.analysis.AnalysisUiState.Error -> {
+                                externalFileAnalysisActive = false
+                                if (navController.currentDestination?.route != Screen.ImportFile.route) {
+                                    navController.navigate(Screen.ImportFile.route) {
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+
+                            else -> Unit
                         }
-
-                        PanicLabNavGraph(
-                            navController = navController,
-                            diagnosticRepository = diagnosticRepository,
-                            kbRepository = kbRepository,
-                            settingsRepository = settingsRepository,
-                            analysisViewModel = analysisViewModel,
-                            historyViewModel = historyViewModel,
-                            kbViewModel = kbViewModel,
-                            settingsViewModel = settingsViewModel,
-                            trendDashboardViewModel = trendDashboardViewModel,
-                            recentReports = recentReports,
-                            kbVersion = kbVersion
-                        )
-                    } else {
-                        TrialExpiredScreen(
-                            onActivate = { code ->
-                                val activated = trialAccessManager.activate(code)
-                                if (activated) {
-                                    trialState = trialAccessManager.currentState()
-                                }
-                                activated
-                            }
-                        )
                     }
+
+                    PanicLabNavGraph(
+                        navController = navController,
+                        diagnosticRepository = diagnosticRepository,
+                        kbRepository = kbRepository,
+                        settingsRepository = settingsRepository,
+                        analysisViewModel = analysisViewModel,
+                        historyViewModel = historyViewModel,
+                        kbViewModel = kbViewModel,
+                        settingsViewModel = settingsViewModel,
+                        trendDashboardViewModel = trendDashboardViewModel,
+                        recentReports = recentReports,
+                        kbVersion = kbVersion
+                    )
                 }
             }
         }
