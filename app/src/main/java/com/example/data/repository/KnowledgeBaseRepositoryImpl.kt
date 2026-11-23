@@ -80,7 +80,8 @@ class KnowledgeBaseRepositoryImpl(
 
             val activePack = rulePackDao.getActiveRulePack()
             val existingRules = ruleDao.getAllRulesDirect()
-            if (activePack != null && existingRules.isNotEmpty()) {
+            val hasActiveRules = activePack != null && existingRules.isNotEmpty()
+            if (hasActiveRules && activePack?.origin != RulePackOrigin.BUNDLED.name) {
                 initializationChecked = true
                 return@withLock false
             }
@@ -97,6 +98,11 @@ class KnowledgeBaseRepositoryImpl(
                     sourceFilename = "paniclab_rules_v1.json"
                 )
 
+                if (hasActiveRules && activePack?.version == parseResult.rulePackEntity.version) {
+                    initializationChecked = true
+                    return@withLock false
+                }
+
                 database.withTransaction {
                     deviceDao.deleteAll()
                     ruleDao.deleteAll()
@@ -105,7 +111,11 @@ class KnowledgeBaseRepositoryImpl(
                     deviceDao.insertAll(parseResult.deviceModelEntities)
                     ruleDao.insertAll(parseResult.diagnosticRuleEntities)
                     rulePackDao.insertRulePack(
-                        parseResult.rulePackEntity.copy(isActive = true, isDefault = true)
+                        parseResult.rulePackEntity.copy(
+                            isActive = true,
+                            isDefault = true,
+                            previousVersion = activePack?.version
+                        )
                     )
                 }
 
